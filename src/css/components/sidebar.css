@@ -1,0 +1,131 @@
+
+  @layer components {
+  .member-item {
+    @apply flex items-center p-3 mb-2 rounded-lg cursor-pointer transition-all duration-300;
+  }
+
+  .member-item.online {
+    @apply opacity-100;
+  }
+
+  .member-item.offline {
+    @apply opacity-60;
+  }
+
+  .member-avatar-container {
+    @apply relative inline-block;
+  }
+
+  .member-status {
+    @apply absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-slate-800;
+  }
+
+  .member-status.online {
+    @apply bg-green-500;
+  }
+
+  .member-status.offline {
+    @apply bg-slate-500;
+  } 
+  .member-avatar {
+    @apply w-8 h-8 rounded-full object-cover mr-3;
+  }
+  .member-initial {
+    @apply w-8 h-8 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold;
+    background: var(--primary-color);
+  }
+
+@media (max-width: 768px) {
+    .sidebar {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        width: 280px;
+        height: 100vh;
+        background: var(--bg-gradient-start);
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar.mobile-visible {
+        transform: translateX(0);
+    }
+.channels-sidebar {
+    @apply hidden;
+  }   
+
+}
+
+.sidebar {
+    @apply fixed left-0 top-0 w-[160px] bg-slate-800 border-r border-slate-600 z-[100] overflow-visible transition-all duration-300 flex flex-col;
+    height: calc(100vh - var(--bottom-section-height));
+  }
+.members-toggle {
+  @apply hidden fixed top-5 right-5 bg-white/10 backdrop-blur-[10px] border border-white/20 text-white w-12 h-12 rounded-xl z-[1001] cursor-pointer transition-all duration-300 flex items-center justify-center;
+}
+
+.channel-item {
+  @apply p-2 rounded cursor-pointer transition-all duration-200 mb-1 w-full min-w-0 box-border flex items-center justify-between;
+}
+.channels-sidebar {
+  @apply fixed left-[160px] top-0 w-[180px] h-screen bg-slate-800 border-r border-slate-600 z-30 overflow-y-auto shadow-sm;
+}
+.mobile-profile-page {
+  @apply fixed top-0 left-0 w-full h-[calc(100vh-60px)] bg-slate-600 z-10 overflow-y-auto pb-5;
+}
+.channel-settings-btn {
+  @apply opacity-0 invisible transition-all duration-200 bg-transparent border-none text-slate-400 cursor-pointer rounded text-sm flex-shrink-0 flex items-center justify-center w-6 h-6;
+}
+.channel-btn-small {
+  @apply bg-blue-600 text-white border-none rounded px-2 py-1 text-sm cursor-pointer transition-all duration-200;
+}
+.sidebar-settings-btn {
+  @apply bg-transparent border-none text-lg cursor-pointer p-2 rounded transition-colors duration-200;
+}
+.channels-header {
+  @apply header-base;
+}
+.user-section {
+  @apply fixed bottom-0 left-0 w-full px-4 flex items-center border-t border-slate-600 bg-slate-800 z-[150];
+  height: var(--bottom-section-height);
+}
+
+@media (min-width: 768px) {
+  .user-section {
+    @apply w-[340px] pl-0 pr-4;
+  }
+}
+
+.mobile-profile-header {
+  @apply header-base;
+}
+
+.main-content {
+  @apply ml-0 mr-0 min-w-[300px] h-screen box-border overflow-hidden md:ml-[340px];
+}
+
+.no-channels {
+  @apply p-4 text-slate-400 text-center text-sm;
+}
+
+.channels-list {
+  @apply p-2;
+}
+.main-content.with-members {
+  @apply mr-[240px];
+} 
+.channel-item.active {
+  @apply bg-blue-400 text-white;
+}
+
+.channel-item:hover {
+  @apply bg-blue-400 text-white;
+}
+
+.channel-item:hover .channel-settings-btn {
+  @apply opacity-100 visible;
+}
+
+}

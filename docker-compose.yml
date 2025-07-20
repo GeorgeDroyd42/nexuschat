@@ -1,0 +1,33 @@
+version: '3'
+services:
+  app:
+    # Your existing app configuration
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      # Add Redis environment variables
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=
+      - REDIS_DB=0
+      
+  postgres:
+    image: postgres:latest
+    container_name: auth_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: authdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: always
+    

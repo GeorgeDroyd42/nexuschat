@@ -1,0 +1,24 @@
+@layer components {
+  
+
+.user-avatar {
+  @apply w-20 h-20 rounded-full object-cover;
+  border: 3px solid #8aa3e8;
+}
+
+.user-profile {
+  @apply flex flex-col items-center justify-center text-center gap-4;
+}
+
+.user-info {
+  @apply flex flex-col gap-2 items-center;
+}
+
+.user-info h4 {
+  @apply m-0 text-xl text-gray-200;
+}
+
+.user-info p {
+  @apply m-0 text-sm text-gray-500;
+}
+}

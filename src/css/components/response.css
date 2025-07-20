@@ -1,0 +1,8 @@
+@layer components {
+
+
+  .container {
+    @apply max-w-full box-border;
+    padding: 0;
+  }
+}

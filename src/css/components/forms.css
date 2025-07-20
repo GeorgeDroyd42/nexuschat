@@ -1,0 +1,20 @@
+@layer components {
+  .form-group {
+    @apply mb-4 md:mb-5;
+  }
+
+  .form-group label {
+    @apply block mb-2 font-medium text-slate-400 text-sm md:text-base;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    @apply w-full p-3 md:p-4 border border-slate-600 rounded-xl bg-slate-800 text-slate-200 
+           shadow-inner transition-all duration-300 resize-none text-sm md:text-base;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    @apply outline-none border-blue-400 bg-slate-900 ring-4 ring-blue-300/30;
+  }
+}

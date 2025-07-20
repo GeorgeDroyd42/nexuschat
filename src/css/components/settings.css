@@ -1,0 +1,145 @@
+@layer components {
+  .profile-menu-overlay {
+      @apply fixed top-0 left-0 w-screen h-screen bg-[#252b39] hidden z-[10000] opacity-0 transition-opacity duration-300 ease-in-out;
+      height: 100vh !important;
+  }
+
+.profile-menu-overlay.active {
+    @apply opacity-100;
+}
+
+.profile-menu {
+    @apply w-full h-full flex flex-col;
+}
+
+.profile-menu-header {
+    @apply flex justify-between items-center p-8;
+    border-bottom: 1px solid #475569;
+}
+
+.profile-menu-close {
+    @apply bg-transparent border-none text-2xl text-[#9ba3b4] cursor-pointer p-0 w-10 h-10 flex items-center justify-center rounded-md transition-all duration-200;
+}
+
+.profile-menu-close:hover {
+    @apply text-[#e2e5eb] bg-[#475569];
+}
+
+.profile-menu-content {
+    @apply flex-1 p-8 overflow-y-auto;
+}
+
+.settings-layout {
+    @apply flex h-full gap-0 max-md:flex-col;
+}
+
+.settings-sidebar {
+    @apply w-[200px] flex flex-col p-0;
+    border-right: 1px solid #475569;
+    @apply max-md:w-full max-md:order-first max-md:border-r-0 max-md:border-b max-md:border-[#475569] max-md:flex-row max-md:overflow-x-auto max-md:py-4 max-md:px-4 max-md:gap-3;
+}
+
+.settings-tab {
+    @apply bg-transparent border-none py-3 px-4 text-left cursor-pointer text-[#9ba3b4] font-medium transition-all duration-200 rounded-none;
+    @apply max-md:whitespace-nowrap max-md:min-w-[140px] max-md:text-center max-md:rounded-lg max-md:py-3 max-md:px-4 max-md:text-base max-md:flex-shrink-0;
+}
+
+.settings-tab:hover {
+    @apply bg-[#475569] text-[#e2e5eb];
+    transform: none;
+}
+
+.settings-tab.active {
+    @apply bg-[#5a78c7] text-white;
+}
+
+.settings-content {
+    @apply flex-1 p-6 overflow-y-auto flex flex-col items-center justify-start;
+}
+
+.settings-panel {
+    @apply hidden w-full max-w-[600px];
+}
+
+.settings-panel.active {
+    @apply flex flex-col gap-4;
+}
+
+.profile-info-section,
+.channel-info-section,
+.info-section {
+    @apply grid gap-5 items-center p-5 bg-[#1a1f2c] rounded-lg border border-[#475569] mb-6 shadow-lg;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+.info-section .form-group {
+    @apply mb-0 flex flex-col min-w-0;
+}
+
+.info-section label {
+    @apply text-[11px] font-semibold text-[#9ba3b4] uppercase tracking-wider mb-1 block;
+}
+
+.info-display {
+    @apply bg-transparent p-0 rounded-none text-[#e2e5eb] font-medium break-words;
+}
+
+.info-display.user-id,
+.info-display.channel-id {
+    @apply font-mono text-xs text-[#9ba3b4] cursor-pointer transition-colors duration-200;
+}
+
+.info-display.user-id:hover,
+.info-display.channel-id:hover {
+    @apply text-[#e2e5eb];
+}
+
+.info-display.bio-display {
+    @apply italic text-[#9ba3b4] overflow-hidden text-ellipsis max-h-[9em] leading-6 min-h-[4.5em] p-3 bg-[#252b39] rounded-md border border-[#475569];
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+}
+
+.settings-panel .form-group:not(.profile-picture-group) {
+    @apply bg-[#1a1f2c] rounded-lg p-5 mb-4 border border-[#475569];
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+#channel-settings-error-container,
+#profile-settings-error-container,
+.settings-error-container {
+    @apply text-sm font-medium text-[#e86671] bg-[#252b39] border border-[#e86671] rounded px-5 py-3 hidden max-w-[90%] text-center whitespace-nowrap;
+    position: fixed !important;
+    top: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 10001 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    margin: 0 !important;
+}
+
+.settings-content::-webkit-scrollbar,
+.profile-menu-content::-webkit-scrollbar {
+    @apply w-1.5;
+}
+
+.settings-content::-webkit-scrollbar-track,
+.profile-menu-content::-webkit-scrollbar-track {
+    @apply bg-transparent;
+}
+
+.settings-content::-webkit-scrollbar-thumb,
+.profile-menu-content::-webkit-scrollbar-thumb {
+    @apply bg-slate-600 rounded opacity-50;
+}
+
+.settings-content::-webkit-scrollbar-thumb:hover,
+.profile-menu-content::-webkit-scrollbar-thumb:hover {
+    @apply opacity-80;
+}
+
+.settings-layout {
+    @apply flex h-full gap-0 max-md:flex-col max-md:h-auto;
+}
+}

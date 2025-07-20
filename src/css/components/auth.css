@@ -1,0 +1,65 @@
+@layer components {
+  /* Auth page body styles */
+  body:has(.auth-container) {
+    @apply min-h-screen grid place-items-center m-0 p-8 box-border overflow-x-hidden;
+    background: linear-gradient(145deg, #1e2330 0%, #252b39 100%);
+  }
+.auth-box {
+    @apply w-full max-w-md mx-auto;
+  }
+
+  .auth-actions {
+    @apply flex flex-col sm:flex-row gap-4 justify-center items-center mt-8;
+  }
+  .auth-container {
+    @apply w-full max-w-4xl min-h-96 p-8 rounded-2xl shadow-2xl flex flex-col items-center text-center mt-10 mx-auto bg-slate-800/90 border border-slate-600 backdrop-blur-md;
+    animation: slideIn 0.3s ease-out;
+  }
+
+  .auth-container h1 {
+    @apply mb-8 text-white text-3xl font-bold w-full;
+  }
+
+  .auth-container form {
+    @apply mb-6 flex flex-col gap-6 w-full max-w-md;
+  }
+
+  .auth-container p {
+    @apply text-sm text-slate-400 mt-6 font-medium w-full;
+  }
+    @keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+.guild-info {
+    @apply w-full max-w-sm mx-auto my-5 sm:my-6 md:my-7 p-5 sm:p-6 md:p-7 rounded-lg;
+    border: 1px solid #475569;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .guild-info h2 {
+    @apply text-xl sm:text-2xl mb-4 sm:mb-5 font-semibold;
+    color: #6b8adb;
+    font-size: clamp(1.3rem, 3vw, 1.5rem);
+  }
+
+  .guild-info p {
+    @apply mb-5 sm:mb-6 text-slate-300;
+  }
+
+.auth-container .error-container {
+    @apply w-full max-w-md mx-auto mb-4 p-3 rounded border-l-4 text-sm font-medium bg-red-900/15 text-red-400 border-l-red-500 shadow-lg hidden;
+  }
+
+  .auth-container .error-container.show {
+    @apply block;
+    animation: fadeIn 0.4s ease-out;
+  }
+
+
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }  

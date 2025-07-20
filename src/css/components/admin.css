@@ -1,0 +1,218 @@
+@layer components {
+.admin-page {
+  @apply overflow-hidden h-screen;
+}
+
+.admin-layout {
+  @apply h-screen overflow-hidden flex flex-col p-3 md:p-6;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.admin-layout main {
+  @apply flex-1 overflow-hidden flex flex-col min-h-0;
+}
+
+.admin-panel {
+  @apply bg-slate-800/80 backdrop-blur-sm rounded-lg p-4 mb-4 shadow-xl border border-slate-700/50;
+}
+
+.admin-panel h2 {
+  @apply my-0 mb-2 text-base;
+}
+
+.admin-section {
+  @apply mb-4 flex-1 flex flex-col min-h-0 overflow-hidden;
+}
+
+.admin-section h3 {
+  @apply border-b border-slate-600 pb-1.5 mb-3;
+}
+
+.admin-container {
+  @apply max-w-6xl mx-auto px-5;
+}
+
+.admin-header {
+  @apply bg-slate-800 rounded-md shadow-lg flex-shrink-0 px-3 py-3 mb-3 md:px-6 md:py-4 md:mb-6;
+}
+
+.admin-header h1 {
+  @apply mt-0 mb-1 text-slate-200 text-lg md:text-2xl;
+}
+
+  /* User Table Styles */
+  .user-table-container {
+  @apply flex-1 overflow-y-auto border border-slate-600 rounded-md bg-slate-800 
+          pb-2 sm:pb-3 lg:pb-4
+          min-h-0 h-auto max-h-none;
+}
+
+.user-list {
+  @apply w-full border-collapse m-0 mb-4 md:table block overflow-x-visible;
+}
+
+.user-list thead {
+  @apply sticky top-0 z-10 bg-slate-900 md:table-header-group hidden;
+}
+
+.user-list tbody {
+  @apply md:table-row-group block;
+}
+
+.user-list th,
+.user-list td {
+  @apply md:table-cell md:border-b md:border-slate-600 md:p-3 md:text-left block border-none py-1.5 px-0 text-left;
+}
+
+.user-list th {
+  @apply bg-slate-900 font-bold md:text-center md:p-4;
+}
+
+.user-list tr {
+  @apply table-row bg-transparent border-b border-slate-600 mb-0 p-0;
+}
+
+
+.stats-container {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4;
+  }
+
+  .stat-card {
+    @apply bg-slate-800 rounded-md shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl p-2 sm:p-3 md:p-4 lg:p-5 min-w-0 w-full;
+  }
+
+.stat-card h4 {
+  @apply mt-0 text-slate-400 text-xs uppercase tracking-wide;
+}
+
+.stat-value {
+  @apply text-2xl font-bold text-slate-200 my-1.5;
+}
+
+.pagination-controls {
+  @apply flex justify-center items-center flex-shrink-0 gap-1 md:gap-2 py-2;
+}
+
+.pagination-controls button {
+  @apply bg-blue-600 text-white border-none rounded-md cursor-pointer font-medium transition-all duration-200 px-2 py-1.5 text-xs min-w-[60px] md:px-5 md:py-3 md:text-sm md:min-w-[100px];
+}
+
+.pagination-controls button:hover:not(:disabled) {
+  @apply bg-blue-700 -translate-y-px;
+}
+
+.pagination-controls button:disabled {
+  @apply bg-slate-600 text-slate-400 cursor-not-allowed transform-none;
+}
+
+#page-info {
+  @apply font-medium text-slate-200 px-1 md:px-3 text-xs md:text-base;
+}
+
+.section-header {
+  @apply flex flex-col items-center mb-2 gap-2;
+}
+
+.section-header h3 {
+  @apply m-0 text-center;
+}
+
+.search-container {
+  @apply relative flex items-center max-w-[300px] w-full;
+}
+
+.search-input {
+  @apply w-full border border-slate-600 rounded-xl bg-slate-800 transition-all duration-300 shadow-inner text-sm md:text-base py-2 px-3 pl-8 md:py-3 md:px-4 md:pl-10;
+}
+
+.search-input:focus {
+  @apply outline-none border-blue-400 bg-white text-slate-900 ring-4 ring-blue-300/30 transition-colors;
+}
+
+.search-clear {
+  @apply absolute right-2 bg-transparent border-none text-lg text-slate-500 cursor-pointer p-1 rounded-full w-6 h-6 flex items-center justify-center opacity-0 transition-all duration-200;
+}
+
+.search-input:not(:placeholder-shown) + .search-clear {
+  @apply opacity-100;
+}
+
+.search-clear:hover {
+  @apply bg-slate-600 text-slate-200;
+}
+
+
+.user-list td::before {
+  @apply md:hidden font-semibold text-slate-400 inline-block w-16 text-xs uppercase;
+}
+
+
+.action-btn {
+  @apply py-2 px-3 text-sm m-1 min-w-[70px] md:min-w-[80px] touch-manipulation;
+}
+
+
+.header-content {
+  @apply flex flex-col gap-3 md:flex-row md:justify-between md:items-center;
+}
+
+.header-left {
+  @apply flex-1;
+}
+
+.header-right {
+  @apply flex flex-col gap-2 md:flex-row md:items-center md:gap-4;
+}
+
+.dashboard-title {
+  @apply text-2xl font-bold text-slate-200 mb-2;
+}
+
+.dashboard-subtitle {
+  @apply text-slate-400 text-base mb-0;
+}
+
+.admin-info {
+  @apply flex flex-col items-end text-sm text-slate-400;
+}
+
+.admin-label {
+  @apply text-slate-500;
+}
+
+.admin-name {
+  @apply text-slate-200 font-medium;
+}
+
+  /* Mobile button overrides */
+  .admin-header .btn {
+  @apply px-3 py-2 text-sm md:px-4 md:py-2 md:text-base;
+}
+
+.admin-header .admin-info {
+  @apply text-center md:text-right;
+}
+
+.admin-header .header-right {
+  @apply items-center md:items-end;
+}   
+}
+
+
+
+  .user-table-container::-webkit-scrollbar {
+    @apply w-1.5;
+  }
+
+  .user-table-container::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .user-table-container::-webkit-scrollbar-thumb {
+    @apply rounded opacity-50;
+    background: var(--border-light);
+  }
+
+  .user-table-container::-webkit-scrollbar-thumb:hover {
+    @apply opacity-80;
+  }

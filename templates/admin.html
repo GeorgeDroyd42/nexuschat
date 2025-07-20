@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/public/css/tailwind.css">
+    
+</head>
+<body class="admin-page">
+    <div class="admin-layout">
+        <header class="admin-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1 class="dashboard-title">Admin Dashboard</h1>
+                    <div class="stats-inline">
+                        <span class="stat-item">Total Users: <span id="total-users" class="stat-number">--</span></span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="admin-info">
+                        <span class="admin-label">Logged in as:</span>
+                        <span id="admin-username" class="admin-name">Loading...</span>
+                    </div>
+                    <button id="logout-btn" class="btn btn-secondary">Logout</button>
+                </div>
+            </div>
+        </header>
+        
+        <main class="main-content-spaced">
+            <div class="search-controls">
+                <div class="search-container">
+                    <input type="text" id="user-search" class="search-input" placeholder="Search users..." autocomplete="off">
+                    <button type="button" id="clear-search" class="search-clear" title="Clear search">&times;</button>
+                </div>
+                <div class="pagination-controls">
+                    <button id="prev-btn" disabled>Previous</button>
+                    <span id="page-info">Page 1 of 1</span>
+                    <button id="next-btn">Next</button>
+                </div>
+            </div>
+            
+<div class="admin-section">
+    <div class="user-table-container">
+        <table class="user-list" id="user-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Created</th>
+                                <th>Admin</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-list-body">
+                            <tr>
+                                <td colspan="5">Loading user data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+    </div>
+
+</div>
+            <div class="modal-overlay" id="confirm-modal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirm Action</h3>
+                <button class="modal-close" id="close-confirm-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-message">Are you sure you want to perform this action?</p>
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" id="confirm-no">No</button>
+                    <button type="button" class="btn btn-primary" id="confirm-yes">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+        <script src="/public/js/core-bundle.js"></script>
+        <script src="/public/js/admin-bundle.js"></script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+@layer components {
+  .profile-preview-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: clamp(15px, 3vh, 25px);
+    width: 100%;
+  }
+
+  #profile-preview,
+  #server-preview,
+  .image-preview,
+  .profile-picture-large {
+    width: clamp(100px, 15vw, 120px);
+    height: clamp(100px, 15vw, 120px);
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+    border: 2px solid #475569;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .profile-input {
+    display: none;
+  }
+  .bottom-nav-item {
+    @apply flex flex-col items-center justify-center p-2 rounded-lg cursor-pointer;
+    @apply transition-all duration-200 min-w-16;
+  }
+
+  .bottom-nav-item:hover {
+    @apply bg-slate-700;
+  }
+
+  .bottom-nav-item.active {
+    @apply bg-blue-600 text-white;
+  }
+
+  .bottom-nav-icon {
+    @apply text-lg mb-1;
+  }
+
+  .bottom-nav-label {
+    @apply text-xs font-medium text-slate-300;
+  }
+
+  .bottom-nav-item.active .bottom-nav-label {
+    @apply text-white;
+  }
+
+  .bottom-nav {
+    @apply fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-600 px-4 py-2 z-50;
+    @apply flex justify-around items-center;
+    @apply hidden max-md:flex;
+  }
+}

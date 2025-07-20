@@ -1,0 +1,99 @@
+const fs = require('fs');
+const { execSync } = require('child_process');
+
+const coreFiles = [
+    'src/js/utils/dom-utils.js',
+    'src/js/utils/api-utils.js',
+    'src/js/utils/format-utils.js',
+    'src/js/utils/ui-utils.js',
+    'src/js/utils/session-utils.js',
+    'src/js/utils/component-utils.js',
+    'src/js/utils/members-utils.js',
+    'src/js/utils.js',
+    'src/js/csrf.js', 
+    'src/js/AuthAPI.js',
+    'src/js/UserAPI.js',
+    'src/js/utils/navutils.js',
+    'src/js/ChannelAPI.js',
+    'src/js/BaseAPI.js',
+    'src/js/modal.js',
+    'src/js/invite.js',
+    'src/js/utils/profile-utils.js',
+    'src/js/utils/avatar-utils.js', 
+    'src/js/utils/modal-utils.js',
+];
+
+const authFiles = [
+    'src/js/auth.js'
+];
+
+const guildFiles = [
+    'src/js/guild.js',
+    'src/js/utils/channel-menu-api.js',
+    'src/js/utils/embed-utils.js',
+    'src/js/utils/profile-menu-api.js',
+    'src/js/utils/guild-menu-api.js',
+    'src/js/utils/menu-renderer.js',
+    'src/js/utils/permission-manager.js',
+    'src/js/MessageAPI.js',
+    'src/js/sidebar.js',
+    'src/js/sockets.js',
+    'src/js/context-menu.js',
+    'src/js/utils/typing-indicator.js'
+];
+
+const adminFiles = [
+    'src/js/admin.js'
+];
+
+function createBundle(files, outputName) {
+    let bundledContent = '';
+    files.forEach(file => {
+        try {
+            const content = fs.readFileSync(file, 'utf8');
+            bundledContent += `${content}\n`;
+        } catch (err) {
+            console.error(`Error reading ${file}:`, err.message);
+        }
+    });
+    
+    const tempFile = `public/js/${outputName}.temp.js`;
+    const minifiedFile = `public/js/${outputName}.minified.js`;
+    const finalFile = `public/js/${outputName}`;
+    
+    fs.writeFileSync(tempFile, bundledContent);
+    
+    try {
+        execSync(`npx terser ${tempFile} --compress --mangle -o ${minifiedFile}`, { stdio: 'inherit' });
+        
+        if (!fs.existsSync(minifiedFile)) {
+            throw new Error('Minified file was not created');
+        }
+        
+        execSync(`npx javascript-obfuscator ${minifiedFile} --output ${finalFile} --compact true --control-flow-flattening true --control-flow-flattening-threshold 0.5 --dead-code-injection true --dead-code-injection-threshold 0.3 --identifier-names-generator hexadecimal --string-array true --string-array-encoding base64 --string-array-threshold 0.5`, { stdio: 'inherit' });
+        
+        fs.unlinkSync(tempFile);
+        fs.unlinkSync(minifiedFile);
+        
+        const originalSize = Math.round(bundledContent.length / 1024);
+        const obfuscatedSize = Math.round(fs.readFileSync(finalFile).length / 1024);
+        const savings = Math.round(((originalSize - obfuscatedSize) / originalSize) * 100);
+        
+        console.log(`${outputName}: ${originalSize}KB → ${obfuscatedSize}KB (${savings}% reduction, obfuscated)`);
+    } catch (error) {
+        console.log(`Obfuscation failed for ${outputName}, trying terser only...`);
+        try {
+            execSync(`npx terser ${tempFile} --compress --mangle -o ${finalFile}`, { stdio: 'inherit' });
+            fs.unlinkSync(tempFile);
+            console.log(`${outputName} created (terser minified only)`);
+        } catch (terserError) {
+            fs.renameSync(tempFile, finalFile);
+            console.log(`${outputName} created (unminified fallback)`);
+        }
+    }
+}
+
+createBundle(coreFiles, 'core-bundle.js');
+createBundle(guildFiles, 'guild-bundle.js');
+createBundle(authFiles, 'auth-bundle.js');
+createBundle(adminFiles, 'admin-bundle.js');

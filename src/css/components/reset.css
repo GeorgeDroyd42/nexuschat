@@ -1,0 +1,62 @@
+@layer components {
+  * {
+    @apply m-0 p-0 box-border;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply min-h-screen flex flex-col;
+    font-family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.7;
+    color: #e2e5eb;
+    background: linear-gradient(145deg, #1e2330 0%, #252b39 100%);
+    font-size: clamp(1rem, 2.5vw, 1.1rem);
+  }
+
+  a {
+    @apply no-underline transition-all duration-300;
+    color: #5a78c7;
+  }
+
+  a:hover {
+    @apply underline -translate-y-px;
+    color: #8aa3e8;
+  }
+
+  a:focus {
+    @apply outline-2 outline-blue-500 outline-offset-2;
+  }
+
+  .sidebar,
+  .channels-sidebar,
+  .members-sidebar,
+  .channels-list,
+  .members-list,
+  .context-menu,
+  .bottom-nav,
+  button,
+  .btn,
+  .guild-pill,
+  .channel-item,
+  .member-item,
+  .members-toggle {
+    @apply select-none;
+  }
+
+  .main-content,
+  .guild-info,
+  .guild-content,
+  input,
+  textarea {
+    @apply select-text;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

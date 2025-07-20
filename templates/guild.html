@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.name}} - Guild</title>
+    <link rel="stylesheet" href="/public/css/guild-tailwind.css">  
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="guild-btn" id="create-guild-btn">
+            <span>+</span>
+        </div>
+        <div class="sidebar-separator"></div>
+        <template id="guild-template">
+                    <div class="guild-pill">
+                        <div class="guild-header">
+                            <div class="guild-icon">
+                                <img class="guild-image" style="display: none;">
+                                <span class="guild-initial" style="display: none;"></span>
+                            </div>
+                            <div class="guild-chevron">▶</div>
+                            <button class="btn-small add-channel-mobile">+</button>
+                        </div>
+                        <div class="guild-channels" style="display: none;"></div>
+                    </div>
+                </template>
+        <div class="guild-list" id="guild-list"></div>
+        <div class="sidebar-separator"></div>
+        <div class="user-section">
+            <div class="user-profile-btn" id="user-profile-btn">
+                <img id="user-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cccccc'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E" alt="User Avatar" class="member-avatar">
+                <span id="user-display-name" class="member-name">Loading...</span>
+                <button class="settings-btn" id="settings-btn" title="Account Settings">
+                    ⚙️
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <div class="channels-sidebar{{if not .guild_id}} hidden{{end}}">
+        <div class="channels-header">
+            <h3>Channels</h3>
+            <button id="create-channel-btn" class="btn-small">+</button>
+        </div>
+        <div id="channels-list" class="channels-list">
+            <!-- Channels will be loaded here -->
+        </div>
+    </div>
+
+    <main class="main-content">
+        <div class="container">
+        {{if not .guild_id}}
+        <div class="welcome-content">
+            <p>{{.description}}</p>
+            <button id="logout-btn" class="btn btn-secondary" style="margin-top: 1rem;">Logout</button>
+        </div>
+        {{else if .is_channel}} 
+        <div class="channel-content messaging-layout">
+            <div class="channel-title">
+                <h2># {{.name}}</h2>
+                {{if .description}}<p>{{.description}}</p>{{end}}
+            </div>
+            <div id="messages-list" class="messages-list">
+                            <!-- Messages will be loaded here -->
+                        </div>
+        </div>
+        <div id="typing-indicator" class="typing-indicator" style="display: none;">
+            <!-- Typing indicator will be populated here -->
+        </div>
+                    
+        <div class="message-input-container">
+                <div class="message-input-wrapper">
+                    <textarea 
+                        id="message-input" 
+                        class="message-input" 
+                        placeholder="Message #channel-name..."
+                        rows="1"
+                        maxlength="2000"
+                    ></textarea>
+                    <div class="message-controls">
+                        <span id="char-count" class="char-count">0/2000</span>
+                        <button id="send-message-btn" class="btn btn-sm" disabled>→</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{else}}
+        <div class="guild-info">
+            <p>{{.description}}</p>
+            {{if .guild_id}}<p>Guild ID: {{.guild_id}}</p>{{end}}
+            {{if .created_at}}<p>Created: {{.created_at}}</p>{{end}}
+        </div> 
+        <div class="guild-content">
+            <p>Welcome to {{.name}}, start by creating your first channel</p>
+        </div>
+        {{end}}
+        </div>
+    </main>
+
+    <button class="members-toggle" id="members-toggle">
+    </button>
+
+    <button class="guild-toggle" id="guild-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+
+<div class="modal-overlay" id="server-modal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 class="modal-title">Create New Guild</h3>
+            <button class="modal-close" id="close-server-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Enter a name for your new guild.</p>
+            <div id="guild-error-container" class="notification-container" style="display: none;"></div>
+<form id="create-guild-form" enctype="multipart/form-data">
+<div class="form-group profile-picture-group">
+    <div class="profile-preview-container">
+        <img id="server-preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cccccc'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E" alt="Server Preview">
+        <input type="file" id="server_picture" name="server_picture" accept="image/*" class="profile-input">
+        <button type="button" id="select-server-btn" class="btn">Select Server Image</button>
+    </div>
+</div>
+    <div class="form-group">
+        <label for="server-name">GUILD NAME</label>
+        <input type="text" id="server-name" name="name" required>
+    </div>
+    <div class="form-group">
+        <label for="server-description">DESCRIPTION (Optional)</label>
+        <textarea id="server-description" name="description" placeholder="What's your guild about?" rows="3"></textarea>
+    </div>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" id="back-button">Cancel</button>
+                    <button type="submit" class="btn" id="create-server-button">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="modal-overlay" id="channel-modal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 class="modal-title">Create New Channel</h3>
+            <button class="modal-close" id="close-channel-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Enter a name for your new channel.</p>
+            <div id="channel-error-container" class="notification-container" style="display: none;"></div>
+            <form id="create-channel-form">
+                <input type="hidden" id="channel-guild-id" name="guild_id" value="">
+                <div class="form-group">
+                    <label for="channel-name">CHANNEL NAME</label>
+                    <input type="text" id="channel-name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="channel-description">DESCRIPTION (Optional)</label>
+                    <textarea id="channel-description" name="description" placeholder="What's this channel about?" rows="3"></textarea>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" id="cancel-channel-button">Cancel</button>
+                    <button type="submit" class="btn" id="create-channel-button">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="confirm-modal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 class="modal-title">Invite Members</h3>
+            <button class="modal-close" id="close-invite-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Share this link to invite people to this guild:</p>
+            <div class="form-group">
+                <label for="invite-link-text">Invite Link</label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="invite-link-text" readonly style="flex: 1;">
+                    <button type="button" id="copy-invite-btn" class="btn">Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="profile-menu-overlay" id="channel-info-modal" style="display: none;">
+    <div class="profile-menu">
+        <div class="profile-menu-header">
+            <h2>Channel Settings</h2>
+            <button class="profile-menu-close" id="close-channel-info-modal">&times;</button>
+        </div>
+        <div id="channel-settings-error-container" class="error-container" style="font-size: 0.85rem; padding: 8px 12px; margin: 8px 0; min-height: auto; max-height: none; border-radius: 4px;"></div>
+        <div class="profile-menu-content">
+            
+            <!-- Content will be dynamically generated by channelMenuAPI -->
+        </div>
+    </div>
+</div>
+<aside class="members-sidebar" id="members-sidebar">
+    <div class="members-header">
+        <h3>Members</h3>
+    </div>
+    <div class="members-list" id="members-list">
+        <!-- Members will be populated here -->
+    </div>
+</aside>
+    <div class="modal-overlay" id="user-modal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title">User Profile</h3>
+                <button class="modal-close" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="user-profile">
+                    <img id="profile-preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cccccc'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E" alt="Profile Preview">
+                    <div class="user-info">
+                        <h4 id="modal-username">Username</h4>
+                        <p>Account created: <span id="user-created">Unknown</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Profile Page -->
+<div class="mobile-profile-page" id="mobile-profile-page" style="display: none;">
+    <div class="mobile-profile-header">
+        <h2>Profile</h2>
+    </div>
+    <div class="profile-menu-content">
+        <!-- Content will be dynamically generated by ProfileMenuAPI -->
+    </div>
+</div>
+<!-- Fullscreen Profile Menu -->
+<div class="profile-menu-overlay" id="profile-modal" style="display: none;">
+    <div class="profile-menu">
+        <div class="profile-menu-header">
+            <h2>Account Settings</h2>
+            <button class="profile-menu-close" id="close-profile-modal">&times;</button>
+        </div>
+<div class="profile-menu-content">
+    <!-- Content will be dynamically generated by ProfileMenuAPI -->
+</div>
+    </div>
+</div>
+<!-- Guild Settings Overlay -->
+<div class="profile-menu-overlay" id="guild-settings-modal" style="display: none;">
+    <div class="profile-menu">
+        <div class="profile-menu-header">
+            <h2>Guild Settings</h2>
+            <button class="profile-menu-close" id="close-guild-settings-modal">&times;</button>
+        </div>
+        <div class="profile-menu-content">
+            <!-- Content will be dynamically generated by GuildMenuAPI -->
+        </div>
+    </div>
+</div>
+    <nav class="bottom-nav">
+        <div class="bottom-nav-item active" data-tab="home">
+            <div class="bottom-nav-icon">🏠</div>
+            <div class="bottom-nav-label">Home</div>
+        </div>
+        <div class="bottom-nav-item" data-tab="profile">
+            <div class="bottom-nav-icon">👤</div>
+            <div class="bottom-nav-label">Profile</div>
+        </div>
+    </nav>
+    <script src="/public/js/guild-bundle.js"></script>
+    <script src="/public/js/core-bundle.js"></script>
+</body>
+</html>

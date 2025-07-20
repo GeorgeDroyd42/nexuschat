@@ -1,0 +1,65 @@
+/* CSS Custom Properties - Design System Variables */
+
+:root {
+    /* ========== COLOR SYSTEM ========== */
+    
+    /* Primary Colors */
+    --primary-color: #6b8adb;
+    --primary-dark: #5a78c7;
+    --primary-light: #8aa3e8;
+    --primary-gradient-start: #5a78c7;
+
+    /* Background Colors - Dark Theme */
+    --bg-gradient-start: #1e2330;
+    --bg-gradient-end: #252b39;
+    --bg-white: #252b39;
+    --bg-input: #1a1f2c;
+
+
+
+/* ========== SPACING SYSTEM ========== */
+    --bottom-section-height: 86px;
+    --spacing-xs: 6px;
+    --spacing-sm: 12px;
+    --spacing-md: 20px;
+    --spacing-lg: 2rem;
+
+    /* Component Spacing Patterns */
+    --padding-component: 8px 12px;
+    --padding-section: var(--spacing-md);
+    --padding-large: var(--spacing-lg);
+    --margin-component: 4px;
+    --margin-element: 8px;
+    /* ========== BORDER RADIUS SYSTEM ========== */
+    
+    --border-radius-sm: 6px;
+    --border-radius-md: 8px;
+    --border-radius-circle: 50%;
+
+    /* ========== SIZE SYSTEM ========== */
+
+    /* ========== TYPOGRAPHY SYSTEM ========== */
+    
+    --font-size-xs: 0.8rem;
+    --font-size-sm: 14px;
+    --font-size-base: 16px;
+    --font-size-md: 1.2rem;
+    --font-size-lg: 1.5rem;
+
+    /* Component Typography */
+    --font-size-button: var(--font-size-base);
+    --font-size-input: var(--font-size-base);
+    --font-size-component: var(--font-size-sm);
+
+/* ========== LAYOUT POSITIONING ========== */
+    
+--layout-left-offset: 400px;
+--layout-right-offset: 0px;
+--layout-right-offset-with-members: 240px;
+}
+
+/* ========== COMMON HEADER STYLING ========== */
+.header-base {
+  @apply flex items-center justify-between h-[60px] p-4 border-b border-slate-600;
+  background: var(--bg-gradient-start);
+}

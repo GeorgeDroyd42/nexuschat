@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join {{.name}} - Guild Invite</title>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Join {{.name}}">
+    <meta property="og:description" content="{{.description}} • {{.member_count}} members">
+    <meta property="og:site_name" content="NexusChat">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:title" content="Join {{.name}}">
+    <meta property="twitter:description" content="{{.description}} • {{.member_count}} members">
+    
+    <!-- General meta -->
+    <meta name="description" content="Join {{.name}} guild: {{.description}} • {{.member_count}} members">
+    
+    <link rel="stylesheet" href="/public/css/tailwind.css">
+</head>
+<body>
+    <div class="auth-container">
+        <h1>Join {{.name}}</h1>
+        
+        <div id="guild-error-container" class="notification-container" style="display: none;"></div>
+        
+<div class="guild-info">
+    <h2>{{.description}}</h2>
+    <p><strong>Members:</strong> {{.member_count}}</p>
+    <p><strong>Created:</strong> {{.created_at}}</p>
+    
+    <button id="join-guild-btn" class="btn" data-invite-code="{{.invite_code}}">Join Guild</button>
+</div>
+        
+        <p><a href="/v/main">← Back to Dashboard</a></p>
+    </div>
+    
+    <script src="/public/js/core-bundle.js"></script>
+    <script src="/public/js/guild-bundle.js"></script>
+</body>
+</html>

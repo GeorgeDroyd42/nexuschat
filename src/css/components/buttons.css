@@ -1,0 +1,138 @@
+@layer components {
+  /* === BASE BUTTONS === */
+  .btn {
+    @apply inline-flex items-center justify-center border-0 rounded-lg cursor-pointer font-semibold text-center transition-all duration-300;
+    background: linear-gradient(45deg, #5a78c7, #6b8adb);
+    @apply text-white;
+    padding: clamp(12px, 3vh, 16px) clamp(24px, 6vw, 32px);
+    font-size: clamp(0.95rem, 2.5vw, 1.05rem);
+    box-shadow: 0 4px 12px rgba(90, 120, 199, 0.3);
+  }
+
+  .btn:hover {
+    background: linear-gradient(45deg, #6b8adb, #8aa3e8);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+    @apply -translate-y-0.5;
+  }
+
+  .btn:active {
+    @apply translate-y-0 shadow-md shadow-blue-500/30;
+  }
+
+  .btn:focus {
+    @apply outline-2 outline-blue-600 outline-offset-2;
+  }
+
+  .btn:disabled {
+    @apply opacity-60 cursor-not-allowed transform-none shadow-none;
+  }
+
+  /* === BUTTON VARIANTS === */
+  .btn-secondary:hover {
+    @apply bg-slate-700 text-blue-500 shadow-xl shadow-black/30 -translate-y-0.5;
+  }
+
+  .btn-warning {
+    @apply bg-amber-500 text-white shadow-lg shadow-amber-500/30 hover:bg-amber-400 hover:shadow-xl hover:shadow-amber-500/40 hover:-translate-y-0.5;
+  }
+
+  .btn-danger {
+    @apply bg-red-500 text-white shadow-lg shadow-red-500/30 hover:bg-red-400 hover:shadow-xl hover:shadow-red-500/40 hover:-translate-y-0.5;
+  }
+
+  .btn-success {
+    @apply bg-green-500 text-white shadow-lg shadow-green-500/30 hover:bg-green-400 hover:shadow-xl hover:shadow-green-500/40 hover:-translate-y-0.5;
+  }
+
+  /* === BUTTON SIZES === */
+  .btn-sm {
+    @apply px-3 py-1.5 text-sm rounded-md;
+  }
+
+  .btn-lg {
+    @apply rounded-[10px];
+    padding: clamp(14px, 3.5vh, 18px) clamp(28px, 7vw, 36px);
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+  }
+
+  .btn-small {
+    @apply w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold cursor-pointer;
+    @apply bg-slate-700 border border-slate-600 text-slate-300 shadow-sm transition-all duration-200;
+  }
+
+  .btn-small:hover {
+    @apply shadow-md -translate-y-0.5 bg-slate-600;
+  }
+
+  /* === BUTTON STATES === */
+  .btn.copied {
+    @apply scale-95;
+    background: linear-gradient(45deg, #4CAF50, #66BB6A) !important;
+  }
+
+  /* === SPECIALIZED BUTTONS === */
+  .user-profile-btn {
+    @apply relative min-w-[120px] h-[50px] flex-1 rounded-none flex items-center cursor-pointer z-[1000] hidden md:flex;
+    background: #1e293b;
+    color: #e2e5eb;
+    padding: 8px 12px;
+    border: none;
+    transition: background 0.2s ease;
+  }
+
+  .user-profile-btn:hover {
+    background: #363c4a;
+  }
+
+.user-profile-btn .member-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #e2e5eb;
+    line-height: 1.3;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .guild-btn {
+    @apply absolute top-5 left-1/2 w-10 h-10 rounded-full flex items-center justify-center cursor-pointer text-lg font-bold z-10;
+    transform: translateX(-50%);
+    background: linear-gradient(45deg, #1e2330, #252b39);
+    border: 1px solid #475569;
+    @apply text-gray-200;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .guild-btn:hover {
+    transform: translateX(-50%) translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(45deg, #252b39, #252b39);
+  }
+
+  .settings-btn {
+    @apply w-8 h-8 rounded-full flex items-center justify-center cursor-pointer text-base ml-auto;
+    @apply bg-slate-700 border border-slate-600 text-slate-300 shadow-sm transition-all duration-200;
+    @apply hidden sm:flex;
+  }
+
+  .settings-btn:hover {
+    @apply shadow-md -translate-y-0.5 bg-slate-600;
+  }
+
+  .modal-close {
+    @apply bg-transparent border-0 cursor-pointer text-2xl text-slate-500 transition-colors duration-200;
+  }
+
+  .modal-close:hover {
+    @apply text-slate-300;
+  }
+
+  /* === LAYOUT HELPERS === */
+  .guild-initial,
+  .members-toggle,
+  .hero-section {
+    @apply flex items-center justify-center;
+  }
+}

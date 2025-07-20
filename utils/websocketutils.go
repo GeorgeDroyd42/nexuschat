@@ -1,0 +1,577 @@
+package utils
+
+import (
+	"database/sql"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"sync"
+	"time"
+
+	"auth.com/v4/cache"
+	"github.com/gorilla/websocket"
+	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
+)
+
+type WebSocketConnection struct {
+	Conn      *websocket.Conn
+	UserID    string
+	SessionID string
+	writeMu   sync.Mutex
+}
+type ConnectionManager struct {
+	connections map[string]*WebSocketConnection
+	mu          sync.RWMutex
+}
+
+var wsManager = &ConnectionManager{
+	connections: make(map[string]*WebSocketConnection),
+}
+
+func BroadcastToAll(messageType int, data []byte) {
+	wsManager.mu.RLock()
+	var failedSessions []string
+
+	for sessionID, conn := range wsManager.connections {
+		if conn != nil && conn.Conn != nil {
+			conn.writeMu.Lock()
+			err := conn.Conn.WriteMessage(messageType, data)
+			conn.writeMu.Unlock()
+			if err != nil {
+				failedSessions = append(failedSessions, sessionID)
+			}
+		}
+	}
+	wsManager.mu.RUnlock()
+
+	if len(failedSessions) > 0 {
+		wsManager.mu.Lock()
+		for _, sessionID := range failedSessions {
+			delete(wsManager.connections, sessionID)
+		}
+		wsManager.mu.Unlock()
+	}
+}
+
+func UpgradeAndRegister(c echo.Context, userID string) (*WebSocketConnection, string, error) {
+	ws, err := Upgrader.Upgrade(c.Response(), c.Request(), nil)
+	if err != nil {
+		return nil, "", err
+	}
+
+	ws.SetReadLimit(int64(AppConfig.MaxWSMessageSize))
+	ws.SetReadDeadline(time.Now().Add(5 * time.Minute))
+
+	var httpSessionToken string
+	if cookie, err := c.Cookie("session"); err == nil {
+		httpSessionToken = cookie.Value
+	}
+
+	sessionID := GenerateWebSocketSessionID(userID)
+	wsConn := RegisterConnection(ws, userID, sessionID, httpSessionToken)
+	return wsConn, sessionID, nil
+}
+
+var Upgrader = websocket.Upgrader{
+	ReadBufferSize:  0,
+	WriteBufferSize: 0,
+	CheckOrigin: func(r *http.Request) bool {
+		origin := r.Header.Get("Origin")
+		host := r.Host
+
+		if origin == "http://"+host || origin == "https://"+host {
+			return true
+		}
+
+		for _, allowedOrigin := range AppConfig.AllowedOrigins {
+			if origin == allowedOrigin {
+				return true
+			}
+		}
+		return false
+	},
+}
+
+func RegisterConnection(conn *websocket.Conn, userID, sessionID, httpSessionToken string) *WebSocketConnection {
+	wsConn := &WebSocketConnection{
+		Conn:      conn,
+		UserID:    userID,
+		SessionID: sessionID,
+	}
+
+	wsManager.mu.Lock()
+	wsManager.connections[sessionID] = wsConn
+	wsManager.mu.Unlock()
+
+	cache.Provider.AddWebSocketConnection(userID, sessionID, map[string]string{
+		"user_id":            userID,
+		"session_id":         sessionID,
+		"connected":          fmt.Sprintf("%d", time.Now().Unix()),
+		"http_session_token": httpSessionToken,
+	}, 24*time.Hour)
+
+	log(logrus.InfoLevel, "WebSocket", "user_connected", userID, nil)
+
+	HandleUserConnect(userID)
+
+	go func() {
+		SendInitialStatusesToUser(userID)
+	}()
+
+	return wsConn
+}
+
+func RemoveConnection(sessionID string) {
+	wsManager.mu.RLock()
+	conn := wsManager.connections[sessionID]
+	wsManager.mu.RUnlock()
+
+	var userID string
+	if conn != nil {
+		userID = conn.UserID
+	} else {
+		connectionData, found, _ := cache.Provider.GetWebSocketConnectionData(sessionID)
+		if found {
+			if uid, exists := connectionData["user_id"]; exists {
+				userID = uid
+			}
+		}
+	}
+
+	wsManager.mu.Lock()
+	delete(wsManager.connections, sessionID)
+	wsManager.mu.Unlock()
+
+	if userID != "" {
+		cache.Provider.RemoveWebSocketConnection(userID, sessionID)
+		HandleUserDisconnect(userID)
+	}
+}
+
+func SendToUser(userID string, messageType int, data []byte) {
+
+	wsManager.mu.RLock()
+	defer wsManager.mu.RUnlock()
+
+	for _, conn := range wsManager.connections {
+		if conn.UserID == userID {
+			conn.writeMu.Lock()
+			err := conn.Conn.WriteMessage(messageType, data)
+			conn.writeMu.Unlock()
+			if err != nil {
+				log(logrus.ErrorLevel, "WebSocket", "send_to_user", "", err)
+			}
+		}
+	}
+}
+func StartHeartbeat() {
+	go func() {
+		ticker := time.NewTicker(30 * time.Second)
+		defer ticker.Stop()
+
+		for range ticker.C {
+			wsManager.mu.RLock()
+			for _, conn := range wsManager.connections {
+				conn.writeMu.Lock()
+				err := conn.Conn.WriteMessage(websocket.PingMessage, []byte{})
+				conn.writeMu.Unlock()
+				if err != nil {
+					log(logrus.WarnLevel, "WebSocket", "heartbeat", "Connection lost", err)
+					go RemoveConnection(conn.SessionID)
+				}
+			}
+			wsManager.mu.RUnlock()
+		}
+	}()
+}
+
+func BroadcastWithRedis(messageType int, data []byte) {
+	var messageData map[string]interface{}
+	json.Unmarshal(data, &messageData)
+
+	channelID, hasChannel := messageData["channel_id"].(string)
+
+	msg := struct {
+		Type      int    `json:"type"`
+		Data      []byte `json:"data"`
+		ChannelID string `json:"channel_id,omitempty"`
+		Secure    bool   `json:"secure"`
+	}{
+		Type:      messageType,
+		Data:      data,
+		ChannelID: channelID,
+		Secure:    hasChannel,
+	}
+
+	err := cache.Provider.PublishMessage("broadcast", msg)
+	if err != nil {
+		log(logrus.ErrorLevel, "WebSocket", "broadcast_publish", "", err)
+	}
+}
+
+func SendToUserWithRedis(userID string, messageType int, data []byte) {
+	msg := struct {
+		Type   int    `json:"type"`
+		Data   []byte `json:"data"`
+		UserID string `json:"user_id"`
+	}{
+		Type:   messageType,
+		Data:   data,
+		UserID: userID,
+	}
+
+	err := cache.Provider.PublishMessage("user_messages", msg)
+	if err != nil {
+		log(logrus.ErrorLevel, "WebSocket", "send_user_publish", "", err)
+	}
+}
+
+func CleanupUserWebSocketConnections(userID string) {
+	connections, found, _ := cache.Provider.GetWebSocketConnections(userID)
+
+	wsManager.mu.Lock()
+	for sessionID, conn := range wsManager.connections {
+		if conn.UserID == userID {
+			conn.Conn.Close()
+			delete(wsManager.connections, sessionID)
+		}
+	}
+	wsManager.mu.Unlock()
+
+	if found {
+		for _, sessionID := range connections {
+			cache.Provider.RemoveWebSocketConnection(userID, sessionID)
+		}
+	}
+}
+
+func SendErrorToUser(userID string, errorCode int) {
+	errorMessage := ErrorMessages[errorCode]
+	eventData := map[string]interface{}{
+		"type":       "error",
+		"error_code": errorCode,
+		"message":    errorMessage,
+	}
+	jsonData, _ := json.Marshal(eventData)
+	SendToUser(userID, websocket.TextMessage, jsonData)
+}
+
+func SendEventToUser(userID, eventType, message string) {
+	eventData := map[string]string{"type": eventType}
+	if message != "" {
+		eventData["message"] = message
+	}
+	jsonData, _ := json.Marshal(eventData)
+	SendToUser(userID, websocket.TextMessage, jsonData)
+}
+
+func GenerateWebSocketSessionID(userID string) string {
+	return fmt.Sprintf("%s_%d", userID, time.Now().UnixNano())
+}
+
+func HandleMessageEvent(userID string, data map[string]interface{}) error {
+	channelID, ok := data["channel_id"].(string)
+	if !ok {
+		return fmt.Errorf("invalid channel_id")
+	}
+
+	content, ok := data["content"].(string)
+	if !ok {
+		return fmt.Errorf("invalid content")
+	}
+
+	var username string
+	var profilePicture string
+	var isWebhook bool
+
+	if len(userID) > 3 && userID[:3] == "wh_" {
+		webhookID := userID[3:]
+		err := GetDB().QueryRow("SELECT name, COALESCE(profile_picture, '') FROM webhooks WHERE webhook_id = $1", webhookID).Scan(&username, &profilePicture)
+		if err != nil {
+			username = "Unknown Webhook"
+			profilePicture = ""
+		}
+		isWebhook = true
+	} else {
+		username, _ = GetUsernameByID(userID)
+		profilePicture = ""
+		isWebhook = false
+	}
+
+	messageID, err := CreateMessage(channelID, userID, content)
+	if err != nil {
+		return err
+	}
+
+	currentTime := time.Now().UTC()
+	messageData := map[string]interface{}{
+		"type":            "new_message",
+		"message_id":      messageID,
+		"channel_id":      channelID,
+		"user_id":         userID,
+		"username":        username,
+		"content":         content,
+		"created_at":      currentTime.Format(time.RFC3339),
+		"profile_picture": profilePicture,
+		"is_webhook":      isWebhook,
+	}
+
+	return BroadcastToChannel(channelID, messageData)
+}
+
+func BroadcastToChannel(channelID string, data map[string]interface{}) error {
+	var guildID string
+	found, err := QueryRow("GetGuildFromChannel", &guildID,
+		"SELECT guild_id FROM channels WHERE channel_id = $1", channelID)
+
+	if !found || err != nil {
+		return err
+	}
+
+	return BroadcastToGuildMembers(guildID, data)
+}
+
+func BroadcastToGuildMembers(guildID string, data map[string]interface{}) error {
+	members, _, err := GetGuildMembersPaginated(guildID, 1, 0)
+	if err != nil {
+		return err
+	}
+
+	broadcastData, _ := json.Marshal(data)
+
+	for _, member := range members {
+		isStillInGuild, err := IsUserInGuild(guildID, member.UserID)
+		if err == nil && isStillInGuild {
+			SendToUser(member.UserID, websocket.TextMessage, broadcastData)
+		}
+	}
+
+	return nil
+}
+
+type MessageEvent struct {
+	Type      string `json:"type"`
+	ChannelID string `json:"channel_id"`
+	Content   string `json:"content"`
+}
+
+type MessageResult struct {
+	ID        string                 `json:"message_id"`
+	ChannelID string                 `json:"channel_id"`
+	UserID    string                 `json:"user_id"`
+	Username  string                 `json:"username"`
+	Content   string                 `json:"content"`
+	CreatedAt time.Time              `json:"created_at"`
+	Data      map[string]interface{} `json:"broadcast_data"`
+}
+
+func handleDeleteMessage(userID string, data map[string]interface{}) error {
+	messageID, ok := data["message_id"].(string)
+	if !ok || messageID == "" {
+		return fmt.Errorf("invalid_message_id")
+	}
+
+	var channelID string
+	found, _ := QueryRow("GetMessageChannel", &channelID,
+		"SELECT channel_id FROM messages WHERE message_id = $1", messageID)
+
+	if !found {
+		return fmt.Errorf("message not found")
+	}
+
+	err := DeleteMessage(messageID, userID)
+	if err != nil {
+		return err
+	}
+
+	deleteData := map[string]interface{}{
+		"type":       "message_deleted",
+		"message_id": messageID,
+		"channel_id": channelID,
+	}
+	return BroadcastToChannel(channelID, deleteData)
+}
+func HandleWebSocketMessage(userID string, rawMessage []byte) error {
+	var jsonMsg map[string]interface{}
+	if json.Unmarshal(rawMessage, &jsonMsg) != nil {
+		return fmt.Errorf("invalid_message_format")
+	}
+
+	if jsonMsg["type"] == "message" {
+		return handleMessageEvent(userID, jsonMsg)
+	}
+
+	if jsonMsg["type"] == "status_update" {
+		statusData := map[string]interface{}{
+			"type":      "user_status_changed",
+			"user_id":   userID,
+			"is_online": true,
+		}
+
+		userGuilds, err := GetUserGuilds(userID)
+		if err == nil {
+			for _, guild := range userGuilds {
+				if guildID, ok := guild["guild_id"].(string); ok {
+					statusData["guild_id"] = guildID
+					BroadcastToGuildMembers(guildID, statusData)
+				}
+			}
+		}
+		return nil
+	}
+
+	if jsonMsg["type"] == "typing_start" {
+		return handleTypingStart(userID, jsonMsg)
+	}
+
+	if jsonMsg["type"] == "typing_stop" {
+		return handleTypingStop(userID, jsonMsg)
+	}
+
+	if jsonMsg["type"] == "delete_message" {
+		return handleDeleteMessage(userID, jsonMsg)
+	}
+
+	return fmt.Errorf("unsupported_message_type")
+
+}
+func handleTypingStart(userID string, data map[string]interface{}) error {
+	channelID, ok := data["channel_id"].(string)
+	if !ok || channelID == "" {
+		return fmt.Errorf("invalid_channel_id")
+	}
+
+	err := cache.Provider.AddTypingUser(channelID, userID, 15*time.Second)
+	if err != nil {
+		return err
+	}
+
+	return BroadcastTypingStatus(channelID)
+}
+
+func handleTypingStop(userID string, data map[string]interface{}) error {
+	channelID, ok := data["channel_id"].(string)
+	if !ok || channelID == "" {
+		return fmt.Errorf("invalid_channel_id")
+	}
+
+	err := cache.Provider.RemoveTypingUser(channelID, userID)
+	if err != nil {
+		return err
+	}
+
+	return BroadcastTypingStatus(channelID)
+}
+
+func BroadcastTypingStatus(channelID string) error {
+	typingUsers, err := cache.Provider.GetTypingUsers(channelID)
+	if err != nil {
+		return err
+	}
+
+	var guildID string
+	found, err := QueryRow("GetGuildFromChannel", &guildID,
+		"SELECT guild_id FROM channels WHERE channel_id = $1", channelID)
+
+	if !found || err != nil {
+		return err
+	}
+
+	typingData := map[string]interface{}{
+		"type":         "typing_update",
+		"channel_id":   channelID,
+		"typing_users": typingUsers,
+	}
+
+	return BroadcastToGuildMembers(guildID, typingData)
+}
+func handleMessageEvent(userID string, data map[string]interface{}) error {
+	channelID, ok1 := data["channel_id"].(string)
+	content, ok2 := data["content"].(string)
+
+	if !ok1 || !ok2 || channelID == "" || content == "" {
+		return fmt.Errorf("invalid_message_data")
+	}
+
+	cache.Provider.RemoveTypingUser(channelID, userID)
+
+	result, err := createAndBroadcastMessage(channelID, userID, content)
+	if err != nil {
+		return err
+	}
+
+	broadcastJSON, _ := json.Marshal(result.Data)
+	BroadcastWithRedis(1, broadcastJSON)
+
+	BroadcastTypingStatus(channelID)
+
+	return nil
+}
+
+func createAndBroadcastMessage(channelID, userID, content string) (*MessageResult, error) {
+	username, _ := GetUsernameByID(userID)
+
+	var profilePicture sql.NullString
+	QueryRow("GetUserProfilePicture", &profilePicture,
+		"SELECT profile_picture FROM users WHERE user_id = $1", userID)
+
+	profilePictureValue := ""
+	if profilePicture.Valid {
+		profilePictureValue = profilePicture.String
+	}
+
+	messageID, err := CreateMessage(channelID, userID, content)
+	if err != nil {
+		return nil, err
+	}
+
+	currentTime := time.Now().UTC()
+	result := &MessageResult{
+		ID:        messageID,
+		ChannelID: channelID,
+		UserID:    userID,
+		Username:  username,
+		Content:   content,
+		CreatedAt: currentTime,
+		Data: map[string]interface{}{
+			"type":            "new_message",
+			"message_id":      messageID,
+			"channel_id":      channelID,
+			"user_id":         userID,
+			"username":        username,
+			"content":         content,
+			"created_at":      currentTime.Format(time.RFC3339),
+			"profile_picture": profilePictureValue,
+		},
+	}
+
+	return result, nil
+}
+
+func SendEventToSpecificSession(userID, sessionToken, eventType, message string) {
+	eventData := map[string]string{"type": eventType}
+	if message != "" {
+		eventData["message"] = message
+	}
+	jsonData, _ := json.Marshal(eventData)
+
+	wsManager.mu.RLock()
+	defer wsManager.mu.RUnlock()
+
+	for _, conn := range wsManager.connections {
+		if conn.UserID == userID {
+			connectionData, found, _ := cache.Provider.GetWebSocketConnectionData(conn.SessionID)
+			if found {
+				if token, exists := connectionData["http_session_token"]; exists && token == sessionToken {
+					conn.writeMu.Lock()
+					err := conn.Conn.WriteMessage(websocket.TextMessage, jsonData)
+					conn.writeMu.Unlock()
+					if err != nil {
+						log(logrus.ErrorLevel, "WebSocket", "send_to_specific_session", "", err)
+					}
+				}
+			}
+		}
+	}
+}

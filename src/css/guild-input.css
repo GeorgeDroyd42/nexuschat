@@ -1,0 +1,20 @@
+@import './components/variables.css';
+@import './components/reset.css';
+@import './components/buttons.css';
+@import './components/forms.css';
+@import './components/layouts.css';
+@import './components/sidebar.css';
+@import './components/profile.css';
+@import './components/user-profile.css';
+@import './components/modal.css';
+@import './components/response.css';
+@import './components/guild.css';
+@import './components/messages.css';
+@import './components/context-menu.css';
+@import './components/typing-indicator.css';
+@import './components/webhook.css';
+@import './components/settings.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

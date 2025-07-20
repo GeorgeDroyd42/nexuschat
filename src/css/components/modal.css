@@ -1,0 +1,60 @@
+@layer components {
+  .modal-overlay {
+    @apply fixed inset-0 z-[1000] opacity-0 invisible pointer-events-none;
+    background-color: rgba(0, 0, 0, 0.5);
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  .modal-overlay.active {
+    @apply opacity-100 visible pointer-events-auto;
+  }
+
+  .modal-container {
+    @apply fixed left-5 w-[300px] max-w-[90%] h-auto overflow-y-visible p-6 rounded-lg pointer-events-auto;
+    background-color: #252b39;
+    bottom: 80px;
+    transform: scale(0.9) translateY(20px);
+    transform-origin: bottom left;
+    transition: transform 0.2s ease;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+  }
+
+  .modal-container::after {
+    @apply absolute left-5 w-0 h-0;
+    content: '';
+    bottom: -10px;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #252b39;
+  }
+
+  .modal-overlay.active .modal-container {
+    transform: scale(1) translateY(0);
+  }
+
+  .modal-header {
+    @apply flex justify-between items-center mb-4 pb-3;
+    border-bottom: 1px solid #475569;
+  }
+
+  .modal-title {
+    @apply text-xl font-semibold m-0;
+    color: #e2e5eb;
+  }
+
+  .modal-body {
+    @apply mb-4;
+  }
+
+  #server-modal .modal-container,
+  #channel-modal .modal-container,
+  #confirm-modal .modal-container {
+    @apply fixed top-1/2 left-1/2 w-[580px] max-w-[95vw] max-h-[90vh] min-h-[500px] flex flex-col overflow-hidden;
+    transform: translate(-50%, -50%);
+  }
+
+  #server-modal .modal-body,
+  #channel-modal .modal-body {
+    @apply flex-1 overflow-y-auto pb-0 flex flex-col;
+  }
+}

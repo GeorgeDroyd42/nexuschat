@@ -1,0 +1,16 @@
+@import './components/variables.css';
+@import './components/reset.css';
+@import './components/buttons.css';
+@import './components/profile.css';
+@import './components/forms.css';
+@import './components/hero.css';
+@import './components/errorpages.css';
+@import './components/auth.css';
+@import './components/sidebar.css';
+@import './components/modal.css';
+@import './components/response.css';
+@import './components/admin.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;    

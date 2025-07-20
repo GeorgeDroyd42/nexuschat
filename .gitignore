@@ -1,0 +1,5 @@
+commit.sh
+data/
+.env
+src/css/node_modules
+src/reactjs/node_modules
