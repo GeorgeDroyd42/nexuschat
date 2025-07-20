@@ -55,12 +55,17 @@
     .sidebar.mobile-visible {
         transform: translateX(0);
     }
-.channels-sidebar {
-    @apply hidden;
-  }   
-
 }
 
+.channels-sidebar {
+  @apply fixed left-[160px] top-0 w-[180px] h-screen bg-slate-800 border-r border-slate-600 z-30 overflow-y-auto shadow-sm;
+}
+
+@media (max-width: 768px) {
+  .channels-sidebar {
+    @apply hidden;
+  }
+}
 
 .members-toggle {
   @apply hidden fixed top-5 right-5 bg-white/10 backdrop-blur-[10px] border border-white/20 text-white w-12 h-12 rounded-xl z-[1001] cursor-pointer transition-all duration-300 flex items-center justify-center;
@@ -69,21 +74,14 @@
 .channel-item {
   @apply p-2 rounded cursor-pointer transition-all duration-200 mb-1 w-full min-w-0 box-border flex items-center justify-between;
 }
-.channels-sidebar {
-  @apply fixed left-[160px] top-0 w-[180px] h-screen bg-slate-800 border-r border-slate-600 z-30 overflow-y-auto shadow-sm;
-}
-.mobile-profile-page {
-  @apply fixed top-0 left-0 w-full h-[calc(100vh-60px)] bg-slate-600 z-10 overflow-y-auto pb-5;
-}
+
 .channel-settings-btn {
   @apply opacity-0 invisible transition-all duration-200 bg-transparent border-none text-slate-400 cursor-pointer rounded text-sm flex-shrink-0 flex items-center justify-center w-6 h-6;
 }
 .channel-btn-small {
   @apply bg-blue-600 text-white border-none rounded px-2 py-1 text-sm cursor-pointer transition-all duration-200;
 }
-.sidebar-settings-btn {
-  @apply bg-transparent border-none text-lg cursor-pointer p-2 rounded transition-colors duration-200;
-}
+
 .channels-header {
   @apply header-base;
 }
@@ -98,9 +96,23 @@
   }
 }
 
-.mobile-profile-header {
-  @apply header-base;
+.user-profile-container {
+  @apply flex items-center justify-between w-full;
 }
+
+.user-profile-btn {
+  @apply flex items-center flex-1 cursor-pointer;
+}
+
+.settings-btn {
+  @apply bg-transparent border-none text-lg cursor-pointer p-2 rounded transition-colors duration-200 flex;
+}
+
+.settings-btn:hover {
+  @apply bg-slate-700;
+}
+
+
 
 .main-content {
   @apply ml-0 mr-0 min-w-[300px] box-border overflow-hidden md:ml-[340px] flex flex-col h-screen;

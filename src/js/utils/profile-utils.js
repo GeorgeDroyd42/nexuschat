@@ -54,38 +54,20 @@ imageElements.forEach(selector => {
 }
 
 openProfile(isSettingsMode = false) {
-    const isMobile = window.innerWidth <= 768;
+    window.modalManager.openModal('profile-modal');
     
-    if (isSettingsMode || isMobile) {
-        if (isMobile) {
-            const mobileProfilePage = $('mobile-profile-page');
-            if (mobileProfilePage) mobileProfilePage.style.display = 'block';
-        } else {
-            window.modalManager.openModal('profile-modal');
+    this.loadUserData().then(userData => {
+        if (window.profileMenuAPI && userData) {
+            window.profileMenuAPI.renderButtons('profile-modal', userData);
         }
-        
-        this.loadUserData().then(userData => {
-            if (window.profileMenuAPI && userData) {
-                const containerId = isMobile ? 'mobile-profile-page' : 'profile-modal';
-                window.profileMenuAPI.renderButtons(containerId, userData);
-            }
-        });
-    } else {
-        const userModal = $('user-modal'); 
-        if (userModal) userModal.classList.add('active');
-        this.loadUserData();
-    }
+    });
 }
-
-    closeProfile() {
-        window.modalManager.closeModal('profile-modal');
-        
-        const userModal = document.querySelector('#user-modal');
-        if (userModal) userModal.classList.remove('active');
-        
-        const mobileProfilePage = document.querySelector('#mobile-profile-page');
-        if (mobileProfilePage) mobileProfilePage.style.display = 'none';
-    }
+closeProfile() {
+    window.modalManager.closeModal('profile-modal');
+    
+    const userModal = document.querySelector('#user-modal');
+    if (userModal) userModal.classList.remove('active');
+}
 }
 
 window.profileManager = new ProfileManager();
