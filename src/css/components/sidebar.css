@@ -34,7 +34,10 @@
     @apply w-8 h-8 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold;
     background: var(--primary-color);
   }
-
+.sidebar {
+    @apply fixed left-0 top-0 w-[160px] bg-slate-800 border-r border-slate-600 z-[100] overflow-visible transition-all duration-300 flex flex-col;
+    height: calc(100vh - var(--bottom-section-height));
+  }
 @media (max-width: 768px) {
     .sidebar {
         display: block;
@@ -58,10 +61,7 @@
 
 }
 
-.sidebar {
-    @apply fixed left-0 top-0 w-[160px] bg-slate-800 border-r border-slate-600 z-[100] overflow-visible transition-all duration-300 flex flex-col;
-    height: calc(100vh - var(--bottom-section-height));
-  }
+
 .members-toggle {
   @apply hidden fixed top-5 right-5 bg-white/10 backdrop-blur-[10px] border border-white/20 text-white w-12 h-12 rounded-xl z-[1001] cursor-pointer transition-all duration-300 flex items-center justify-center;
 }
@@ -103,7 +103,7 @@
 }
 
 .main-content {
-  @apply ml-0 mr-0 min-w-[300px] h-screen box-border overflow-hidden md:ml-[340px];
+  @apply ml-0 mr-0 min-w-[300px] box-border overflow-hidden md:ml-[340px] flex flex-col h-screen;
 }
 
 .no-channels {

@@ -117,13 +117,6 @@
       @apply block;
     }
   }
-#messages-list {
-  @apply flex-1 overflow-y-auto flex flex-col gap-3 max-h-[calc(100vh-140px)];
-  min-height: 200px;
-  padding: 0;
-  padding-bottom: 100px;
-  background: var(--bg-white);
-}
 @media (max-width: 768px) {
     .add-channel-mobile {
       @apply inline-block ml-2 px-2 py-1 rounded-md text-sm min-w-6 h-6 font-semibold 

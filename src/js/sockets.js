@@ -24,6 +24,10 @@ websocket.onopen = function() {
 websocket.onclose = function(event) {
         console.log('WebSocket disconnected', event.code, event.reason);
         
+        if (window.MessageAPI) {
+            window.MessageAPI.messageCache.clear();
+        }
+        
         if (event.reason && event.reason !== 'unauthed') {
             displayErrorMessage(event.reason);
             setTimeout(() => {
