@@ -14,11 +14,6 @@ type inviteService struct {
 	db DBProvider
 }
 
-type DBProvider interface {
-	QueryRow(query string, args ...interface{}) *sql.Row
-	Exec(query string, args ...interface{}) (sql.Result, error)
-}
-
 func Initialize(db DBProvider) {
 	Service.db = db
 }

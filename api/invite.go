@@ -56,7 +56,7 @@ func JoinByInviteHandler(c echo.Context) error {
 
 	guildID, err := invite.Service.GetGuildByInviteCode(inviteCode)
 	if err != nil {
-		return utils.SendErrorResponse(c, utils.ErrInvalidInviteCode)
+		return utils.SendErrorResponse(c, invite.ErrInvalidInviteCode)
 	}
 	validUser, err := utils.GetValidUserID(userID)
 	if err != nil {

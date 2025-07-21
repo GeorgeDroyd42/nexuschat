@@ -35,7 +35,6 @@ const (
 	ErrPasswordTooShort          = 1015
 	ErrPasswordTooLong           = 1016
 	ErrPasswordNoCapital         = 1017
-	ErrCSRFValidation            = 1018
 	ErrFileTooLarge              = 2001
 	ErrInvalidFileType           = 2002
 	ErrUserNotFound              = 2003
@@ -54,7 +53,6 @@ const (
 	ErrChannelNameTooLong        = 2016
 	ErrChannelDescriptionTooLong = 2017
 	ErrNotGuildOwner             = 2018
-	ErrInvalidInviteCode         = 2019
 	ErrInsufficientPermissions   = 2020
 )
 
@@ -83,7 +81,6 @@ var ErrorMessages = map[int]string{
 	ErrAccountSuspended:          "Your account has been suspended.",
 	ErrSessionTerminated:         "Your session was terminated. Please log in again.",
 	ErrUnauthorized:              "You do not have permission to access this resource.",
-	ErrCSRFValidation:            "CSRF validation failed",
 	ErrUserNotFound:              "User does not exist",
 	ErrUserNotInGuild:            "You do not have permission to view info for this guild, as you are not in it",
 	ErrGuildNameTooShort:         "Guild name must be at least 2 characters.",
@@ -95,7 +92,6 @@ var ErrorMessages = map[int]string{
 	ErrChannelNameTooLong:        "Channel name cannot exceed 30 characters.",
 	ErrChannelDescriptionTooLong: "Channel description cannot exceed 200 characters.",
 	ErrNotGuildOwner:             "Only the guild owner can create, edit, or delete channels.",
-	ErrInvalidInviteCode:         "Invalid or expired invite code.",
 	RegisterSuccess:              "Sucessfully Registered",
 	ErrInsufficientPermissions:   "Unauthorized",
 	LoginSuccess:                 "Logged in Successfully as {username}",
