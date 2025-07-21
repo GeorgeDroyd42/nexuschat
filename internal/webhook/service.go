@@ -1,4 +1,4 @@
-package utils
+package webhook
 
 import (
 	"database/sql"
@@ -7,16 +7,28 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"auth.com/v4/utils"
 )
 
-func CreateWebhook(channelID, name, createdBy string) (string, string, error) {
-	webhookID := GenerateSessionID("webhook")
-	token, err := generateSessionToken()
+var Service = &webhookService{}
+
+type webhookService struct {
+	db DBProvider
+}
+
+func Initialize(db DBProvider) {
+	Service.db = db
+}
+
+func (s *webhookService) CreateWebhook(channelID, name, createdBy string) (string, string, error) {
+	webhookID := utils.GenerateSessionID("webhook")
+	token, err := utils.GenerateSessionToken()
 	if err != nil {
 		return "", "", err
 	}
 
-	err = ExecuteQuery("CreateWebhook",
+	err = utils.ExecuteQuery("CreateWebhook",
 		`INSERT INTO webhooks (webhook_id, channel_id, name, token, created_by) 
 		 VALUES ($1, $2, $3, $4, $5)`,
 		webhookID, channelID, name, token, createdBy)
@@ -28,8 +40,8 @@ func CreateWebhook(channelID, name, createdBy string) (string, string, error) {
 	return webhookID, token, nil
 }
 
-func GetChannelWebhooks(channelID string) ([]map[string]interface{}, error) {
-	rows, err := GetDB().Query(`
+func (s *webhookService) GetChannelWebhooks(channelID string) ([]map[string]interface{}, error) {
+	rows, err := s.db.Query(`
 		SELECT webhook_id, name, token, created_by, created_at, is_active, use_count, last_used, COALESCE(profile_picture, '') as profile_picture
 		FROM webhooks 
 		WHERE channel_id = $1 AND is_active = true
@@ -75,11 +87,11 @@ func GetChannelWebhooks(channelID string) ([]map[string]interface{}, error) {
 	return webhooks, nil
 }
 
-func ValidateWebhookToken(webhookID, token string) (string, bool, error) {
+func (s *webhookService) ValidateWebhookToken(webhookID, token string) (string, bool, error) {
 	var channelID string
 	var isActive bool
 
-	err := GetDB().QueryRow(`SELECT channel_id, is_active FROM webhooks 
+	err := s.db.QueryRow(`SELECT channel_id, is_active FROM webhooks 
 		WHERE webhook_id = $1 AND token = $2`, webhookID, token).Scan(&channelID, &isActive)
 
 	if err != nil {
@@ -93,7 +105,7 @@ func ValidateWebhookToken(webhookID, token string) (string, bool, error) {
 	return channelID, true, nil
 }
 
-func SaveWebhookProfilePicture(webhookName string, imageData []byte, outputFormat string) (string, error) {
+func (s *webhookService) SaveWebhookProfilePicture(webhookName string, imageData []byte, outputFormat string) (string, error) {
 	os.MkdirAll("public/webhooks", 0750)
 
 	cleanName := strings.ReplaceAll(webhookName, "/", "_")
@@ -119,9 +131,9 @@ func SaveWebhookProfilePicture(webhookName string, imageData []byte, outputForma
 	return "/public/webhooks/" + filename, nil
 }
 
-func CreateWebhookWithProfilePicture(channelID, name, createdBy, profilePicture string) (string, string, error) {
-	webhookID := GenerateSessionID("webhook")
-	token, err := generateSessionToken()
+func (s *webhookService) CreateWebhookWithProfilePicture(channelID, name, createdBy, profilePicture string) (string, string, error) {
+	webhookID := utils.GenerateSessionID("webhook")
+	token, err := utils.GenerateSessionToken()
 	if err != nil {
 		return "", "", err
 	}
@@ -139,7 +151,7 @@ func CreateWebhookWithProfilePicture(channelID, name, createdBy, profilePicture 
 		args = []interface{}{webhookID, channelID, name, token, createdBy}
 	}
 
-	err = ExecuteQuery("CreateWebhook", query, args...)
+	err = utils.ExecuteQuery("CreateWebhook", query, args...)
 	if err != nil {
 		return "", "", err
 	}

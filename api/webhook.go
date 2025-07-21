@@ -2,6 +2,7 @@ package api
 
 import (
 	"auth.com/v4/utils"
+	"auth.com/v4/internal/webhook"
 	"github.com/labstack/echo/v4"
 )
 
@@ -32,13 +33,13 @@ func CreateWebhookHandler(c echo.Context) error {
 			return utils.SendErrorResponse(c, errCode)
 		}
 
-		profilePicturePath, err = utils.SaveWebhookProfilePicture(name, imageData, outputFormat)
+		profilePicturePath, err = webhook.Service.SaveWebhookProfilePicture(name, imageData, outputFormat)
 		if err != nil {
 			return utils.SendErrorResponse(c, utils.ErrDatabaseError)
 		}
 	}
 
-	webhookID, token, err := utils.CreateWebhookWithProfilePicture(channelID, name, userID, profilePicturePath)
+	webhookID, token, err := webhook.Service.CreateWebhookWithProfilePicture(channelID, name, userID, profilePicturePath)
 	if err != nil {
 		return utils.SendErrorResponse(c, utils.ErrDatabaseError)
 	}
@@ -66,7 +67,7 @@ func ListWebhooksHandler(c echo.Context) error {
 		return err
 	}
 
-	webhooks, err := utils.GetChannelWebhooks(channelID)
+	webhooks, err := webhook.Service.GetChannelWebhooks(channelID)
 	if err != nil {
 		return utils.SendErrorResponse(c, utils.ErrDatabaseError)
 	}
@@ -93,7 +94,7 @@ func ExecuteWebhookHandler(c echo.Context) error {
 		return utils.SendErrorResponse(c, utils.ErrEmptyMessage)
 	}
 
-	channelID, valid, err := utils.ValidateWebhookToken(webhookID, token)
+	channelID, valid, err := webhook.Service.ValidateWebhookToken(webhookID, token)
 	if !valid || err != nil {
 		return utils.SendErrorResponse(c, utils.ErrUnauthorized)
 	}

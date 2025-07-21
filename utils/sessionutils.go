@@ -83,7 +83,7 @@ func GetSessionUser(token string) (string, bool, error) {
 	return GetUserBySessionID(sessionID)
 }
 
-func generateSessionToken() (string, error) {
+func GenerateSessionToken() (string, error) {
 	b := make([]byte, 32)
 	_, err := rand.Read(b)
 	if err != nil {
@@ -105,9 +105,9 @@ func createSessionCookie(token string, expires time.Time) *http.Cookie {
 }
 
 func SetAuthCookie(c echo.Context, userID string) error {
-	token, err := generateSessionToken()
+	token, err := GenerateSessionToken()
 	if err != nil {
-		log(logrus.ErrorLevel, ModuleSession, "generateSessionToken", "", err)
+		log(logrus.ErrorLevel, ModuleSession, "GenerateSessionToken", "", err)
 		return err
 	}
 

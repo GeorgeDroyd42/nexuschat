@@ -78,7 +78,7 @@ func (sm *SessionManager) validateSessionOwnership(token, userID string) error {
 }
 
 func (sm *SessionManager) createNewSession(userID string) (string, error) {
-	token, err := generateSessionToken()
+	token, err := GenerateSessionToken()
 	if err != nil {
 		return "", err
 	}
