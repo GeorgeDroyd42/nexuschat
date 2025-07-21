@@ -44,10 +44,6 @@ type CacheProvider interface {
 	GetUserBan(userID string) (bool, bool, error)
 	SetUserBan(userID string, isBanned bool, expiration time.Duration) error
 	DeleteUserBan(userID string) error
-	//csrf shit
-	GetCSRFToken(sessionID string) (string, bool, error)
-	SetCSRFToken(sessionID, token string, expiration time.Duration) error
-	DeleteCSRFToken(sessionID string) error
 	GetWebSocketConnections(userID string) ([]string, bool, error)
 	AddWebSocketConnection(userID, sessionID string, data map[string]string, expiration time.Duration) error
 	RemoveWebSocketConnection(userID, sessionID string) error
@@ -68,7 +64,6 @@ type KeyGenerator interface {
 	UserSessions(userID string) string
 	WebSocket(userID string) string
 	UserBan(userID string) string
-	CSRFToken(sessionID string) string
 	WebSocketConnection(sessionID string) string
 	SessionData(token string) string
 	TypingIndicator(channelID string) string

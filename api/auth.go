@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"auth.com/v4/internal/csrf"
 	"auth.com/v4/utils"
 	"github.com/labstack/echo/v4"
 )
@@ -38,7 +39,7 @@ func GetCSRFToken(c echo.Context) error {
 
 	cookie, err := c.Cookie("session")
 	if err == nil && cookie.Value != "" {
-		utils.StoreCSRFToken(cookie.Value, token)
+		csrf.Service.StoreToken(cookie.Value, token)
 	}
 
 	return c.JSON(http.StatusOK, echo.Map{

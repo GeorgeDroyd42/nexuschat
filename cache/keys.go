@@ -32,10 +32,6 @@ func (kg StandardKeyGenerator) UserBan(userID string) string {
 // DefaultKeys is the default key generator instance
 var DefaultKeys = StandardKeyGenerator{}
 
-func (kg StandardKeyGenerator) CSRFToken(sessionID string) string {
-	return fmt.Sprintf("csrf:%s", sessionID)
-}
-
 func (kg StandardKeyGenerator) WebSocketConnection(sessionID string) string {
 	return fmt.Sprintf("ws:connection:%s", sessionID)
 }
