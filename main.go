@@ -12,6 +12,7 @@ import (
 	"auth.com/v4/api"
 	"auth.com/v4/cache"
 	"auth.com/v4/internal/csrf"
+	"auth.com/v4/internal/invite"
 	"auth.com/v4/utils"
 	"github.com/go-redis/redis"
 	"github.com/labstack/echo/v4"
@@ -197,6 +198,7 @@ func main() {
 	err := cache.Initialize(redisOptions, utils.GetDB(), utils.Log)
 	
 	csrf.Initialize(cache.Provider, csrf.DefaultKeys)
+	invite.Initialize(utils.GetDB())
 
 	startRedisSubscriber()
 	utils.StartHeartbeat()

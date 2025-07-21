@@ -1,6 +1,7 @@
 package api
 
 import (
+	"auth.com/v4/internal/invite"
 	"auth.com/v4/utils"
 	"github.com/labstack/echo/v4"
 )
@@ -27,7 +28,7 @@ func GenerateInviteHandler(c echo.Context) error {
 	}
 
 	// Generate invite code
-	inviteCode, err := utils.CreateInviteCode(guildID, userID)
+	inviteCode, err := invite.Service.CreateInviteCode(guildID, userID)
 	if err != nil {
 		return utils.SendErrorResponse(c, utils.ErrDatabaseError)
 	}
@@ -53,7 +54,7 @@ func JoinByInviteHandler(c echo.Context) error {
 
 	// Validate invite code format
 
-	guildID, err := utils.GetGuildByInviteCode(inviteCode)
+	guildID, err := invite.Service.GetGuildByInviteCode(inviteCode)
 	if err != nil {
 		return utils.SendErrorResponse(c, utils.ErrInvalidInviteCode)
 	}
@@ -106,7 +107,7 @@ func GetInviteInfoHandler(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	guildID, err := utils.GetGuildByInviteCode(inviteCode)
+	guildID, err := invite.Service.GetGuildByInviteCode(inviteCode)
 	if err != nil {
 		return c.Render(200, "guild_not_found.html", nil)
 	}

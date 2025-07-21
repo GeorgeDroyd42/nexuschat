@@ -1,4 +1,4 @@
-package utils
+package invite
 
 import (
 	"crypto/rand"
@@ -8,7 +8,22 @@ import (
 	"strings"
 )
 
-func GenerateInviteCode() string {
+var Service = &inviteService{}
+
+type inviteService struct {
+	db DBProvider
+}
+
+type DBProvider interface {
+	QueryRow(query string, args ...interface{}) *sql.Row
+	Exec(query string, args ...interface{}) (sql.Result, error)
+}
+
+func Initialize(db DBProvider) {
+	Service.db = db
+}
+
+func (s *inviteService) GenerateInviteCode() string {
 	const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	code := make([]byte, 8)
 	rand.Read(code)
@@ -18,9 +33,9 @@ func GenerateInviteCode() string {
 	return string(code)
 }
 
-func CreateInviteCode(guildID, createdBy string) (string, error) {
+func (s *inviteService) CreateInviteCode(guildID, createdBy string) (string, error) {
 	var code string
-	err := GetDB().QueryRow(`
+	err := s.db.QueryRow(`
 		SELECT invite_code FROM guild_invites 
 		WHERE guild_id = $1 AND (expires_at IS NULL OR expires_at > NOW())
 		LIMIT 1
@@ -31,8 +46,8 @@ func CreateInviteCode(guildID, createdBy string) (string, error) {
 	}
 
 	for i := 0; i < 5; i++ {
-		code = GenerateInviteCode()
-		_, err = GetDB().Exec(`
+		code = s.GenerateInviteCode()
+		_, err = s.db.Exec(`
 			INSERT INTO guild_invites (invite_code, guild_id, created_by, uses_count, max_uses)
 			VALUES ($1, $2, $3, 0, NULL)
 		`, code, guildID, createdBy)
@@ -44,9 +59,9 @@ func CreateInviteCode(guildID, createdBy string) (string, error) {
 	return "", err
 }
 
-func GetGuildByInviteCode(code string) (string, error) {
+func (s *inviteService) GetGuildByInviteCode(code string) (string, error) {
 	var guildID string
-	err := GetDB().QueryRow(`
+	err := s.db.QueryRow(`
 		SELECT guild_id FROM guild_invites 
 		WHERE invite_code = $1 AND (expires_at IS NULL OR expires_at > NOW())
 	`, strings.ToUpper(code)).Scan(&guildID)
@@ -57,6 +72,6 @@ func GetGuildByInviteCode(code string) (string, error) {
 	return guildID, err
 }
 
-func IsValidInviteCode(code string) bool {
+func (s *inviteService) IsValidInviteCode(code string) bool {
 	return len(code) == 8 && regexp.MustCompile(`^[A-Z0-9]+$`).MatchString(strings.ToUpper(code))
 }

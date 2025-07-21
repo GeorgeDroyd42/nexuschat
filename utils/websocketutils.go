@@ -62,6 +62,11 @@ func UpgradeAndRegister(c echo.Context, userID string) (*WebSocketConnection, st
 
 	ws.SetReadLimit(int64(AppConfig.MaxWSMessageSize))
 	ws.SetReadDeadline(time.Now().Add(5 * time.Minute))
+	
+	ws.SetPongHandler(func(string) error {
+		ws.SetReadDeadline(time.Now().Add(5 * time.Minute))
+		return nil
+	})
 
 	var httpSessionToken string
 	if cookie, err := c.Cookie("session"); err == nil {
@@ -181,7 +186,7 @@ func StartHeartbeat() {
 				err := conn.Conn.WriteMessage(websocket.PingMessage, []byte{})
 				conn.writeMu.Unlock()
 				if err != nil {
-					log(logrus.WarnLevel, "WebSocket", "heartbeat", "Connection lost", err)
+					log(logrus.DebugLevel, "WebSocket", "heartbeat", "Ping failed, connection may be stale", err)
 					go RemoveConnection(conn.SessionID)
 				}
 			}
