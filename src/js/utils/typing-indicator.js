@@ -15,8 +15,14 @@ setupTypingIndicator() {
 
 updateTypingUsers(users) {
         console.log('DEBUG: updateTypingUsers called with:', users);
-        this.typingUsers = users || [];
-        console.log('DEBUG: NO FILTERING - showing all users:', this.typingUsers);
+        const currentUsername = window.profileManager?.currentUser?.username;
+        if (currentUsername) {
+            this.typingUsers = this.filterTypingUsers(users || [], currentUsername);
+            console.log('DEBUG: Filtered out current user:', currentUsername, 'Result:', this.typingUsers);
+        } else {
+            this.typingUsers = users || [];
+            console.log('DEBUG: No current user found - showing all users:', this.typingUsers);
+        }
         this.renderTypingIndicator();
     }
 

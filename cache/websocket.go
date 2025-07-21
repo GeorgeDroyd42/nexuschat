@@ -141,3 +141,35 @@ func (c *RedisCache) GetTypingUsers(channelID string) ([]string, error) {
 
 	return activeUsers, nil
 }
+
+func (c *RedisCache) RemoveUserFromAllTypingIndicators(userID string) ([]string, error) {
+	pattern := "typing:*"
+	keys, err := c.client.Keys(pattern).Result()
+	if err != nil {
+		return nil, err
+	}
+	
+	channelsToUpdate := []string{}
+	
+	for _, key := range keys {
+		var typingUsers map[string]int64
+		found, err := c.Get(key, &typingUsers)
+		if err != nil || !found {
+			continue
+		}
+		
+		if _, exists := typingUsers[userID]; exists {
+			channelID := key[7:]
+			channelsToUpdate = append(channelsToUpdate, channelID)
+			
+			delete(typingUsers, userID)
+			if len(typingUsers) == 0 {
+				c.Delete(key)
+			} else {
+				c.Set(key, typingUsers, c.config.DefaultTTL)
+			}
+		}
+	}
+	
+	return channelsToUpdate, nil
+}

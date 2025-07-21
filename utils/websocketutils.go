@@ -145,6 +145,10 @@ func RemoveConnection(sessionID string) {
 
 	if userID != "" {
 		cache.Provider.RemoveWebSocketConnection(userID, sessionID)
+		channelIDs, _ := cache.Provider.RemoveUserFromAllTypingIndicators(userID)
+		if len(channelIDs) > 0 {
+			BroadcastTypingStatusForChannels(channelIDs)
+		}
 		HandleUserDisconnect(userID)
 	}
 }
@@ -422,11 +426,11 @@ func HandleWebSocketMessage(userID string, rawMessage []byte) error {
 	}
 
 	if jsonMsg["type"] == "typing_start" {
-		return handleTypingStart(userID, jsonMsg)
+		return HandleTypingStart(userID, jsonMsg)
 	}
 
 	if jsonMsg["type"] == "typing_stop" {
-		return handleTypingStop(userID, jsonMsg)
+		return HandleTypingStop(userID, jsonMsg)
 	}
 
 	if jsonMsg["type"] == "delete_message" {
@@ -434,85 +438,13 @@ func HandleWebSocketMessage(userID string, rawMessage []byte) error {
 	}
 
 	if jsonMsg["type"] == "request_typing_state" {
-		return handleRequestTypingState(userID, jsonMsg)
+		return HandleRequestTypingState(userID, jsonMsg)
 	}
 
 	return fmt.Errorf("unsupported_message_type")
 
 }
-func handleTypingStart(userID string, data map[string]interface{}) error {
-	channelID, ok := data["channel_id"].(string)
-	if !ok || channelID == "" {
-		return fmt.Errorf("invalid_channel_id")
-	}
 
-	err := cache.Provider.AddTypingUser(channelID, userID, 15*time.Second)
-	if err != nil {
-		return err
-	}
-
-	return BroadcastTypingStatus(channelID)
-}
-
-func handleTypingStop(userID string, data map[string]interface{}) error {
-	channelID, ok := data["channel_id"].(string)
-	if !ok || channelID == "" {
-		return fmt.Errorf("invalid_channel_id")
-	}
-
-	err := cache.Provider.RemoveTypingUser(channelID, userID)
-	if err != nil {
-		return err
-	}
-
-	return BroadcastTypingStatus(channelID)
-}
-
-func BroadcastTypingStatus(channelID string) error {
-	typingUsers, err := cache.Provider.GetTypingUsers(channelID)
-	if err != nil {
-		return err
-	}
-
-	var guildID string
-	found, err := QueryRow("GetGuildFromChannel", &guildID,
-		"SELECT guild_id FROM channels WHERE channel_id = $1", channelID)
-
-	if !found || err != nil {
-		return err
-	}
-
-	typingData := map[string]interface{}{
-		"type":         "typing_update",
-		"channel_id":   channelID,
-		"typing_users": typingUsers,
-	}
-
-	return BroadcastToGuildMembers(guildID, typingData)
-}
-
-func handleRequestTypingState(userID string, data map[string]interface{}) error {
-	channelID, ok := data["channel_id"].(string)
-	if !ok || channelID == "" {
-		return fmt.Errorf("invalid_channel_id")
-	}
-
-	typingUsers, err := cache.Provider.GetTypingUsers(channelID)
-	if err != nil {
-		return err
-	}
-
-	typingData := map[string]interface{}{
-		"type":         "typing_update",
-		"channel_id":   channelID,
-		"typing_users": typingUsers,
-	}
-
-	jsonData, _ := json.Marshal(typingData)
-	SendToUser(userID, websocket.TextMessage, jsonData)
-
-	return nil
-}
 
 func handleMessageEvent(userID string, data map[string]interface{}) error {
 	channelID, ok1 := data["channel_id"].(string)

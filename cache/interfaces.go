@@ -55,6 +55,7 @@ type CacheProvider interface {
 	AddTypingUser(channelID, userID string, duration time.Duration) error
 	RemoveTypingUser(channelID, userID string) error
 	GetTypingUsers(channelID string) ([]string, error)
+	RemoveUserFromAllTypingIndicators(userID string) ([]string, error)
 	PublishMessage(channel string, message interface{}) error
 	Subscribe(channels ...string) (PubSubSubscription, error)
 	SetNX(key string, value interface{}, expiration time.Duration) bool
