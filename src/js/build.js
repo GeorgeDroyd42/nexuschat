@@ -37,6 +37,7 @@ const guildFiles = [
     'src/js/utils/permission-manager.js',
     'src/js/MessageAPI.js',
     'src/js/sidebar.js',
+    'src/js/utils/websocket-queue.js',
     'src/js/sockets.js',
     'src/js/context-menu.js',
     'src/js/utils/typing-indicator.js'

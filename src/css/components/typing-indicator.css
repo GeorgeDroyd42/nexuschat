@@ -1,9 +1,11 @@
 @layer components {
   .typing-indicator {
-    @apply hidden items-center gap-2 sticky z-30 m-0 rounded-none;
+    @apply hidden items-center gap-2 fixed z-30 m-0 rounded-none;
     @apply px-2 py-1;
-    @apply text-xs text-slate-400 bg-transparent;
+    @apply text-xs text-slate-400 bg-slate-800 border-t border-slate-600;
     bottom: var(--bottom-section-height);
+    left: 340px;
+    right: 0;
   }
 
 .typing-dots {
@@ -34,7 +36,10 @@
 
 @media (max-width: 768px) {
   .typing-indicator {
-    @apply sticky bottom-36 px-4 py-3 text-sm border-t border-slate-600 z-40;
+    @apply fixed px-4 py-3 text-sm border-t border-slate-600 z-40;
+    bottom: var(--bottom-section-height);
+    left: 0;
+    right: 0;
   }
   
   .typing-dots span {

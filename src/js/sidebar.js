@@ -1,16 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Bottom nav active state handling
-  const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
-  const currentPath = window.location.pathname;
   
-  bottomNavItems.forEach(item => {
-    const href = item.getAttribute('href');
-    if (href === currentPath) {
-      item.classList.add('active');
-    } else {
-      item.classList.remove('active');
-    }
-  });
   loadUserGuilds();
 });
 

@@ -433,6 +433,10 @@ func HandleWebSocketMessage(userID string, rawMessage []byte) error {
 		return handleDeleteMessage(userID, jsonMsg)
 	}
 
+	if jsonMsg["type"] == "request_typing_state" {
+		return handleRequestTypingState(userID, jsonMsg)
+	}
+
 	return fmt.Errorf("unsupported_message_type")
 
 }
@@ -486,6 +490,30 @@ func BroadcastTypingStatus(channelID string) error {
 
 	return BroadcastToGuildMembers(guildID, typingData)
 }
+
+func handleRequestTypingState(userID string, data map[string]interface{}) error {
+	channelID, ok := data["channel_id"].(string)
+	if !ok || channelID == "" {
+		return fmt.Errorf("invalid_channel_id")
+	}
+
+	typingUsers, err := cache.Provider.GetTypingUsers(channelID)
+	if err != nil {
+		return err
+	}
+
+	typingData := map[string]interface{}{
+		"type":         "typing_update",
+		"channel_id":   channelID,
+		"typing_users": typingUsers,
+	}
+
+	jsonData, _ := json.Marshal(typingData)
+	SendToUser(userID, websocket.TextMessage, jsonData)
+
+	return nil
+}
+
 func handleMessageEvent(userID string, data map[string]interface{}) error {
 	channelID, ok1 := data["channel_id"].(string)
 	content, ok2 := data["content"].(string)

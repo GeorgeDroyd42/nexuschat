@@ -123,6 +123,13 @@ async loadChannelMessages(channelId) {
     
     this.currentChannelId = channelId;
     
+    if (window.sendMessage) {
+        window.sendMessage({
+            type: 'request_typing_state',
+            channel_id: channelId
+        });
+    }
+    
     if (this.messageCache.has(channelId)) {
         const cached = this.messageCache.get(channelId);
         this.messages = cached.messages;

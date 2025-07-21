@@ -10,11 +10,15 @@ function connectWebSocket() {
 websocket.onopen = function() {
     console.log('WebSocket connected');
     
+    window.wsQueue.setWebSocket(websocket);
+    
     // Send a status update message to trigger server-side online broadcasting
-    websocket.send(JSON.stringify({
+    window.wsQueue.sendMessage({
         type: 'status_update',
         status: 'online'
-    }));
+    });
+    
+    window.wsQueue.flushQueue();
     
     if (window.MessageAPI && window.MessageAPI.currentChannelId) {
         window.MessageAPI.loadChannelMessages(window.MessageAPI.currentChannelId);
@@ -273,21 +277,12 @@ function handleTypingUpdate(data) {
             const users = data.typing_users || [];
             const validUsers = users.filter(user => user && typeof user === 'string' && user.trim() !== '');
             window.TypingIndicator.updateTypingUsers(validUsers);
-        } else {
-            window.TypingIndicator.updateTypingUsers([]);
         }
     }
 }
 
 function sendMessage(data) {
-    if (websocket && websocket.readyState === WebSocket.OPEN) {
-        console.log('Sending message via WebSocket:', data);
-        websocket.send(JSON.stringify(data));
-        return true;
-    } else {
-        console.error('WebSocket not connected, state:', websocket ? websocket.readyState : 'null');
-        return false;
-    }
+    return window.wsQueue.sendMessage(data);
 }
 
 window.socket = websocket;

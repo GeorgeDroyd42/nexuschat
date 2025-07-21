@@ -5,7 +5,6 @@ class TypingIndicator {
             this.currentChannelId = null;
             this.isTyping = false;
             this.lastInputLength = 0;
-            console.log('DEBUG: TypingIndicator initialized, using existing HTML element');
         }
 
 setupTypingIndicator() {

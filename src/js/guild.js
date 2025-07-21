@@ -343,35 +343,7 @@ onSuccess: () => {
         });
     });
 
-    // Centralized tab switching
-    function switchToTab(activeTab, action) {
-        document.querySelectorAll('.bottom-nav-item').forEach(tab => {
-            tab.classList.remove('active');
-        });
-        activeTab.classList.add('active');
-        if (action) action();
-    }
     
-    const homeTabBtn = document.querySelector('[data-tab="home"]');
-    const profileTabBtn = document.querySelector('[data-tab="profile"]');
-    const sidebar = document.querySelector('.sidebar');
-    
-    if (homeTabBtn && profileTabBtn && sidebar) {
-        
-        homeTabBtn.addEventListener('click', () => {
-            switchToTab(homeTabBtn, () => {
-                // Hide mobile profile if visible
-                const mobileProfilePage = document.getElementById('mobile-profile-page');
-                if (mobileProfilePage) mobileProfilePage.style.display = 'none';
-            });
-        });
-        
-        profileTabBtn.addEventListener('click', () => {
-            switchToTab(profileTabBtn, () => {
-                window.profileManager.openProfile(false);
-            });
-        });
-    }
 
     initWebSocket();
     setupServerImageUpload();
