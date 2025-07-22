@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"time"
+	"auth.com/v4/internal/perms"
 )
 
 func CreateMessage(channelID, userID, content string) (string, error) {
@@ -127,7 +128,7 @@ func DeleteMessage(messageID, userID string) error {
 		canDelete = true
 	} else {
 		// Check if user has DELETE_MESSAGE permission
-		hasPermission, err := HasChannelPermission(userID, channelID, DELETE_MESSAGE)
+		hasPermission, err := perms.Service.HasChannelPermission(userID, channelID, perms.DELETE_MESSAGE)
 		if err == nil && hasPermission {
 			canDelete = true
 		}

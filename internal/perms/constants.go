@@ -1,4 +1,4 @@
-package utils
+package perms
 
 // Guild Permissions - Single source of truth for all permission definitions
 const (

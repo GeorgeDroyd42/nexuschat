@@ -2,6 +2,7 @@ package api
 
 import (
 	"auth.com/v4/utils"
+	"auth.com/v4/internal/perms"
 	"auth.com/v4/internal/webhook"
 	"github.com/labstack/echo/v4"
 )
@@ -21,7 +22,7 @@ func CreateWebhookHandler(c echo.Context) error {
 	if name == "" {
 		return utils.SendErrorResponse(c, utils.ErrInvalidCredentials)
 	}
-	_, err = utils.RequireChannelPermission(c, userID, channelID, utils.CREATE_WEBHOOKS)
+	_, err = perms.Service.RequireChannelPermission(c, userID, channelID, perms.CREATE_WEBHOOKS)
 	if err != nil {
 		return err
 	}
@@ -62,7 +63,7 @@ func ListWebhooksHandler(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	_, err = utils.RequireChannelPermission(c, userID, channelID, utils.VIEW_WEBHOOKS)
+	_, err = perms.Service.RequireChannelPermission(c, userID, channelID, perms.VIEW_WEBHOOKS)
 	if err != nil {
 		return err
 	}
@@ -132,7 +133,7 @@ func DeleteWebhookHandler(c echo.Context) error {
 		return err
 	}
 
-	channelID, guildID, err := utils.RequireWebhookPermission(c, userID, webhookID, utils.DELETE_WEBHOOKS)
+	channelID, guildID, err := perms.Service.RequireWebhookPermission(c, userID, webhookID, perms.DELETE_WEBHOOKS)
 	if err != nil {
 		return err
 	}

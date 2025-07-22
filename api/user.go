@@ -12,6 +12,7 @@ import (
 
 	"auth.com/v4/cache"
 	"auth.com/v4/utils"
+	"auth.com/v4/internal/perms"
 	"github.com/labstack/echo/v4"
 )
 
@@ -355,7 +356,7 @@ func CheckGuildOwnershipHandler(c echo.Context) error {
 	}
 
 	// Check if user is guild owner
-	hasPermission, err := utils.HasGuildPermission(userID, guildID, utils.MANAGE_GUILD)
+	hasPermission, err := perms.Service.HasGuildPermission(userID, guildID, perms.MANAGE_GUILD)
 	if err != nil {
 		return utils.SendErrorResponse(c, utils.ErrDatabaseError)
 	}

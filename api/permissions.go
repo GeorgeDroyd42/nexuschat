@@ -1,6 +1,7 @@
 package api
 
 import (
+	"auth.com/v4/internal/perms"
 	"auth.com/v4/utils"
 	"github.com/labstack/echo/v4"
 )
@@ -20,23 +21,23 @@ func GetGuildPermissionsHandler(c echo.Context) error {
 		return err
 	}
 
-	permissions, isOwner, err := utils.GetAllGuildPermissions(userID, guildID)
+	permissions, isOwner, err := perms.Service.GetAllGuildPermissions(userID, guildID)
 	if err != nil {
 		return utils.SendErrorResponse(c, utils.ErrDatabaseError)
 	}
 
 	frontendPerms := map[string]bool{
-		"canManageGuild":    permissions[utils.MANAGE_GUILD],
-		"canManageRoles":    permissions[utils.MANAGE_ROLES],
-		"canCreateChannels": permissions[utils.CREATE_CHANNEL],
-		"canEditChannels":   permissions[utils.EDIT_CHANNEL],
-		"canDeleteChannels": permissions[utils.DELETE_CHANNEL],
-		"canDeleteMessages": permissions[utils.DELETE_MESSAGE],
-		"canKickMembers":    permissions[utils.KICK_MEMBERS],
-		"canCreateInvite":   permissions[utils.CREATE_INVITE],
-		"canViewWebhooks":   permissions[utils.VIEW_WEBHOOKS],
-		"canCreateWebhooks": permissions[utils.CREATE_WEBHOOKS],
-		"canDeleteWebhooks": permissions[utils.DELETE_WEBHOOKS],
+		"canManageGuild":    permissions[perms.MANAGE_GUILD],
+		"canManageRoles":    permissions[perms.MANAGE_ROLES],
+		"canCreateChannels": permissions[perms.CREATE_CHANNEL],
+		"canEditChannels":   permissions[perms.EDIT_CHANNEL],
+		"canDeleteChannels": permissions[perms.DELETE_CHANNEL],
+		"canDeleteMessages": permissions[perms.DELETE_MESSAGE],
+		"canKickMembers":    permissions[perms.KICK_MEMBERS],
+		"canCreateInvite":   permissions[perms.CREATE_INVITE],
+		"canViewWebhooks":   permissions[perms.VIEW_WEBHOOKS],
+		"canCreateWebhooks": permissions[perms.CREATE_WEBHOOKS],
+		"canDeleteWebhooks": permissions[perms.DELETE_WEBHOOKS],
 	}
 
 	return c.JSON(200, map[string]interface{}{

@@ -2,6 +2,7 @@ package api
 
 import (
 	"auth.com/v4/utils"
+	"auth.com/v4/internal/perms"
 	"github.com/labstack/echo/v4"
 )
 
@@ -26,7 +27,7 @@ func GetContextMenuHandler(c echo.Context) error {
 		)
 
 		if guildID != "" {
-			if hasPermission, err := utils.HasGuildPermission(userID, guildID, utils.MANAGE_GUILD); err == nil && hasPermission {
+			if hasPermission, err := perms.Service.HasGuildPermission(userID, guildID, perms.MANAGE_GUILD); err == nil && hasPermission {
 				buttons = append(buttons, map[string]interface{}{"text": "Guild Settings", "action": "guild_settings", "color": "#dcddde"})
 			}
 		}
@@ -35,7 +36,7 @@ func GetContextMenuHandler(c echo.Context) error {
 
 	case "channel":
 		if guildID != "" {
-			if hasPermission, err := utils.HasGuildPermission(userID, guildID, utils.EDIT_CHANNEL); err == nil && hasPermission {
+			if hasPermission, err := perms.Service.HasGuildPermission(userID, guildID, perms.EDIT_CHANNEL); err == nil && hasPermission {
 				buttons = append(buttons,
 					map[string]interface{}{"text": "Channel Settings", "action": "channel_settings", "color": "#dcddde"},
 					map[string]interface{}{"text": "Delete Channel", "action": "delete_channel", "color": "#f04747"},
@@ -55,7 +56,7 @@ func GetContextMenuHandler(c echo.Context) error {
 			if found && messageUserID == userID {
 				canDelete = true
 			} else if guildID != "" {
-				if hasPermission, err := utils.HasGuildPermission(userID, guildID, utils.DELETE_MESSAGE); err == nil && hasPermission {
+				if hasPermission, err := perms.Service.HasGuildPermission(userID, guildID, perms.DELETE_MESSAGE); err == nil && hasPermission {
 					canDelete = true
 				}
 			}

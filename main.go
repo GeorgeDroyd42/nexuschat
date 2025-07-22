@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"time"
+	"auth.com/v4/internal/perms"
 
 	"auth.com/v4/api"
 	"auth.com/v4/cache"
@@ -201,6 +202,7 @@ func main() {
 	csrf.Initialize(cache.Provider, csrf.DefaultKeys)
 	invite.Initialize(utils.GetDB())
 	webhook.Initialize(utils.GetDB())
+	perms.InitService(utils.GetDB())
 
 	startRedisSubscriber()
 	utils.StartHeartbeat()

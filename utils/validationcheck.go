@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image/gif"
 	"io"
+	"auth.com/v4/internal/perms"
 	"mime/multipart"
 	"net/http"
 	"time"
@@ -274,7 +275,7 @@ func ValidateChannelPermissions(userID, channelID, guildID string, operation str
 		if guildID == "" {
 			return "", false, ErrUnauthorized
 		}
-		hasPermission, err := HasGuildPermission(userID, guildID, CREATE_CHANNEL)
+		hasPermission, err := perms.Service.HasGuildPermission(userID, guildID, perms.CREATE_CHANNEL)
 		if err != nil {
 			return "", false, ErrDatabaseError
 		}

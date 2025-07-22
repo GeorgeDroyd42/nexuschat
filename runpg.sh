@@ -1,4 +1,5 @@
 docker network create auth-network 2>/dev/null || true
+docker rm -f auth_redis
 
 docker rm -f auth_postgres
 sudo docker run --name auth_postgres \

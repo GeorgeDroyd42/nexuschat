@@ -375,32 +375,7 @@ type MessageResult struct {
 	Data      map[string]interface{} `json:"broadcast_data"`
 }
 
-func handleDeleteMessage(userID string, data map[string]interface{}) error {
-	messageID, ok := data["message_id"].(string)
-	if !ok || messageID == "" {
-		return fmt.Errorf("invalid_message_id")
-	}
 
-	var channelID string
-	found, _ := QueryRow("GetMessageChannel", &channelID,
-		"SELECT channel_id FROM messages WHERE message_id = $1", messageID)
-
-	if !found {
-		return fmt.Errorf("message not found")
-	}
-
-	err := DeleteMessage(messageID, userID)
-	if err != nil {
-		return err
-	}
-
-	deleteData := map[string]interface{}{
-		"type":       "message_deleted",
-		"message_id": messageID,
-		"channel_id": channelID,
-	}
-	return BroadcastToChannel(channelID, deleteData)
-}
 func HandleWebSocketMessage(userID string, rawMessage []byte) error {
 	var jsonMsg map[string]interface{}
 	if json.Unmarshal(rawMessage, &jsonMsg) != nil {
@@ -408,7 +383,57 @@ func HandleWebSocketMessage(userID string, rawMessage []byte) error {
 	}
 
 	if jsonMsg["type"] == "message" {
-		return handleMessageEvent(userID, jsonMsg)
+		channelID, ok1 := jsonMsg["channel_id"].(string)
+		content, ok2 := jsonMsg["content"].(string)
+
+		if !ok1 || !ok2 || channelID == "" || content == "" {
+			return fmt.Errorf("invalid_message_data")
+		}
+
+		cache.Provider.RemoveTypingUser(channelID, userID)
+
+		username, _ := GetUsernameByID(userID)
+
+		var profilePicture sql.NullString
+		QueryRow("GetUserProfilePicture", &profilePicture,
+			"SELECT profile_picture FROM users WHERE user_id = $1", userID)
+
+		profilePictureValue := ""
+		if profilePicture.Valid {
+			profilePictureValue = profilePicture.String
+		}
+
+		messageID, err := CreateMessage(channelID, userID, content)
+		if err != nil {
+			return err
+		}
+
+		currentTime := time.Now().UTC()
+		result := &MessageResult{
+			ID:        messageID,
+			ChannelID: channelID,
+			UserID:    userID,
+			Username:  username,
+			Content:   content,
+			CreatedAt: currentTime,
+			Data: map[string]interface{}{
+				"type":            "new_message",
+				"message_id":      messageID,
+				"channel_id":      channelID,
+				"user_id":         userID,
+				"username":        username,
+				"content":         content,
+				"created_at":      currentTime.Format(time.RFC3339),
+				"profile_picture": profilePictureValue,
+			},
+		}
+
+		broadcastJSON, _ := json.Marshal(result.Data)
+		BroadcastWithRedis(1, broadcastJSON)
+
+		BroadcastTypingStatus(channelID)
+
+		return nil
 	}
 
 	if jsonMsg["type"] == "status_update" {
@@ -439,7 +464,30 @@ func HandleWebSocketMessage(userID string, rawMessage []byte) error {
 	}
 
 	if jsonMsg["type"] == "delete_message" {
-		return handleDeleteMessage(userID, jsonMsg)
+		messageID, ok := jsonMsg["message_id"].(string)
+		if !ok || messageID == "" {
+			return fmt.Errorf("invalid_message_id")
+		}
+
+		var channelID string
+		found, _ := QueryRow("GetMessageChannel", &channelID,
+			"SELECT channel_id FROM messages WHERE message_id = $1", messageID)
+
+		if !found {
+			return fmt.Errorf("message not found")
+		}
+
+		err := DeleteMessage(messageID, userID)
+		if err != nil {
+			return err
+		}
+
+		deleteData := map[string]interface{}{
+			"type":       "message_deleted",
+			"message_id": messageID,
+			"channel_id": channelID,
+		}
+		return BroadcastToChannel(channelID, deleteData)
 	}
 
 	if jsonMsg["type"] == "request_typing_state" {
@@ -451,68 +499,9 @@ func HandleWebSocketMessage(userID string, rawMessage []byte) error {
 }
 
 
-func handleMessageEvent(userID string, data map[string]interface{}) error {
-	channelID, ok1 := data["channel_id"].(string)
-	content, ok2 := data["content"].(string)
 
-	if !ok1 || !ok2 || channelID == "" || content == "" {
-		return fmt.Errorf("invalid_message_data")
-	}
 
-	cache.Provider.RemoveTypingUser(channelID, userID)
 
-	result, err := createAndBroadcastMessage(channelID, userID, content)
-	if err != nil {
-		return err
-	}
-
-	broadcastJSON, _ := json.Marshal(result.Data)
-	BroadcastWithRedis(1, broadcastJSON)
-
-	BroadcastTypingStatus(channelID)
-
-	return nil
-}
-
-func createAndBroadcastMessage(channelID, userID, content string) (*MessageResult, error) {
-	username, _ := GetUsernameByID(userID)
-
-	var profilePicture sql.NullString
-	QueryRow("GetUserProfilePicture", &profilePicture,
-		"SELECT profile_picture FROM users WHERE user_id = $1", userID)
-
-	profilePictureValue := ""
-	if profilePicture.Valid {
-		profilePictureValue = profilePicture.String
-	}
-
-	messageID, err := CreateMessage(channelID, userID, content)
-	if err != nil {
-		return nil, err
-	}
-
-	currentTime := time.Now().UTC()
-	result := &MessageResult{
-		ID:        messageID,
-		ChannelID: channelID,
-		UserID:    userID,
-		Username:  username,
-		Content:   content,
-		CreatedAt: currentTime,
-		Data: map[string]interface{}{
-			"type":            "new_message",
-			"message_id":      messageID,
-			"channel_id":      channelID,
-			"user_id":         userID,
-			"username":        username,
-			"content":         content,
-			"created_at":      currentTime.Format(time.RFC3339),
-			"profile_picture": profilePictureValue,
-		},
-	}
-
-	return result, nil
-}
 
 func SendEventToSpecificSession(userID, sessionToken, eventType, message string) {
 	eventData := map[string]string{"type": eventType}
