@@ -1,11 +1,10 @@
-package api
+package embed
 
 import (
 	"io"
 	"net/http"
 	"regexp"
 	"strings"
-	"time"
 
 	"auth.com/v4/cache"
 	"auth.com/v4/utils"
@@ -20,23 +19,24 @@ var (
 	titleRegex         = regexp.MustCompile(`<title[^>]*>([^<]*)</title>`)
 )
 
-func validateURL(url string) bool {
+func ValidateURL(url string) bool {
 	if url == "" {
 		return false
 	}
 	return strings.HasPrefix(url, "http://") || strings.HasPrefix(url, "https://")
 }
+
 func GetEmbedHandler(c echo.Context) error {
 	if _, err := utils.RequireUserID(c); err != nil {
 		return err
 	}
 
 	url := c.QueryParam("url")
-	if !validateURL(url) {
+	if !ValidateURL(url) {
 		return utils.SendErrorResponse(c, utils.ErrUnauthorized)
 	}
 
-	cacheKey := "embed:" + url
+	cacheKey := CacheKeyPrefix + url
 	var cachedResult map[string]interface{}
 	if found, err := cache.Provider.Get(cacheKey, &cachedResult); err == nil && found {
 		return c.JSON(200, cachedResult)
@@ -49,7 +49,7 @@ func GetEmbedHandler(c echo.Context) error {
 		return c.JSON(200, map[string]interface{}{"success": false})
 	}
 
-	req.Header.Set("User-Agent", "NexusChat")
+	req.Header.Set("User-Agent", UserAgent)
 	resp, err := client.Do(req)
 	if err != nil {
 		return c.JSON(200, map[string]interface{}{"success": false})
@@ -68,7 +68,7 @@ func GetEmbedHandler(c echo.Context) error {
 	embed := extractMetaTags(string(body))
 	embed["success"] = true
 
-	cache.Provider.Set(cacheKey, embed, 1*time.Hour)
+	cache.Provider.Set(cacheKey, embed, CacheDuration)
 
 	return c.JSON(200, embed)
 }
@@ -100,9 +100,9 @@ func extractMetaTags(html string) map[string]interface{} {
 
 func createHTTPClient() *http.Client {
 	return &http.Client{
-		Timeout: 5 * time.Second,
+		Timeout: RequestTimeout,
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			if len(via) >= 3 {
+			if len(via) >= MaxRedirects {
 				return http.ErrUseLastResponse
 			}
 			return nil
@@ -116,13 +116,13 @@ func ProxyImageHandler(c echo.Context) error {
 	}
 
 	imageURL := c.QueryParam("url")
-	if !validateURL(imageURL) {
+	if !ValidateURL(imageURL) {
 		return c.NoContent(404)
 	}
 
 	client := createHTTPClient()
 	req, _ := http.NewRequest("GET", imageURL, nil)
-	req.Header.Set("User-Agent", "NexusChat")
+	req.Header.Set("User-Agent", UserAgent)
 	resp, err := client.Do(req)
 	if err != nil {
 		return c.NoContent(404)

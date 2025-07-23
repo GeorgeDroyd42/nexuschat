@@ -6,14 +6,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-const (
-	ErrChannelNotFound         = 2012
-	ErrUnauthorized           = 1003
-	ErrDatabaseError          = 1007
-	ErrInsufficientPermissions = 2020
-	ErrUserNotInGuild         = 2010
-)
-
 var Service *PermissionService
 
 type PermissionService struct {
@@ -27,28 +19,7 @@ func InitService(database *sql.DB) {
 }
 
 func (s *PermissionService) sendErrorResponse(c echo.Context, errCode int) error {
-	statusCode := http.StatusInternalServerError
-	message := "Unknown error"
-	
-	switch errCode {
-	case ErrChannelNotFound:
-		statusCode = http.StatusNotFound
-		message = "Channel does not exist"
-	case ErrUnauthorized:
-		statusCode = http.StatusUnauthorized
-		message = "You do not have permission to access this resource."
-	case ErrDatabaseError:
-		statusCode = http.StatusInternalServerError
-		message = "Database error"
-	case ErrInsufficientPermissions:
-		statusCode = http.StatusForbidden
-		message = "Unauthorized"
-	case ErrUserNotInGuild:
-		statusCode = http.StatusForbidden
-		message = "You do not have permission to view info for this guild, as you are not in it"
-	}
-	
-	return c.JSON(statusCode, echo.Map{"error": message})
+	return c.JSON(http.StatusBadRequest, echo.Map{"error_code": errCode})
 }
 
 func (s *PermissionService) isUserInGuild(guildID, userID string) (bool, error) {

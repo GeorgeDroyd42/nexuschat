@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"time"
 	"auth.com/v4/internal/perms"
+	"auth.com/v4/internal/embed"
 
 	"auth.com/v4/api"
 	"auth.com/v4/cache"
@@ -270,9 +271,9 @@ func main() {
 		{Method: "POST", Path: "/api/webhook/create/:channelid", Handler: api.CreateWebhookHandler, AuthLevel: AUTH_USER},
 		{Method: "GET", Path: "/api/webhook/list/:channelid", Handler: api.ListWebhooksHandler, AuthLevel: AUTH_USER},
 		{Method: "POST", Path: "/api/guild/leave/:id", Handler: api.LeaveGuildHandler, AuthLevel: AUTH_USER},
-		{Method: "GET", Path: "/api/embed", Handler: api.GetEmbedHandler, AuthLevel: AUTH_USER},
+		{Method: "GET", Path: "/api/embed", Handler: embed.GetEmbedHandler, AuthLevel: AUTH_USER},
 		{Method: "GET", Path: "/v/:guildid/:channelid", Handler: api.ViewChannelHandler, AuthLevel: AUTH_USER},
-		{Method: "GET", Path: "/api/proxy-image", Handler: api.ProxyImageHandler, AuthLevel: AUTH_USER},
+		{Method: "GET", Path: "/api/proxy-image", Handler: embed.ProxyImageHandler, AuthLevel: AUTH_USER},
 		{Method: "POST", Path: "/api/auth/refresh", Handler: api.RefreshSessionHandler, AuthLevel: AUTH_USER},
 		{Method: "GET", Path: "/v/:id", Handler: api.ViewGuildHandler, AuthLevel: AUTH_USER},
 		{Method: "GET", Path: "/v/main", Handler: api.ViewMainHandler, AuthLevel: AUTH_USER},
