@@ -118,11 +118,21 @@ func HandleUserDisconnect(userID string) {
 		log(logrus.InfoLevel, "Status", "scheduling_offline", userID, fmt.Errorf("user %s scheduling offline in 1s", userID))
 		go func(uid string) {
 			time.Sleep(1 * time.Second)
-			if !IsUserOnline(uid) {
-				log(logrus.InfoLevel, "Status", "broadcasting_offline", uid, fmt.Errorf("user %s going offline after delay", uid))
+			
+			var currentConnectionCount int
+			var currentIsOnline bool
+			err := GetDB().QueryRow("SELECT connection_count, is_online FROM users WHERE user_id = $1", uid).Scan(&currentConnectionCount, &currentIsOnline)
+			if err != nil {
+				log(logrus.ErrorLevel, "Status", "check_delayed_status_error", uid, err)
+				return
+			}
+			
+			actuallyOnline := currentIsOnline && currentConnectionCount > 0
+			if !actuallyOnline {
+				log(logrus.InfoLevel, "Status", "broadcasting_offline", uid, fmt.Errorf("user %s going offline after delay (count: %d, online: %t)", uid, currentConnectionCount, currentIsOnline))
 				BroadcastUserStatusChange(uid, false)
 			} else {
-				log(logrus.InfoLevel, "Status", "cancelled_offline", uid, fmt.Errorf("user %s reconnected, cancelled offline", uid))
+				log(logrus.InfoLevel, "Status", "cancelled_offline", uid, fmt.Errorf("user %s reconnected, cancelled offline (count: %d, online: %t)", uid, currentConnectionCount, currentIsOnline))
 			}
 		}(userID)
 	}

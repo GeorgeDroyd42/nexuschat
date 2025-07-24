@@ -225,7 +225,7 @@ async handleChannelSelect(channel) {
     const guildId = channel.guild_id || this.currentGuildId;
     const targetPath = `/v/${guildId}/${channel.channel_id}`;
     
-    if (window.location.pathname === targetPath) {
+    if (isCurrentPath(targetPath)) {
         return;
     }
     

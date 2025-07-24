@@ -146,12 +146,11 @@ document.addEventListener('DOMContentLoaded', () => {
 if (guildID) {
     setupMembersSidebar(guildID);
     
-    const currentPath = window.location.pathname;
-    const channelMatch = currentPath.match(/\/v\/[^\/]+\/(.+)/);
-    if (channelMatch) {
-        window.channelManager.focusedChannel = channelMatch[1];
+    const channelId = getCurrentChannelId();
+    if (channelId) {
+        window.channelManager.focusedChannel = channelId;
         MessageAPI.init();
-        MessageAPI.loadChannelMessages(channelMatch[1]);
+        MessageAPI.loadChannelMessages(channelId);
         
         const channelTitle = document.querySelector('.channel-title');
         const messageInput = document.getElementById('message-input');
@@ -434,8 +433,7 @@ async function toggleGuildChannels(guildId, chevron, channelsContainer) {
 
     
     window.switchToGuild = async (guildId) => {
-        const currentPath = window.location.pathname;
-        if (currentPath.startsWith(`/v/${guildId}`)) {
+        if (isCurrentGuild(guildId)) {
             return;
         }
         

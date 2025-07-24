@@ -110,8 +110,7 @@ function handleMessage(data) {
             }
 }
 function handleUserStatusChanged(data) {
-    const currentPath = window.location.pathname;
-    if (currentPath.startsWith(`/v/${data.guild_id}`)) {
+    if (isCurrentGuild(data.guild_id)) {
         if (window.updateMemberStatus) {
             window.updateMemberStatus(data.user_id, data.is_online, data.guild_id);
         }
@@ -156,8 +155,7 @@ function handleGuildRemoved(data) {
             }
         }
         
-        const currentPath = window.location.pathname;
-        if (currentPath.startsWith(`/v/${data.guild_id}`)) {
+        if (isCurrentGuild(data.guild_id)) {
             NavigationUtils.redirectToMain();
         }
     }
@@ -171,8 +169,7 @@ function handleChannelCreated(data) {
 
 async function handleChannelDeleted(data) {
     if (data.channel && data.guild_id && window.channelManager) {
-        const currentPath = window.location.pathname;
-        if (currentPath === `/v/${data.guild_id}/${data.channel.channel_id}`) {
+        if (isCurrentChannel(data.guild_id, data.channel.channel_id)) {
             const channelsData = await API.guild.getChannels(data.guild_id);
             if (channelsData.channels && channelsData.channels.length > 0) {
                 window.channelManager.handleChannelSelect(channelsData.channels[0]);
@@ -186,8 +183,7 @@ async function handleChannelDeleted(data) {
 
 function handleChannelUpdated(data) {
     if (data.channel && data.guild_id && window.channelManager) {
-        const currentPath = window.location.pathname;
-        if (currentPath === `/v/${data.guild_id}/${data.channel.channel_id}`) {
+        if (isCurrentChannel(data.guild_id, data.channel.channel_id)) {
             const channelTitle = document.querySelector('.channel-title');
             if (channelTitle) {
                 const nameElement = channelTitle.querySelector('h2');

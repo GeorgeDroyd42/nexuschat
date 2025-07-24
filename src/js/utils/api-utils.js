@@ -12,7 +12,20 @@ function getCurrentChannelId() {
     const parts = path.split('/');
     return parts[3];
 }
-
+function getCurrentGuildId() {
+    const currentPath = window.location.pathname;
+    if (currentPath.startsWith('/v/')) {
+        const pathParts = currentPath.split('/v/')[1];
+        const guildId = pathParts ? pathParts.split('/')[0] : null;
+        
+        if (guildId === 'main') {
+            return null;
+        }
+        
+        return guildId;
+    }
+    return null;
+}
 async function handleFormSubmission(options) {
     const {
         formElement,
@@ -46,5 +59,17 @@ async function handleFormSubmission(options) {
         return false;
     }
 }
+function isCurrentGuild(guildId) {
+    const currentPath = window.location.pathname;
+    return currentPath.startsWith(`/v/${guildId}`);
+}
 
+function isCurrentChannel(guildId, channelId) {
+    const currentPath = window.location.pathname;
+    return currentPath === `/v/${guildId}/${channelId}`;
+}
+
+function isCurrentPath(targetPath) {
+    return window.location.pathname === targetPath;
+}
 window.handleFormSubmission = handleFormSubmission;

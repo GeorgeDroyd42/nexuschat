@@ -1,11 +1,14 @@
+function createInitialFallback(name, className) {
+    const initial = name ? name.charAt(0).toUpperCase() : '?';
+    return `<span class="${className}">${initial}</span>`;
+}
+
 function show404pfp(username) {
-    const initial = username ? username.charAt(0).toUpperCase() : '?';
-    return `<span class="member-initial">${initial}</span>`;
+    return createInitialFallback(username, 'member-initial');
 }
 
 function show404guild(guildName) {
-    const initial = guildName ? guildName.charAt(0).toUpperCase() : '?';
-    return `<span class="guild-initial">${initial}</span>`;
+    return createInitialFallback(guildName, 'guild-initial');
 }
 
 function createAvatarHTML(username, profilePicture) {

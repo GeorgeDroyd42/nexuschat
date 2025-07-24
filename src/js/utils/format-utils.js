@@ -37,17 +37,3 @@ function isMainPage() {
     return window.location.pathname === '/v/main';
 }
 
-function getCurrentGuildId() {
-    const currentPath = window.location.pathname;
-    if (currentPath.startsWith('/v/')) {
-        const pathParts = currentPath.split('/v/')[1];
-        const guildId = pathParts ? pathParts.split('/')[0] : null;
-        
-        if (guildId === 'main') {
-            return null;
-        }
-        
-        return guildId;
-    }
-    return null;
-}

@@ -1,0 +1,23 @@
+@layer components {
+  .main-sidebar:not(.hidden) {
+    @apply fixed left-[160px] top-0 w-[180px] h-screen bg-slate-800 border-r border-slate-600 z-30 overflow-y-auto shadow-sm;
+  }
+
+  @media (max-width: 768px) {
+    .main-sidebar {
+      @apply hidden;
+    }
+  }
+
+  .main-sidebar-content {
+    @apply p-4;
+  }
+
+  .placeholder-section {
+    @apply text-slate-400 text-sm;
+  }
+
+  .placeholder-section p {
+    @apply m-0 text-center;
+  }
+}
