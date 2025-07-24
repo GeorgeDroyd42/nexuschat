@@ -131,7 +131,7 @@ window.forceNavigateToGuildChannel = async (guildId, channelId = null) => {
         
         setActiveGuild(guildId);
         window.GuildMembers.setupMembersSidebar(guildID);
-        loadGuildMembers(guildId);
+        window.GuildMembers.loadGuildMembers(guildId);
         
     } catch (error) {
         console.error('Force navigation error:', error);
@@ -270,37 +270,9 @@ const settingsBtn = document.getElementById('settings-btn');
         });
     }
 
-async function loadGuildMembers(guildID) {
-    try {
-        const data = await API.guild.getMembers(guildID);
-        
-        if (data.error) {
-            console.error('Error loading members:', data.error);
-            return;
-        }
-        
-        updateMembersList(data.members, guildID);
-    } catch (error) {
-        console.error('Error loading guild members:', error);
-    }
-}
 
-async function getUsernameByID(userID) {
-    try {
-        const data = await UserAPI.getUserProfile(userID);
-        return data.username || 'Unknown';
-    } catch {
-        return 'Unknown';
-    }
-}
-async function getUserProfilePicture(userID) {
-    try {
-        const data = await UserAPI.getUserProfile(userID);
-        return data.profile_picture || '';
-    } catch {
-        return '';
-    }
-}
+
+
 window.refreshGuildList = async function() {
     try {
         const data = await API.guild.fetchUserGuilds();
@@ -360,7 +332,7 @@ async function toggleGuildChannels(guildId, chevron, channelsContainer) {
             }
                     
             setActiveGuild(guildId);
-            loadGuildMembers(guildId);
+            window.GuildMembers.loadGuildMembers(guildId);
 
         } catch (error) {
             NavigationUtils.redirectToGuild(guildId);
