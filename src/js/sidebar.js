@@ -26,7 +26,7 @@ async function loadUserGuilds() {
             guildList.innerHTML = '';
             
             data.guilds.forEach(guild => {
-                const guildElement = createGuildElement(guild);
+                const guildElement = window.GuildManager.createGuildElement(guild);
                 guildList.appendChild(guildElement);
             });
             

@@ -18,104 +18,9 @@ async function loadChannelContent(guildId, channelId) {
 
 
 
-function setupMembersSidebar(guildId) {
-    if (window.innerWidth > 768) {
-        document.getElementById('members-sidebar').classList.add('visible');
-        document.querySelector('.main-content').classList.add('with-members');
-    }
-    loadGuildMembers(guildId);
-}
-
-function createGuildElement(guild) {
-    const template = document.getElementById('guild-template');
-    const guildElement = template.content.cloneNode(true).querySelector('.guild-pill');
-    guildElement.setAttribute('data-guild-id', guild.guild_id);
-    
-    const guildIcon = guildElement.querySelector('.guild-icon');
-    const guildIconHtml = guild.profile_picture_url && guild.profile_picture_url.trim() !== '' ?
-        `<img src="${guild.profile_picture_url}" alt="${guild.name}" class="guild-image">` :
-        (window.AvatarUtils ? window.AvatarUtils.show404guild(guild.name) : `<span class="guild-initial">${guild.name.charAt(0).toUpperCase()}</span>`);
-    guildIcon.innerHTML = guildIconHtml;
-
-const imgEl = guildIcon.querySelector('img.guild-image');
-if (imgEl) {
-    imgEl.onerror = function() {
-        this.outerHTML = window.AvatarUtils ? window.AvatarUtils.show404guild(guild.name) : `<span class="guild-initial">${guild.name.charAt(0).toUpperCase()}</span>`;
-    };
-}
-    
-if (window.innerWidth > 768) {
-    guildElement.addEventListener('mouseenter', () => {
-        // Don't show tooltip if context menu is open
-        if (window.ctxMenu && window.ctxMenu.isOpen) return;
-        const tooltip = document.createElement('div');
-        tooltip.className = 'guild-tooltip';
-        tooltip.textContent = guild.name;
-        const rect = guildElement.getBoundingClientRect();
-        tooltip.style.left = rect.right - 50 + 'px';
-        tooltip.style.top = rect.top + rect.height / 2 + 'px';
-        tooltip.style.transform = 'translateY(-50%)';
-        tooltip.style.opacity = '1';
-        tooltip.style.visibility = 'visible';
-        document.body.appendChild(tooltip);
-        guildElement.currentTooltip = tooltip;
-    });
-
-    guildElement.addEventListener('mouseleave', () => {
-        if (guildElement.currentTooltip) {
-            guildElement.currentTooltip.remove();
-            guildElement.currentTooltip = null;
-        }
-    });   
-
-    guildElement.addEventListener('contextmenu', () => {
-        if (guildElement.currentTooltip) {
-            guildElement.currentTooltip.remove();
-            guildElement.currentTooltip = null;
-        }
-    });
-}
 
 
-async function loadGuildContent(guildId) {
-    const targetPath = `/v/${guildId}`;
-    const html = await API.guild.getPage(guildId);
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    const newContent = doc.querySelector('.main-content .container');
-    
-    if (newContent) {
-        document.querySelector('.main-content .container').innerHTML = newContent.innerHTML;
-        API.utils.processTimestamps(document.querySelector('.main-content .container'));
-    }
-    
-    history.pushState({guildId: guildId}, '', targetPath);
-    document.title = doc.title;
-}
 
-// Add both click and touch events for mobile compatibility
-const chevron = guildElement.querySelector('.guild-chevron');
-const channelsContainer = guildElement.querySelector('.guild-channels');
-
-if (chevron) {
-    chevron.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        await toggleGuildChannels(guild.guild_id, chevron, channelsContainer);
-    });
-}
-
-guildElement.querySelector('.guild-icon').addEventListener('click', async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        await window.switchToGuild(guild.guild_id);
-    });
-    guildElement.querySelector('.guild-icon').addEventListener('touchend', async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        await window.switchToGuild(guild.guild_id);
-    });
-    return guildElement;
-}
 
 function setupServerImageUpload() {
     setupImageUpload('server_picture', 'server-preview', 'select-server-btn');
@@ -144,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const guildForm = document.querySelector('#server-modal .form-group');
     const guildID = getCurrentGuildId();
 if (guildID) {
-    setupMembersSidebar(guildID);
+    window.GuildMembers.setupMembersSidebar(guildID);
     
     const channelId = getCurrentChannelId();
     if (channelId) {
@@ -225,7 +130,7 @@ window.forceNavigateToGuildChannel = async (guildId, channelId = null) => {
         }
         
         setActiveGuild(guildId);
-        setupMembersSidebar(guildId);
+        window.GuildMembers.setupMembersSidebar(guildID);
         loadGuildMembers(guildId);
         
     } catch (error) {
@@ -404,7 +309,7 @@ window.refreshGuildList = async function() {
         if (guildList && data.guilds) {
             guildList.innerHTML = ''; // Clear existing
             data.guilds.forEach(guild => {
-                const guildElement = createGuildElement(guild);
+                const guildElement = window.GuildManager.createGuildElement(guild);
                 guildList.appendChild(guildElement);
             });
         }
