@@ -1,6 +1,6 @@
 let currentPage = 1;
 let totalPages = 1;
-let confirmCallback = null;
+window.confirmCallback = null;
 
 async function loadUsers(page = 1) {
     try {
@@ -96,9 +96,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             document.getElementById('user-list-body').addEventListener('click', async function(e) {
                 if (e.target.classList.contains('make-admin-btn')) {
                     const username = e.target.getAttribute('data-username');
-                    document.getElementById('confirm-message').textContent = `Are you sure you want to make ${username} an admin?`;
-                    window.modalManager.openModal('confirm-modal');
-                    confirmCallback = async () => {
+                    showConfirmationDialog(`Are you sure you want to make ${username} an admin?`, async () => {
                         try {
                             await UserAPI.makeUserAdmin(username);
                             displayErrorMessage(`${username} is now an admin`, 'error-container', 'success');
@@ -106,12 +104,10 @@ document.addEventListener('DOMContentLoaded', async function() {
                         } catch (error) {
                             displayErrorMessage('Failed to make user an admin', 'error-container', 'error');
                         }
-                    };
+                    });
                 } else if (e.target.classList.contains('demote-admin-btn')) {
                     const username = e.target.getAttribute('data-username');
-                    document.getElementById('confirm-message').textContent = `Are you sure you want to revoke admin privileges from ${username}?`;
-                    window.modalManager.openModal('confirm-modal');
-                    confirmCallback = async () => {
+                    showConfirmationDialog(`Are you sure you want to revoke admin privileges from ${username}?`, async () => {
                         try {
                             await UserAPI.demoteUserAdmin(username);
                             displayErrorMessage(`${username} is no longer an admin`, 'error-container', 'success');
@@ -119,34 +115,31 @@ document.addEventListener('DOMContentLoaded', async function() {
                         } catch (error) {
                             displayErrorMessage('Failed to revoke admin privileges', 'error-container', 'error');
                         }
-                    };
+                    });
                 } else if (e.target.classList.contains('ban-btn')) {
                     const username = e.target.getAttribute('data-username');
                     const userID = e.target.getAttribute('data-userid');
-                    document.getElementById('confirm-message').textContent = `Are you sure you want to ban ${username}?`;
-                    window.modalManager.openModal('confirm-modal');
-                    confirmCallback = async () => {
+                    showConfirmationDialog(`Are you sure you want to ban ${username}?`, async () => {
                         try {
                             await UserAPI.banUser(userID);
                             loadUsers(currentPage);
                         } catch (error) {
                             alert('Failed to ban user');
                         }
-                    };
+                    });
                 } else if (e.target.classList.contains('unban-btn')) {
                     const username = e.target.getAttribute('data-username');
                     const userID = e.target.getAttribute('data-userid');
-                    document.getElementById('confirm-message').textContent = `Are you sure you want to unban ${username}?`;
-                    window.modalManager.openModal('confirm-modal');
-                    confirmCallback = async () => {
+                    showConfirmationDialog(`Are you sure you want to unban ${username}?`, async () => {
                         try {
                             await UserAPI.unbanUser(userID);
                             loadUsers(currentPage);
                         } catch (error) {
                             alert('Failed to unban user');
                         }
-                    };
+                    });
                 }
+
             });    
     
     document.getElementById('next-btn').addEventListener('click', () => {
@@ -157,9 +150,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     window.modalManager.setupModal('confirm-modal', null, 'confirm-no');
     
     document.getElementById('confirm-yes').addEventListener('click', () => {
-        if (confirmCallback) {
-            confirmCallback();
-            confirmCallback = null;
+        if (window.confirmCallback) {
+            window.confirmCallback();
+            window.confirmCallback = null;
         }
         window.modalManager.closeModal('confirm-modal');
     });

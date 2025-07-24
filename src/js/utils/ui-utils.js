@@ -181,6 +181,14 @@ function setActiveChannel(channelId) {
     setActiveElement('.channel-item', '.channel-item[data-channel-id="{id}"]', channelId);
 }
 
+function showConfirmationDialog(message, callback) {
+    document.getElementById('confirm-message').textContent = message;
+    window.modalManager.openModal('confirm-modal');
+    window.confirmCallback = callback;
+}
+
+window.showConfirmationDialog = showConfirmationDialog;
+
 window.setActiveGuild = setActiveGuild;
 window.setActiveChannel = setActiveChannel;
 window.setActiveElement = setActiveElement;
