@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     API.utils.processTimestamps(document);  
         window.addEventListener('popstate', async (e) => {
             if (e.state && e.state.guildId) {
-                await window.forceNavigateToGuildChannel(e.state.guildId, e.state.channelId);
+                await window.GuildNavigation.forceNavigateToGuildChannel(e.state.guildId, e.state.channelId);
             }
         });      
     const currentGuildId = getCurrentGuildId();
@@ -42,81 +42,7 @@ if (guildID) {
     window.channelManager.loadChannels(guildID);
 }
 
-window.forceNavigateToGuildChannel = async (guildId, channelId = null) => {
-    try {
-        const data = await API.guild.getChannels(guildId);
-        if (data.channels) {
-            const channelsList = document.getElementById('channels-list');
-            if (channelsList) {
-                channelsList.innerHTML = '';
-                data.channels.forEach(channel => {
-                    const channelElement = document.createElement('div');
-                    channelElement.className = 'channel-item';
-                    channelElement.innerHTML = `<span class="channel-name">#${channel.name}</span>`;
-                    channelElement.addEventListener('click', () => {
-                        window.location.href = `/v/${guildId}/${channel.channel_id}`;
-                    });
-                    channelsList.appendChild(channelElement);
-                });
-            }
-        }
-        
-        if (channelId) {
-            const channelsData = await API.guild.getChannels(guildId);
-            const channel = channelsData.channels?.find(c => c.channel_id === channelId);
-            
-            const html = await API.channel.getPage(guildId, channelId);
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            const newContent = doc.querySelector('.main-content .container');
-            
-            if (newContent) {
-                document.querySelector('.main-content .container').innerHTML = newContent.innerHTML;
-                API.utils.processTimestamps(document.querySelector('.main-content .container'));
-                MessageAPI.init();
-                MessageAPI.loadChannelMessages(channelId);
-                
-                const messageInput = document.getElementById('message-input');
-                if (messageInput && channel && window.getResponsiveChannelPlaceholder) {
-                    messageInput.placeholder = window.getResponsiveChannelPlaceholder(channel.name);
-                }
-            }
-            
-            document.title = doc.title;
-            window.channelManager.focusedChannel = channelId;
-            setActiveChannel(channelId);
-            
-            if (window.innerWidth > 768) {
-                document.getElementById('members-sidebar').classList.add('visible');
-                document.querySelector('.main-content').classList.add('with-members');
-            }
-        } else {
-            const html = await API.guild.getPage(guildId);
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            const newContent = doc.querySelector('.main-content .container');
-            
-            if (newContent) {
-                document.querySelector('.main-content .container').innerHTML = newContent.innerHTML;
-                API.utils.processTimestamps(document.querySelector('.main-content .container'));
-            }
-            
-            document.title = doc.title;
-        }
-        
-        setActiveGuild(guildId);
-        window.GuildMembers.setupMembersSidebar(guildID);
-        window.GuildMembers.loadGuildMembers(guildId);
-        
-    } catch (error) {
-        console.error('Force navigation error:', error);
-        if (channelId) {
-            NavigationUtils.redirectToChannel(guildId, channelId);
-        } else {
-            NavigationUtils.redirectToGuild(guildId);
-        }
-    }
-};
+
 document.addEventListener('click', (e) => {
     if (e.target.classList.contains('add-channel-mobile')) {
         const guildElement = e.target.closest('[data-guild-id]');
