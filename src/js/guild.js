@@ -1,30 +1,5 @@
-async function loadChannelContent(guildId, channelId) {
-    const targetPath = `/v/${guildId}/${channelId}`;
-    const html = await API.channel.getPage(guildId, channelId);
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    const newContent = doc.querySelector('.main-content .container');
-    
-    if (newContent) {
-        document.querySelector('.main-content .container').innerHTML = newContent.innerHTML;
-        API.utils.processTimestamps(document.querySelector('.main-content .container'));
-        MessageAPI.init();
-        MessageAPI.loadChannelMessages(channelId);
-    }
-    
-    history.pushState({channelId: channelId, guildId: guildId}, '', targetPath);
-    document.title = doc.title;    
-}
 
 
-
-
-
-
-
-function setupServerImageUpload() {
-    setupImageUpload('server_picture', 'server-preview', 'select-server-btn');
-}
 
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -250,7 +225,7 @@ onSuccess: () => {
     
 
     initWebSocket();
-    setupServerImageUpload();
+    window.GuildUI.setupServerImageUpload();
 });
 
 
@@ -269,73 +244,4 @@ const settingsBtn = document.getElementById('settings-btn');
             window.profileManager.closeProfile();
         });
     }
-
-
-
-
-window.refreshGuildList = async function() {
-    try {
-        const data = await API.guild.fetchUserGuilds();
-        
-        const guildList = document.getElementById('guild-list');
-        if (guildList && data.guilds) {
-            guildList.innerHTML = ''; // Clear existing
-            data.guilds.forEach(guild => {
-                const guildElement = window.GuildManager.createGuildElement(guild);
-                guildList.appendChild(guildElement);
-            });
-        }
-    } catch (error) {
-        console.error('Error refreshing guild list:', error);
-    }
-}
-
-async function toggleGuildChannels(guildId, chevron, channelsContainer) {
-    const isExpanded = channelsContainer.style.display === 'block';
-    
-    if (!isExpanded) {
-        try {
-            const data = await API.guild.getChannels(guildId);
-            window.channelManager.updateMobileChannelsForGuild(guildId, data.channels, channelsContainer);
-            channelsContainer.style.display = 'block';
-            chevron.classList.add('expanded');
-        } catch (error) {
-            console.error('Error loading channels:', error);
-        }
-    } else {
-        channelsContainer.style.display = 'none';
-        chevron.classList.remove('expanded');
-    }
-}
-
-    
-    window.switchToGuild = async (guildId) => {
-        if (isCurrentGuild(guildId)) {
-            return;
-        }
-        
-        const guildList = $('guild-list');
-        if (guildList) {
-            sessionStorage.setItem('guildListScrollPosition', guildList.scrollTop);
-        }
-        
-        try {
-            const channelsData = await API.guild.getChannels(guildId);
-            
-            window.channelManager.loadChannels(guildId);
-                        
-            if (channelsData.channels && channelsData.channels.length > 0) {
-                window.channelManager.focusedChannel = channelsData.channels[0].channel_id;
-                await window.channelManager.handleChannelSelect(channelsData.channels[0]);
-            } else {
-                await loadGuildContent(guildId);
-            }
-                    
-            setActiveGuild(guildId);
-            window.GuildMembers.loadGuildMembers(guildId);
-
-        } catch (error) {
-            NavigationUtils.redirectToGuild(guildId);
-        }
-    };
     

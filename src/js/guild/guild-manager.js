@@ -54,19 +54,19 @@ const GuildManager = {
         if (chevron) {
             chevron.addEventListener('click', async (e) => {
                 e.stopPropagation();
-                await toggleGuildChannels(guild.guild_id, chevron, channelsContainer);
+                await window.GuildUI.toggleGuildChannels(guild.guild_id, chevron, channelsContainer);
             });
         }
 
         guildElement.querySelector('.guild-icon').addEventListener('click', async (e) => {
             e.preventDefault();
             e.stopPropagation();
-            await window.switchToGuild(guild.guild_id);
+            await window.GuildNavigation.switchToGuild(guild.guild_id);
         });
         guildElement.querySelector('.guild-icon').addEventListener('touchend', async (e) => {
             e.preventDefault();
             e.stopPropagation();
-            await window.switchToGuild(guild.guild_id);
+            await window.GuildNavigation.switchToGuild(guild.guild_id);
         });
         return guildElement;
     }

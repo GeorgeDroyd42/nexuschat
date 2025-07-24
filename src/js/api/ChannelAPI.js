@@ -230,7 +230,7 @@ async handleChannelSelect(channel) {
     }
     
 if (guildId !== this.currentGuildId) {
-        await window.switchToGuild(guildId);
+        await window.GuildNavigation.switchToGuild(guildId);
         return;
     }
     

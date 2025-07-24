@@ -30,6 +30,8 @@ const authFiles = [
 const guildFiles = [
     'src/js/guild/guild-manager.js',
     'src/js/guild/members.js',
+    'src/js/guild/ui.js',
+    'src/js/guild/navigation.js',
     'src/js/guild.js',
     'src/js/menu/channel-menu-api.js',
     'src/js/utils/embed-utils.js',

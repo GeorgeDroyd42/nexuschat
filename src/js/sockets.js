@@ -121,8 +121,8 @@ function redirectToLogin(message) {
 }
 
 function handleGuildCreated(data) {
-    if (data.guild && window.refreshGuildList) {
-        window.refreshGuildList();
+    if (data.guild && window.GuildUI.refreshGuildList) {
+        window.GuildUI.refreshGuildList();
     }
 }
 
