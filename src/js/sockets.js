@@ -170,7 +170,7 @@ function handleChannelCreated(data) {
 async function handleChannelDeleted(data) {
     if (data.channel && data.guild_id && window.channelManager) {
         if (isCurrentChannel(data.guild_id, data.channel.channel_id)) {
-            const channelsData = await API.guild.getChannels(data.guild_id);
+            const channelsData = await GuildAPI.getChannels(data.guild_id);
             if (channelsData.channels && channelsData.channels.length > 0) {
                 window.channelManager.handleChannelSelect(channelsData.channels[0]);
             } else {

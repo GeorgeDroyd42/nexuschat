@@ -131,7 +131,7 @@ if (createChannelBtn) {
         
         await handleFormSubmission({
             formElement: $('create-guild-form'),
-            apiFunction: API.guild.create,
+            apiFunction: GuildAPI.create,
             errorContainerId: 'guild-error-container',
             validateForm: () => $('server-name').value.trim() !== '',
             operationName: 'guild creation',

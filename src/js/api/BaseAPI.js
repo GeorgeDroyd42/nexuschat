@@ -72,45 +72,7 @@ class BaseAPI {
 }
 
 const API = {
-    guild: {
-        create: (formData) => BaseAPI.post('/api/guild/create', formData, true),
-        fetchUserGuilds: () => BaseAPI.get('/api/user/guilds'),
-        getChannels: (guildId) => BaseAPI.get(`/api/channels/get?guild_id=${guildId}`),
-        getMembers: (guildId) => BaseAPI.get(`/api/guild/${guildId}/members?page=1&limit=200`),
-        leave: (guildId) => BaseAPI.post(`/api/guild/leave/${guildId}`),
-        join: (guildId) => BaseAPI.post(`/api/guild/join/${guildId}`),
-        getPage: (guildId) => BaseAPI.get(`/v/${guildId}`),
-        getInfo: (guildId) => BaseAPI.get(`/api/guild/${guildId}/info`),
-        showGuildInfo: async (guildId) => {
-            try {
-                const data = await BaseAPI.get(`/api/guild/${guildId}/info`);
-                if (data && window.guildMenuAPI) {
-                    window.guildMenuAPI.renderButtons('guild-settings-modal', data);
-                    
-                    await new Promise(resolve => {
-                        const checkElements = () => {
-                            const nameElement = document.getElementById('guild-info-name');
-                            const descElement = document.getElementById('guild-info-description');
-                            const idElement = document.getElementById('guild-info-id');
-                            
-                            if (nameElement && descElement && idElement) {
-                                nameElement.textContent = data.name;
-                                descElement.textContent = data.description || 'No description set';
-                                idElement.textContent = data.guild_id;
-                                resolve();
-                            } else {
-                                setTimeout(checkElements, 10);
-                            }
-                        };
-                        checkElements();
-                    });
-                    
-                    window.modalManager.openModal('guild-settings-modal');
-                }
-            } catch (error) {
-                console.error('Error showing guild info:', error);
-            }
-        }    },
+    
     invite: {
         joinByInvite: (inviteCode) => BaseAPI.post(`/api/invite/join/${inviteCode}`),
     },

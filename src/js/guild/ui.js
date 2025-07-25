@@ -1,7 +1,7 @@
 const GuildUI = {
     async refreshGuildList() {
         try {
-            const data = await API.guild.fetchUserGuilds();
+            const data = await GuildAPI.fetchUserGuilds();
             
             const guildList = document.getElementById('guild-list');
             if (guildList && data.guilds) {
@@ -21,7 +21,7 @@ const GuildUI = {
         
         if (!isExpanded) {
             try {
-                const data = await API.guild.getChannels(guildId);
+                const data = await GuildAPI.getChannels(guildId);
                 window.channelManager.updateMobileChannelsForGuild(guildId, data.channels, channelsContainer);
                 channelsContainer.style.display = 'block';
                 chevron.classList.add('expanded');

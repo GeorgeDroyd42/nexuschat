@@ -98,11 +98,11 @@ case 'channel_settings':
     window.channelManager.showChannelInfo(this.currentChannelId, this.currentChannelName);
     break;
             case 'leave_guild':
-                API.guild.leave(this.currentGuildId);
+                GuildAPI.leave(this.currentGuildId);
                 break;
 case 'guild_settings':
-    if (window.API && window.API.guild && window.API.guild.showGuildInfo) {
-        window.API.guild.showGuildInfo(this.currentGuildId);
+    if (window.GuildAPI && window.GuildAPI.showGuildInfo) {
+        window.GuildAPI.showGuildInfo(this.currentGuildId);
     }
     break;
         }

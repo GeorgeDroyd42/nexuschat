@@ -39,7 +39,7 @@ class ChannelManager {
                 this.hideError();
                 await this.loadChannels(guildId);
                 
-                API.guild.getChannels(guildId)
+                const channelsData = await GuildAPI.getChannels(guildId);
                 if (channelsData.channels && channelsData.channels.length > 0) {
                     const newestChannel = channelsData.channels[channelsData.channels.length - 1];
                     this.handleChannelSelect(newestChannel);
@@ -51,7 +51,7 @@ class ChannelManager {
 async loadChannels(guildId) {
         this.currentGuildId = guildId;
         try {
-            const data = await API.guild.getChannels(guildId);
+            const data = await GuildAPI.getChannels(guildId);
             
             if (data.error) {
                 console.error('Error loading channels:', data.error);

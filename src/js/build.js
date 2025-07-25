@@ -23,10 +23,6 @@ const coreFiles = [
     'src/js/utils/modal-utils.js',
 ];
 
-const authFiles = [
-    'src/js/auth.js'
-];
-
 const guildFiles = [
     'src/js/guild/guild-manager.js',
     'src/js/guild/members.js',
@@ -40,13 +36,16 @@ const guildFiles = [
     'src/js/menu/menu-renderer.js',
     'src/js/utils/permission-manager.js',
     'src/js/api/MessageAPI.js',
+    'src/js/api/GuildAPI.js',
     'src/js/sidebar.js',
     'src/js/utils/websocket-queue.js',
     'src/js/sockets.js',
     'src/js/menu/context-menu.js',
     'src/js/utils/typing-indicator.js'
 ];
-
+const authFiles = [
+    'src/js/auth.js'
+];
 const adminFiles = [
     'src/js/admin.js'
 ];

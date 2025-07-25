@@ -19,7 +19,7 @@ function addSidebarButton(config) {
 }
 async function loadUserGuilds() {
 	    try {
-	        const data = await API.guild.fetchUserGuilds();
+	        const data = await GuildAPI.fetchUserGuilds();
         
         if (data.guilds) {
             const guildList = $('guild-list');

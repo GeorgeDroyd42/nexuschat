@@ -1,7 +1,7 @@
 const GuildMembers = {
     async loadGuildMembers(guildID) {
         try {
-            const data = await API.guild.getMembers(guildID);
+            const data = await GuildAPI.getMembers(guildID);
             
             if (data.error) {
                 console.error('Error loading members:', data.error);
