@@ -30,7 +30,7 @@ if (guildID) {
     if (channelId) {
         window.channelManager.focusedChannel = channelId;
         MessageAPI.init();
-        MessageAPI.loadChannelMessages(channelId);
+        MessageManager.loadChannelMessages(channelId);
         
         const channelTitle = document.querySelector('.channel-title');
         const messageInput = document.getElementById('message-input');

@@ -20,8 +20,8 @@ websocket.onopen = function() {
     
     window.wsQueue.flushQueue();
     
-    if (window.MessageAPI && window.MessageAPI.currentChannelId) {
-        window.MessageAPI.loadChannelMessages(window.MessageAPI.currentChannelId);
+    if (window.MessageManager && window.MessageManager.currentChannelId) {
+        window.MessageManager.loadChannelMessages(window.MessageManager.currentChannelId);
     }
 };
 
@@ -29,7 +29,7 @@ websocket.onclose = function(event) {
         console.log('WebSocket disconnected', event.code, event.reason);
         
         if (window.MessageAPI) {
-            window.MessageAPI.messageCache.clear();
+            window.MessageManager.messageCache.clear();
         }
         
         if (event.reason && event.reason !== 'unauthed') {
@@ -214,7 +214,7 @@ function handleChannelUpdated(data) {
 function handleNewMessage(data) {
     if (window.MessageAPI) {
         // Only add message if it belongs to the currently viewed channel
-        if (data.channel_id && data.channel_id === window.MessageAPI.currentChannelId) {
+        if (data.channel_id && data.channel_id === window.MessageManager.currentChannelId) {
             window.MessageAPI.addNewMessage(data);
         }
     }
@@ -223,7 +223,7 @@ function handleNewMessage(data) {
 function handleMessageDeleted(data) {
     if (window.MessageAPI) {
         // Only remove message if it belongs to the currently viewed channel
-        if (data.channel_id && data.channel_id === window.MessageAPI.currentChannelId) {
+        if (data.channel_id && data.channel_id === window.MessageManager.currentChannelId) {
             const messageElement = document.querySelector(`[data-message-id="${data.message_id}"]`);
             if (messageElement) {
                 messageElement.remove();
@@ -260,8 +260,8 @@ function handleUsernameChanged(data) {
             }
         }
         
-        if (window.MessageAPI && window.MessageAPI.currentChannelId && typeof window.MessageAPI.loadChannelMessages === 'function') {
-            window.MessageAPI.loadChannelMessages(window.MessageAPI.currentChannelId);
+        if (window.MessageManager && window.MessageManager.currentChannelId && typeof window.MessageManager.loadChannelMessages === 'function') {
+            window.MessageManager.loadChannelMessages(window.MessageManager.currentChannelId);
         }
         
         console.log(`Username updated: ${data.old_username} → ${data.new_username}`);
@@ -269,7 +269,7 @@ function handleUsernameChanged(data) {
 }
 function handleTypingUpdate(data) {
     if (window.TypingIndicator) {
-        if (data.channel_id === window.MessageAPI?.currentChannelId) {
+        if (data.channel_id === window.MessageManager?.currentChannelId) {
             const users = data.typing_users || [];
             const validUsers = users.filter(user => user && typeof user === 'string' && user.trim() !== '');
             window.TypingIndicator.updateTypingUsers(validUsers);

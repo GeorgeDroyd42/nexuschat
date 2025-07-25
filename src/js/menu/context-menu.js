@@ -89,7 +89,7 @@ case 'invite':
                 }
                 break;
             case 'delete_message':
-                if (window.MessageAPI) window.MessageAPI.deleteMessage(this.currentMessageId);
+                if (window.MessageManager) window.MessageManager.deleteMessage(this.currentMessageId);
                 break;
             case 'delete_channel':
                 ChannelAPI.delete(this.currentChannelId);

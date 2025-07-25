@@ -60,7 +60,7 @@ const ChannelHandlers = {
                 if (window.MessageAPI) {
                     window.MessageAPI.init();
                     if (channel.channel_id) {
-                        window.MessageAPI.loadChannelMessages(channel.channel_id);
+                        window.MessageManager.loadChannelMessages(channel.channel_id);
                     }
                 }
                 

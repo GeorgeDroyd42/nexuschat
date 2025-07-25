@@ -10,7 +10,7 @@ const GuildNavigation = {
             document.querySelector('.main-content .container').innerHTML = newContent.innerHTML;
             API.utils.processTimestamps(document.querySelector('.main-content .container'));
             MessageAPI.init();
-            MessageAPI.loadChannelMessages(channelId);
+            MessageManager.loadChannelMessages(channelId);
         }
         
         history.pushState({channelId: channelId, guildId: guildId}, '', targetPath);
@@ -79,7 +79,7 @@ const GuildNavigation = {
                     document.querySelector('.main-content .container').innerHTML = newContent.innerHTML;
                     API.utils.processTimestamps(document.querySelector('.main-content .container'));
                     MessageAPI.init();
-                    MessageAPI.loadChannelMessages(channelId);
+                    MessageManager.loadChannelMessages(channelId);
                     
                     const messageInput = document.getElementById('message-input');
                     if (messageInput && channel && window.getResponsiveChannelPlaceholder) {
