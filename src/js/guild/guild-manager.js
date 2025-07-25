@@ -70,6 +70,20 @@ const GuildManager = {
         });
         return guildElement;
     }
+    
 };
 
 window.GuildManager = GuildManager;
+
+// initialize guild functionality when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    const currentGuildId = getCurrentGuildId();
+    if (currentGuildId) {
+        GuildUI.highlightActiveGuild(currentGuildId);        
+        window.GuildMembers.setupMembersSidebar(currentGuildId);
+        window.ChannelUI.loadChannels(currentGuildId, window.channelManager);
+    }
+    
+    // Always setup guild UI features
+    window.GuildUI.setupServerImageUpload();
+});

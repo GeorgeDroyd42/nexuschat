@@ -23,3 +23,6 @@ window.GuildOwnership = {
         window.PermissionManager.clearCache(guildId);
     }
 };
+document.addEventListener('DOMContentLoaded', () => {
+    API.utils.processTimestamps(document);
+});

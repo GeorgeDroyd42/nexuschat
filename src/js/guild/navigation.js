@@ -121,7 +121,15 @@ const GuildNavigation = {
                 NavigationUtils.redirectToGuild(guildId);
             }
         }
-    }    
+    },    
 };
 
 window.GuildNavigation = GuildNavigation;
+
+document.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('popstate', async (e) => {
+        if (e.state && e.state.guildId) {
+            await window.GuildNavigation.forceNavigateToGuildChannel(e.state.guildId, e.state.channelId);
+        }
+    });
+});

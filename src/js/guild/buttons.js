@@ -149,3 +149,8 @@ const GuildButtons = {
 };
 
 window.GuildButtons = GuildButtons;
+
+// Self-initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    GuildButtons.init();
+});

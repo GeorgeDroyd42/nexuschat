@@ -278,6 +278,8 @@ function handleTypingUpdate(data) {
 function sendMessage(data) {
     return window.wsQueue.sendMessage(data);
 }
-
+document.addEventListener('DOMContentLoaded', () => {
+    initWebSocket();
+});
 window.socket = websocket;
 window.sendMessage = sendMessage;
