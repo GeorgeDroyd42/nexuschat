@@ -36,6 +36,15 @@ const GuildUI = {
 
     setupServerImageUpload() {
         setupImageUpload('server_picture', 'server-preview', 'select-server-btn');
+    },
+
+    highlightActiveGuild(guildId) {
+        if (guildId) {
+            setTimeout(() => {
+                const activeGuild = document.querySelector(`[data-guild-id="${guildId}"]`);
+                if (activeGuild) activeGuild.classList.add('active');
+            }, 100);
+        }
     }
 };
 
