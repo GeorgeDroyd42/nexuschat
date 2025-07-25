@@ -1,4 +1,20 @@
 const ChannelUI = {
+    async checkGuildOwnershipAndShowGears(guildId) {
+        await window.PermissionManager.updateGuildUI(guildId);
+        return await window.PermissionManager.hasPermission(guildId, 'canManageChannels');
+    },
+
+    clearForm() {
+        $('channel-name').value = '';
+        $('channel-description').value = '';
+    },
+
+    closeModal(channelManager) {
+        if (channelManager.modal) {
+            window.modalManager.closeModal(channelManager.modal.id);
+        }
+    },
+
     hideError() {
         const errorContainer = $('channel-error-container');
         if (errorContainer) {
@@ -15,8 +31,8 @@ const ChannelUI = {
                 return;
             }
             
-            channelManager.updateChannelsList(data.channels);
-            channelManager.checkGuildOwnershipAndShowGears(channelManager.currentGuildId);
+            window.ChannelUI.updateChannelsList(data.channels, channelManager);
+            window.ChannelUI.checkGuildOwnershipAndShowGears(channelManager.currentGuildId);
             window.ChannelUI.showChannelsSidebar();
             
             if (channelManager.focusedChannel) {
@@ -63,7 +79,7 @@ createChannelElement(channel, channelManager) {
         }
     },
 showChannelInfo(channelId, channelName, channelManager) {
-        channelManager.getChannelInfo(channelId).then(data => {
+        window.ChannelHandlers.getChannelInfo(channelId).then(data => {
             if (data) {
                 if (window.channelMenuAPI) {
                     window.channelMenuAPI.renderButtons('channel-info-modal', channelId, channelName);
@@ -83,7 +99,66 @@ showChannelInfo(channelId, channelName, channelManager) {
                 window.modalManager.openModal('channel-info-modal');
             }
         });
-    }    
+    },
+updateChannelsList(channels, channelManager) {
+        this.updateDesktopChannels(channels, channelManager);
+        this.updateMobileChannels(channels, channelManager);
+    },
+
+    updateDesktopChannels(channels, channelManager) {
+        if (!channelManager.channelsList) return;
+        
+        channelManager.channelsList.innerHTML = '';
+        
+        if (channels && channels.length > 0) {
+            channels.forEach(channel => {
+                const channelElement = window.ChannelUI.createChannelElement(channel, channelManager);
+                channelManager.channelsList.appendChild(channelElement);
+            });
+        } else {
+            channelManager.channelsList.innerHTML = '<div class="no-channels">No channels yet</div>';
+        }
+    },
+
+    updateMobileChannels(channels, channelManager) {
+        const guildElement = document.querySelector(`[data-guild-id="${channelManager.currentGuildId}"]`);
+        if (!guildElement) return;
+        
+        const channelsContainer = guildElement.querySelector('.guild-channels');
+        if (!channelsContainer) return;
+        
+        channelsContainer.innerHTML = '';
+        if (channels && channels.length > 0) {
+            channels.forEach(channel => {
+                const channelElement = document.createElement('div');
+                channelElement.className = 'guild-channel-item';
+                channelElement.textContent = window.truncateChannelName ? window.truncateChannelName(channel.name) : channel.name;
+                channelElement.setAttribute('data-channel-id', channel.channel_id);
+                channelElement.addEventListener('click', () => window.ChannelHandlers.handleChannelSelect({...channel, guild_id: channelManager.currentGuildId}, channelManager));
+                channelsContainer.appendChild(channelElement);
+            });
+        }
+    },
+
+    updateMobileChannelsForGuild(guildId, channels, channelManager) {
+        const guildElement = document.querySelector(`[data-guild-id="${guildId}"]`);
+        if (!guildElement) return;
+        
+        const channelsContainer = guildElement.querySelector('.guild-channels');
+        if (!channelsContainer) return;
+        
+        channelsContainer.innerHTML = '';
+        if (channels && channels.length > 0) {
+            channels.forEach(channel => {
+                const channelElement = document.createElement('div');
+                channelElement.className = 'guild-channel-item';
+                channelElement.textContent = window.truncateChannelName ? window.truncateChannelName(channel.name) : channel.name;
+                channelElement.setAttribute('data-channel-id', channel.channel_id);
+                channelElement.addEventListener('click', () => window.ChannelHandlers.handleChannelSelect({...channel, guild_id: guildId}, channelManager));
+                channelsContainer.appendChild(channelElement);
+            });
+        }
+    }        
 };
 
 

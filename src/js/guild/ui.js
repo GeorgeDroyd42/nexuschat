@@ -22,7 +22,7 @@ const GuildUI = {
         if (!isExpanded) {
             try {
                 const data = await GuildAPI.getChannels(guildId);
-                window.channelManager.updateMobileChannelsForGuild(guildId, data.channels, channelsContainer);
+                window.ChannelUI.updateMobileChannelsForGuild(guildId, data.channels, window.channelManager);
                 channelsContainer.style.display = 'block';
                 chevron.classList.add('expanded');
             } catch (error) {

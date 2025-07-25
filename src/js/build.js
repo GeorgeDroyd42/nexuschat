@@ -14,7 +14,7 @@ const coreFiles = [
     'src/js/api/AuthAPI.js',
     'src/js/api/UserAPI.js',
     'src/js/utils/navutils.js',
-    'src/js/api/ChannelAPI.js',
+    'src/js/channel/channel-manager.js',
     'src/js/api/BaseAPI.js',
     'src/js/modal.js',
     'src/js/invite.js',
