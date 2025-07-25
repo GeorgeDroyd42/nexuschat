@@ -1,28 +1,12 @@
-const MessageAPI = {
-
-    init() {
-        MessageUI.setupMessageInput();
-        MessageUI.setupScrollListener();
-    },
-    addNewMessage(message) {
-        MessageManager.messages.push(message);
-        const messageEl = MessageUI.createMessageElement(message);
-        const messagesList = $('messages-list');
-        messagesList.appendChild(messageEl);
-        messagesList.scrollTop = messagesList.scrollHeight;
+class MessageAPI {
+    static getChannelMessages(channelId, beforeMessageId = null) {
+        let url = `/api/channels/${channelId}/messages?limit=25`;
+        if (beforeMessageId) {
+            url += `&before=${beforeMessageId}`;
+        }
+        
+        return BaseAPI.get(url);
     }
-};
-
-// Debug initialization
-
-document.addEventListener('DOMContentLoaded', () => {
-    MessageAPI.init();
-});
-
-// Also try immediate initialization in case DOM is already ready
-if (document.readyState === 'loading') {
-} else {
-    MessageAPI.init();
 }
 
 window.MessageAPI = MessageAPI;

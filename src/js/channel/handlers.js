@@ -57,8 +57,8 @@ const ChannelHandlers = {
                 document.querySelector('.main-content .container').innerHTML = newContent.innerHTML;
                 
                 API.utils.processTimestamps(document.querySelector('.main-content .container'));
-                if (window.MessageAPI) {
-                    window.MessageAPI.init();
+                if (window.MessageUI) {
+                    MessageUI.init();
                     if (channel.channel_id) {
                         window.MessageManager.loadChannelMessages(channel.channel_id);
                     }

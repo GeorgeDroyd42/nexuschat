@@ -116,7 +116,12 @@ const MessageUI = {
             });
             
             messagesList.scrollTop = messagesList.scrollHeight;
-        },    
+        },
+        
+    init() {
+        this.setupMessageInput();
+        this.setupScrollListener();
+    }
 };
 
 window.MessageUI = MessageUI;

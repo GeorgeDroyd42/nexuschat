@@ -5,14 +5,7 @@ const MessageManager = {
     isLoadingMessages: false,
     hasMoreMessages: true,
 
-    async getChannelMessages(channelId, beforeMessageId = null) {
-        let url = `/api/channels/${channelId}/messages?limit=25`;
-        if (beforeMessageId) {
-            url += `&before=${beforeMessageId}`;
-        }
-        
-        return await BaseAPI.get(url);
-    },
+    
 
 async sendMessage(channelId, content) {
     
@@ -62,7 +55,7 @@ async loadChannelMessages(channelId) {
     this.isLoadingMessages = true;
     
     try {
-        const response = await this.getChannelMessages(channelId);
+        const response = await MessageAPI.getChannelMessages(channelId);
         if (response.success) {
             this.messages = (response.messages || []).reverse();
             this.hasMoreMessages = response.has_more;

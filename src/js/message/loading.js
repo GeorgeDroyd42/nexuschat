@@ -6,7 +6,7 @@ const MessageLoading = {
         const oldestMessageId = MessageManager.messages[0]?.message_id;
 
         try {
-            const response = await MessageManager.getChannelMessages(MessageManager.currentChannelId, oldestMessageId);
+            const response = await MessageAPI.getChannelMessages(MessageManager.currentChannelId, oldestMessageId);
             if (response.success && response.messages.length > 0) {
                 const newMessages = response.messages.reverse();
 

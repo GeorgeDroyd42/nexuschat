@@ -28,9 +28,7 @@ websocket.onopen = function() {
 websocket.onclose = function(event) {
         console.log('WebSocket disconnected', event.code, event.reason);
         
-        if (window.MessageAPI) {
-            window.MessageManager.messageCache.clear();
-        }
+        window.MessageManager.messageCache.clear();
         
         if (event.reason && event.reason !== 'unauthed') {
             displayErrorMessage(event.reason);
@@ -212,16 +210,16 @@ function handleChannelUpdated(data) {
 }
 
 function handleNewMessage(data) {
-    if (window.MessageAPI) {
+    if (window.MessageManager) {
         // Only add message if it belongs to the currently viewed channel
         if (data.channel_id && data.channel_id === window.MessageManager.currentChannelId) {
-            window.MessageAPI.addNewMessage(data);
+            MessageManager.addNewMessage(data);
         }
     }
 }
 
 function handleMessageDeleted(data) {
-    if (window.MessageAPI) {
+    if (window.MessageManager) {
         // Only remove message if it belongs to the currently viewed channel
         if (data.channel_id && data.channel_id === window.MessageManager.currentChannelId) {
             const messageElement = document.querySelector(`[data-message-id="${data.message_id}"]`);

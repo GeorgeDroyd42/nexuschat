@@ -9,7 +9,7 @@ const GuildNavigation = {
         if (newContent) {
             document.querySelector('.main-content .container').innerHTML = newContent.innerHTML;
             API.utils.processTimestamps(document.querySelector('.main-content .container'));
-            MessageAPI.init();
+            MessageUI.init();
             MessageManager.loadChannelMessages(channelId);
         }
         
@@ -78,7 +78,7 @@ const GuildNavigation = {
                 if (newContent) {
                     document.querySelector('.main-content .container').innerHTML = newContent.innerHTML;
                     API.utils.processTimestamps(document.querySelector('.main-content .container'));
-                    MessageAPI.init();
+                    MessageUI.init();
                     MessageManager.loadChannelMessages(channelId);
                     
                     const messageInput = document.getElementById('message-input');
