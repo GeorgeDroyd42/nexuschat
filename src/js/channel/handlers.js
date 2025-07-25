@@ -1,7 +1,7 @@
 const ChannelHandlers = {
     async getChannelInfo(channelId) {
         try {
-            return await API.channel.getInfo(channelId);
+            return await ChannelAPI.getInfo(channelId);
         } catch (error) {
             console.error('Error fetching channel info:', error);
             return null;
@@ -15,7 +15,7 @@ const ChannelHandlers = {
     
         await handleFormSubmission({
             formElement: channelManager.form,
-            apiFunction: API.channel.create,
+            apiFunction: ChannelAPI.create,
             errorContainerId: 'channel-error-container',
             validateForm: () => $('channel-name').value.trim() !== '',
             operationName: 'channel creation',
@@ -48,7 +48,7 @@ const ChannelHandlers = {
         }
         
         try {
-            const html = await API.channel.getPage(guildId, channel.channel_id);
+            const html = await ChannelAPI.getPage(guildId, channel.channel_id);
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             const newContent = doc.querySelector('.main-content .container');

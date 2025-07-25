@@ -1,25 +1,26 @@
-class ChannelManager {
-    constructor() {
-        this.modal = null;
-        this.form = null;
-        this.channelsList = null;
-        this.currentGuildId = null;
-        this.focusedChannel = null;
-        this.init();
+class ChannelAPI {
+    static create(formData) {
+        return BaseAPI.post('/api/channels/create', formData, true);
     }
 
-    init() {
-        this.modal = $('channel-modal');
-        this.form = $('create-channel-form');
-        this.channelsList = $('channels-list');
-        this.setupEventListeners();
+    static getPage(guildId, channelId) {
+        return BaseAPI.get(`/v/${guildId}/${channelId}`);
     }
 
-    setupEventListeners() {
-        const createBtn = $('create-channel-button');
-        if (createBtn) {
-            createBtn.addEventListener('click', (e) => window.ChannelHandlers.handleCreateChannel(e, this));
-        }
+    static getInfo(channelId) {
+        return BaseAPI.get(`/api/channels/${channelId}/info`);
+    }
+
+    static delete(channelId) {
+        return BaseAPI.post('/api/channels/delete', {channel_id: channelId});
+    }
+
+    static edit(channelId, name, description) {
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('description', description);
+        return BaseAPI.put(`/api/channels/${channelId}/edit`, formData, true);
     }
 }
-window.channelManager = new ChannelManager();
+
+window.ChannelAPI = ChannelAPI;

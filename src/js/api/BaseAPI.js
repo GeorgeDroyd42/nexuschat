@@ -77,18 +77,7 @@ const API = {
         joinByInvite: (inviteCode) => BaseAPI.post(`/api/invite/join/${inviteCode}`),
     },
 
-    channel: {
-        create: (formData) => BaseAPI.post('/api/channels/create', formData, true),
-        getPage: (guildId, channelId) => BaseAPI.get(`/v/${guildId}/${channelId}`),
-        getInfo: (channelId) => BaseAPI.get(`/api/channels/${channelId}/info`),
-        delete: (channelId) => BaseAPI.post('/api/channels/delete', {channel_id: channelId}),
-        edit: (channelId, name, description) => {
-            const formData = new FormData();
-            formData.append('name', name);
-            formData.append('description', description);
-            return BaseAPI.put(`/api/channels/${channelId}/edit`, formData, true);
-        }
-    },
+    
 
     auth: {
         login: (formData) => BaseAPI.request('/api/auth/login', { method: 'POST', body: formData, isFormData: true, throwOnError: false }),

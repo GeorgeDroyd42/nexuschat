@@ -92,7 +92,7 @@ case 'invite':
                 if (window.MessageAPI) window.MessageAPI.deleteMessage(this.currentMessageId);
                 break;
             case 'delete_channel':
-                API.channel.delete(this.currentChannelId);
+                ChannelAPI.delete(this.currentChannelId);
                 break;
 case 'channel_settings':
     window.ChannelUI.showChannelInfo(this.currentChannelId, this.currentChannelName, window.channelManager);
