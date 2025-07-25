@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   registerCommonEventListeners();
   startSessionRefresh();
+  API.utils.processTimestamps(document);
   
   if (isMainPage()) {
     const membersSidebar = document.getElementById('members-sidebar');
@@ -23,6 +24,3 @@ window.GuildOwnership = {
         window.PermissionManager.clearCache(guildId);
     }
 };
-document.addEventListener('DOMContentLoaded', () => {
-    API.utils.processTimestamps(document);
-});

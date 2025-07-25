@@ -51,7 +51,8 @@ const guildFiles = [
     'src/js/utils/typing-indicator.js'
 ];
 const authFiles = [
-    'src/js/auth.js'
+    'src/js/auth/forms.js',
+    'src/js/auth/ui.js'
 ];
 const adminFiles = [
     'src/js/admin.js'
