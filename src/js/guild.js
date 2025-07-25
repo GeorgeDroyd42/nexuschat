@@ -82,46 +82,14 @@ document.addEventListener('click', (e) => {
     }
 });
 
-document.getElementById('members-toggle').addEventListener('click', () => {
-    document.getElementById('members-sidebar').classList.toggle('visible');
-}); 
-
-document.getElementById('guild-toggle').addEventListener('click', () => {
-    document.querySelector('.sidebar').classList.toggle('mobile-visible');
-}); 
+ 
 
     
     window.modalManager.setupModal('server-modal', 'create-guild-btn', 'back-button');
     window.modalManager.setupModal('channel-modal', 'create-channel-btn', 'cancel-channel-button');
     window.modalManager.setupModal('confirm-modal', null, 'close-invite-modal');
 
-const copyInviteBtn = document.getElementById('copy-invite-btn');
-if (copyInviteBtn) {
-    copyInviteBtn.addEventListener('click', () => {
-        const inviteText = document.getElementById('invite-link-text');
-        if (inviteText) {
-            navigator.clipboard.writeText(inviteText.value);
-            
-copyInviteBtn.textContent = 'Copied!';
-copyInviteBtn.classList.add('copied');
 
-setTimeout(() => {
-    copyInviteBtn.textContent = 'Copy';
-    copyInviteBtn.classList.remove('copied');
-}, 1500);
-        }
-    });
-}
-
-const createChannelBtn = document.getElementById('create-channel-btn');
-if (createChannelBtn) {
-    createChannelBtn.addEventListener('click', () => {
-        const currentGuildId = getCurrentGuildId();
-        if (currentGuildId) {
-            document.getElementById('channel-guild-id').value = currentGuildId;
-        }
-    });
-}
     window.modalManager.setupModal('channel-info-modal', null, 'close-channel-info-modal');
     window.modalManager.setupModal('guild-settings-modal', null, 'close-guild-settings-modal');
 
@@ -155,19 +123,5 @@ onSuccess: () => {
 });
 
 
-const settingsBtn = document.getElementById('settings-btn');
-        const profileModal = document.getElementById('profile-modal');
-        const closeProfileBtn = document.getElementById('close-profile-modal');
-        
-        if (settingsBtn) {
-            settingsBtn.addEventListener('click', () => {
-                window.profileManager.openProfile(true);
-            });
-        }
-    
-    if (closeProfileBtn) {
-        closeProfileBtn.addEventListener('click', () => {
-            window.profileManager.closeProfile();
-        });
-    }
+GuildButtons.init();
     

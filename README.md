@@ -1,13 +1,42 @@
 # Nexus
 
-**Nexus** is a privacy-focused, real-time chat application designed to deliver seamless and secure communication.
+**Nexus** is a privacy-focused, real-time chat platform built for performance and scalability.
 
-Built with modern technologies, Nexus supports essential features including:
+Currently in development, Nexus includes:
 
-- Creating and managing **guilds** and **channels**  
-- Real-time messaging with low latency  
-- Customizable **profile pictures**  
-- Support for **webhooks**  
-- And many more features coming soon
+- Guild and channel creation
+- Real-time messaging (WebSocket-based)
+- Custom profile pictures and presence
+- Admin dashboard for managing bans, webhooks, and users
+- Modular frontend (vanilla JS + Tailwind)
+- Backend in Go using Echo, with Redis and PostgreSQL
 
-The backend is powered by Go using the robust **Echo** framework, ensuring high performance and scalability. The frontend leverages lightweight **vanilla JavaScript** combined with the flexibility and efficiency of **Tailwind CSS** for a fast and responsive user interface.
+---
+
+## Screenshots
+
+### Desktop
+
+![Desktop UI](images/desktopguild.png)
+
+### Mobile
+
+![Mobile UI](images/mobileguild.png)
+
+---
+
+## Stack
+
+- **Backend**: Go (Echo)
+- **Frontend**: Vanilla JavaScript + Tailwind CSS
+- **Database**: PostgreSQL
+- **Cache / Presence**: Redis
+- **Real-time**: WebSockets
+
+---
+
+## Status
+
+This project is under active development.  
+No license is applied yet.  
+Contributions and self-hosting instructions will be available at a later stage.
