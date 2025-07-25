@@ -163,7 +163,7 @@ function handleGuildRemoved(data) {
 
 function handleChannelCreated(data) {
     if (data.channel && data.guild_id && window.channelManager) {
-        window.channelManager.loadChannels(data.guild_id);
+        window.ChannelUI.loadChannels(data.guild_id, window.channelManager);
     }
 }
 
@@ -172,12 +172,12 @@ async function handleChannelDeleted(data) {
         if (isCurrentChannel(data.guild_id, data.channel.channel_id)) {
             const channelsData = await GuildAPI.getChannels(data.guild_id);
             if (channelsData.channels && channelsData.channels.length > 0) {
-                window.channelManager.handleChannelSelect(channelsData.channels[0]);
+                await window.ChannelHandlers.handleChannelSelect(channelsData.channels[0], window.channelManager);
             } else {
                 window.location.href = `/v/${data.guild_id}`;
             }
         }
-        window.channelManager.loadChannels(data.guild_id);
+        window.ChannelUI.loadChannels(data.guild_id, window.channelManager);
     }
 }
 
@@ -207,7 +207,7 @@ function handleChannelUpdated(data) {
                 }
             }
         }
-        window.channelManager.loadChannels(data.guild_id);
+        window.ChannelUI.loadChannels(data.guild_id, window.channelManager);
     }
 }
 

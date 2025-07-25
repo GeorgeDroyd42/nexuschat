@@ -95,7 +95,7 @@ case 'invite':
                 API.channel.delete(this.currentChannelId);
                 break;
 case 'channel_settings':
-    window.channelManager.showChannelInfo(this.currentChannelId, this.currentChannelName);
+    window.ChannelUI.showChannelInfo(this.currentChannelId, this.currentChannelName, window.channelManager);
     break;
             case 'leave_guild':
                 GuildAPI.leave(this.currentGuildId);

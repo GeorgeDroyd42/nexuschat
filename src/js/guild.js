@@ -39,7 +39,7 @@ if (guildID) {
             messageInput.placeholder = window.getResponsiveChannelPlaceholder(channelName);
         }
     }
-    window.channelManager.loadChannels(guildID);
+    window.ChannelUI.loadChannels(guildID, window.channelManager);
 }
 
 

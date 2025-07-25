@@ -29,6 +29,8 @@ const guildFiles = [
     'src/js/guild/ui.js',
     'src/js/guild/navigation.js',
     'src/js/guild.js',
+    'src/js/channel/ui.js',
+    'src/js/channel/handlers.js',
     'src/js/menu/channel-menu-api.js',
     'src/js/utils/embed-utils.js',
     'src/js/menu/profile-menu-api.js',

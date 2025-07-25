@@ -30,11 +30,11 @@ const GuildNavigation = {
         try {
             const channelsData = await GuildAPI.getChannels(guildId);
             
-            window.channelManager.loadChannels(guildId);
+            await window.ChannelUI.loadChannels(guildId, window.channelManager);
                         
             if (channelsData.channels && channelsData.channels.length > 0) {
                 window.channelManager.focusedChannel = channelsData.channels[0].channel_id;
-                await window.channelManager.handleChannelSelect(channelsData.channels[0]);
+                await window.ChannelHandlers.handleChannelSelect(channelsData.channels[0], window.channelManager);
             } else {
                 await this.loadGuildContent(guildId);
             }
