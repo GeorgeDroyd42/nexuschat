@@ -187,7 +187,7 @@ func SendInitialStatusesToUser(userID string) {
 	totalSent := 0
 	for _, guild := range userGuilds {
 		if guildID, ok := guild["guild_id"].(string); ok {
-			members, _, err := GetGuildMembersWithStatus(guildID, 1, 0)
+			members, _, err := GetGuildMembersWithStatus(guildID, 1, 200)
 			if err != nil {
 				log(logrus.ErrorLevel, "Status", "get_members_error", userID, fmt.Errorf("guild %s: %v", guildID, err))
 				continue

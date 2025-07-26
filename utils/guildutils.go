@@ -201,11 +201,9 @@ func GetGuildMembersPaginated(guildID string, page, limit int) ([]MemberData, in
 	if page > 10000 {
 		page = 10000
 	}
-	if limit < 1 {
-		limit = 200
-	}
-	if limit > 500 {
-		limit = 500
+	// No backend limits - respect frontend request or use unlimited for internal calls
+	if limit > 1000 {
+		limit = 1000  // Reasonable safety limit only
 	}
 
 	offset := (page - 1) * limit
@@ -267,7 +265,7 @@ func BroadcastMemberEvent(guildID, eventType, userID, username string) {
 	}
 	broadcastData, _ := json.Marshal(memberData)
 
-	members, _, _ := GetGuildMembersPaginated(guildID, 1, 0)
+	members, _, _ := GetGuildMembersPaginated(guildID, 1, 200)
 	for _, member := range members {
 		websockets.SendToUser(member.UserID, websocket.TextMessage, broadcastData)
 	}
@@ -308,7 +306,7 @@ func BroadcastChannelEvent(guildID, eventType, channelID, channelName, channelDe
 	}
 	broadcastData, _ := json.Marshal(channelData)
 
-	members, _, _ := GetGuildMembersPaginated(guildID, 1, 0)
+	members, _, _ := GetGuildMembersPaginated(guildID, 1, 200)
 	for _, member := range members {
 		websockets.SendToUser(member.UserID, websocket.TextMessage, broadcastData)
 	}
