@@ -5,56 +5,43 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"sync"
 	"time"
 
 	"auth.com/v4/cache"
+	"auth.com/v4/internal/websockets"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 )
 
-type WebSocketConnection struct {
-	Conn      *websocket.Conn
-	UserID    string
-	SessionID string
-	writeMu   sync.Mutex
-}
-type ConnectionManager struct {
-	connections map[string]*WebSocketConnection
-	mu          sync.RWMutex
-}
 
-var wsManager = &ConnectionManager{
-	connections: make(map[string]*WebSocketConnection),
-}
 
 func BroadcastToAll(messageType int, data []byte) {
-	wsManager.mu.RLock()
+	websockets.Manager.Mu.RLock()
 	var failedSessions []string
 
-	for sessionID, conn := range wsManager.connections {
+	for sessionID, conn := range websockets.Manager.Connections {
 		if conn != nil && conn.Conn != nil {
-			conn.writeMu.Lock()
+			conn.WriteMu.Lock()
 			err := conn.Conn.WriteMessage(messageType, data)
-			conn.writeMu.Unlock()
+			conn.WriteMu.Unlock()
 			if err != nil {
 				failedSessions = append(failedSessions, sessionID)
 			}
 		}
 	}
-	wsManager.mu.RUnlock()
+	websockets.Manager.Mu.RUnlock()
 
 	if len(failedSessions) > 0 {
-		wsManager.mu.Lock()
+		websockets.Manager.Mu.Lock()
 		for _, sessionID := range failedSessions {
-			delete(wsManager.connections, sessionID)
+			delete(websockets.Manager.Connections, sessionID)
 		}
-		wsManager.mu.Unlock()
+		websockets.Manager.Mu.Unlock()
 	}
 }
 
-func UpgradeAndRegister(c echo.Context, userID string) (*WebSocketConnection, string, error) {
+func UpgradeAndRegister(c echo.Context, userID string) (*websockets.WebSocketConnection, string, error) {
 	ws, err := Upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		return nil, "", err
@@ -74,7 +61,14 @@ func UpgradeAndRegister(c echo.Context, userID string) (*WebSocketConnection, st
 	}
 
 	sessionID := GenerateWebSocketSessionID(userID)
-	wsConn := RegisterConnection(ws, userID, sessionID, httpSessionToken)
+	wsConn := websockets.RegisterConnection(ws, userID, sessionID, httpSessionToken)
+	
+	log(logrus.InfoLevel, "WebSocket", "user_connected", userID, nil)
+	HandleUserConnect(userID)
+	go func() {
+		SendInitialStatusesToUser(userID)
+	}()
+	
 	return wsConn, sessionID, nil
 }
 
@@ -98,39 +92,12 @@ var Upgrader = websocket.Upgrader{
 	},
 }
 
-func RegisterConnection(conn *websocket.Conn, userID, sessionID, httpSessionToken string) *WebSocketConnection {
-	wsConn := &WebSocketConnection{
-		Conn:      conn,
-		UserID:    userID,
-		SessionID: sessionID,
-	}
 
-	wsManager.mu.Lock()
-	wsManager.connections[sessionID] = wsConn
-	wsManager.mu.Unlock()
-
-	cache.Provider.AddWebSocketConnection(userID, sessionID, map[string]string{
-		"user_id":            userID,
-		"session_id":         sessionID,
-		"connected":          fmt.Sprintf("%d", time.Now().Unix()),
-		"http_session_token": httpSessionToken,
-	}, 24*time.Hour)
-
-	log(logrus.InfoLevel, "WebSocket", "user_connected", userID, nil)
-
-	HandleUserConnect(userID)
-
-	go func() {
-		SendInitialStatusesToUser(userID)
-	}()
-
-	return wsConn
-}
 
 func RemoveConnection(sessionID string) {
-	wsManager.mu.RLock()
-	conn := wsManager.connections[sessionID]
-	wsManager.mu.RUnlock()
+	websockets.Manager.Mu.RLock()
+	conn := websockets.Manager.Connections[sessionID]
+	websockets.Manager.Mu.RUnlock()
 
 	var userID string
 	if conn != nil {
@@ -144,9 +111,9 @@ func RemoveConnection(sessionID string) {
 		}
 	}
 
-	wsManager.mu.Lock()
-	delete(wsManager.connections, sessionID)
-	wsManager.mu.Unlock()
+	websockets.Manager.Mu.Lock()
+	delete(websockets.Manager.Connections, sessionID)
+	websockets.Manager.Mu.Unlock()
 
 	if userID != "" {
 		cache.Provider.RemoveWebSocketConnection(userID, sessionID)
@@ -160,14 +127,14 @@ func RemoveConnection(sessionID string) {
 
 func SendToUser(userID string, messageType int, data []byte) {
 
-	wsManager.mu.RLock()
-	defer wsManager.mu.RUnlock()
+	websockets.Manager.Mu.RLock()
+	defer websockets.Manager.Mu.RUnlock()
 
-	for _, conn := range wsManager.connections {
+	for _, conn := range websockets.Manager.Connections {
 		if conn.UserID == userID {
-			conn.writeMu.Lock()
+			conn.WriteMu.Lock()
 			err := conn.Conn.WriteMessage(messageType, data)
-			conn.writeMu.Unlock()
+			conn.WriteMu.Unlock()
 			if err != nil {
 				log(logrus.ErrorLevel, "WebSocket", "send_to_user", "", err)
 			}
@@ -180,17 +147,17 @@ func StartHeartbeat() {
 		defer ticker.Stop()
 
 		for range ticker.C {
-			wsManager.mu.RLock()
-			for _, conn := range wsManager.connections {
-				conn.writeMu.Lock()
+			websockets.Manager.Mu.RLock()
+			for _, conn := range websockets.Manager.Connections {
+				conn.WriteMu.Lock()
 				err := conn.Conn.WriteMessage(websocket.PingMessage, []byte{})
-				conn.writeMu.Unlock()
+				conn.WriteMu.Unlock()
 				if err != nil {
 					log(logrus.DebugLevel, "WebSocket", "heartbeat", "Ping failed, connection may be stale", err)
 					go RemoveConnection(conn.SessionID)
 				}
 			}
-			wsManager.mu.RUnlock()
+			websockets.Manager.Mu.RUnlock()
 		}
 	}()
 }
@@ -239,14 +206,14 @@ func SendToUserWithRedis(userID string, messageType int, data []byte) {
 func CleanupUserWebSocketConnections(userID string) {
 	connections, found, _ := cache.Provider.GetWebSocketConnections(userID)
 
-	wsManager.mu.Lock()
-	for sessionID, conn := range wsManager.connections {
+	websockets.Manager.Mu.Lock()
+	for sessionID, conn := range websockets.Manager.Connections {
 		if conn.UserID == userID {
 			conn.Conn.Close()
-			delete(wsManager.connections, sessionID)
+			delete(websockets.Manager.Connections, sessionID)
 		}
 	}
-	wsManager.mu.Unlock()
+	websockets.Manager.Mu.Unlock()
 
 	if found {
 		for _, sessionID := range connections {
@@ -498,11 +465,6 @@ func HandleWebSocketMessage(userID string, rawMessage []byte) error {
 
 }
 
-
-
-
-
-
 func SendEventToSpecificSession(userID, sessionToken, eventType, message string) {
 	eventData := map[string]string{"type": eventType}
 	if message != "" {
@@ -510,17 +472,17 @@ func SendEventToSpecificSession(userID, sessionToken, eventType, message string)
 	}
 	jsonData, _ := json.Marshal(eventData)
 
-	wsManager.mu.RLock()
-	defer wsManager.mu.RUnlock()
+	websockets.Manager.Mu.RLock()
+	defer websockets.Manager.Mu.RUnlock()
 
-	for _, conn := range wsManager.connections {
+	for _, conn := range websockets.Manager.Connections {
 		if conn.UserID == userID {
 			connectionData, found, _ := cache.Provider.GetWebSocketConnectionData(conn.SessionID)
 			if found {
 				if token, exists := connectionData["http_session_token"]; exists && token == sessionToken {
-					conn.writeMu.Lock()
+					conn.WriteMu.Lock()
 					err := conn.Conn.WriteMessage(websocket.TextMessage, jsonData)
-					conn.writeMu.Unlock()
+					conn.WriteMu.Unlock()
 					if err != nil {
 						log(logrus.ErrorLevel, "WebSocket", "send_to_specific_session", "", err)
 					}
