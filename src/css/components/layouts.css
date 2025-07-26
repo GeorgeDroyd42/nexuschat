@@ -6,6 +6,22 @@
     transform: translateX(100vw);
   }
 
+  .members-sidebar::-webkit-scrollbar {
+    @apply w-1.5;
+  }
+
+  .members-sidebar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .members-sidebar::-webkit-scrollbar-thumb {
+    @apply bg-slate-600 rounded opacity-50;
+  }
+
+  .members-sidebar::-webkit-scrollbar-thumb:hover {
+    @apply opacity-80;
+  }
+
   .members-sidebar.visible {
     @apply transform-none;
     border-left: 1px solid #475569;

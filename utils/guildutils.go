@@ -223,9 +223,9 @@ func GetGuildMembersPaginated(guildID string, page, limit int) ([]MemberData, in
 	members := []MemberData{}
 	var rows *sql.Rows
 	if limit == AppConfig.AllMembers {
-		rows, err = tx.Query("SELECT gm.user_id, u.username, COALESCE(u.profile_picture, '') as profile_picture, gm.joined_at FROM guild_members gm JOIN users u ON gm.user_id = u.user_id WHERE gm.guild_id = $1 ORDER BY gm.joined_at DESC", guildID)
+		rows, err = tx.Query("SELECT gm.user_id, u.username, COALESCE(u.profile_picture, '') as profile_picture, gm.joined_at FROM guild_members gm JOIN users u ON gm.user_id = u.user_id WHERE gm.guild_id = $1 ORDER BY u.username ASC", guildID)
 	} else {
-		rows, err = tx.Query("SELECT gm.user_id, u.username, COALESCE(u.profile_picture, '') as profile_picture, gm.joined_at FROM guild_members gm JOIN users u ON gm.user_id = u.user_id WHERE gm.guild_id = $1 ORDER BY gm.joined_at DESC LIMIT $2 OFFSET $3", guildID, limit, offset)
+		rows, err = tx.Query("SELECT gm.user_id, u.username, COALESCE(u.profile_picture, '') as profile_picture, gm.joined_at FROM guild_members gm JOIN users u ON gm.user_id = u.user_id WHERE gm.guild_id = $1 ORDER BY u.username ASC LIMIT $2 OFFSET $3", guildID, limit, offset)
 	}
 	if err != nil {
 		return members, totalCount, err
@@ -237,6 +237,7 @@ func GetGuildMembersPaginated(guildID string, page, limit int) ([]MemberData, in
 		if err := rows.Scan(&member.UserID, &member.Username, &member.ProfilePicture, &member.JoinedAt); err != nil {
 			continue
 		}
+		member.IsOnline = websockets.IsUserOnline(member.UserID)
 		members = append(members, member)
 	}
 
