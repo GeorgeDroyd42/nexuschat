@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+	"auth.com/v4/internal/websockets"
 
 	"auth.com/v4/cache"
 	"github.com/gorilla/websocket"
@@ -87,7 +88,7 @@ func HandleRequestTypingState(userID string, data map[string]interface{}) error 
 	}
 
 	jsonData, _ := json.Marshal(typingData)
-	SendToUser(userID, websocket.TextMessage, jsonData)
+	websockets.SendToUser(userID, websocket.TextMessage, jsonData)
 
 	return nil
 }

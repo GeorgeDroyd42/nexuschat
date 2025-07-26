@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"auth.com/v4/cache"
+	"auth.com/v4/internal/websockets"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 )
@@ -268,7 +269,7 @@ func BroadcastMemberEvent(guildID, eventType, userID, username string) {
 
 	members, _, _ := GetGuildMembersPaginated(guildID, 1, 0)
 	for _, member := range members {
-		SendToUser(member.UserID, websocket.TextMessage, broadcastData)
+		websockets.SendToUser(member.UserID, websocket.TextMessage, broadcastData)
 	}
 }
 
@@ -283,7 +284,7 @@ func NotifyUserGuildAdded(userID, guildID string) {
 		"guild": guild,
 	}
 	broadcastData, _ := json.Marshal(guildData)
-	SendToUser(userID, websocket.TextMessage, broadcastData)
+	websockets.SendToUser(userID, websocket.TextMessage, broadcastData)
 }
 
 func NotifyUserGuildRemoved(userID, guildID string) {
@@ -292,7 +293,7 @@ func NotifyUserGuildRemoved(userID, guildID string) {
 		"guild_id": guildID,
 	}
 	broadcastData, _ := json.Marshal(guildData)
-	SendToUser(userID, websocket.TextMessage, broadcastData)
+	websockets.SendToUser(userID, websocket.TextMessage, broadcastData)
 }
 
 func BroadcastChannelEvent(guildID, eventType, channelID, channelName, channelDescription string) {
@@ -309,7 +310,7 @@ func BroadcastChannelEvent(guildID, eventType, channelID, channelName, channelDe
 
 	members, _, _ := GetGuildMembersPaginated(guildID, 1, 0)
 	for _, member := range members {
-		SendToUser(member.UserID, websocket.TextMessage, broadcastData)
+		websockets.SendToUser(member.UserID, websocket.TextMessage, broadcastData)
 	}
 }
 

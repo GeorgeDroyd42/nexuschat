@@ -8,7 +8,7 @@ import (
 	"math/big"
 	"net/http"
 	"time"
-
+	"auth.com/v4/internal/websockets"
 	"auth.com/v4/cache"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -243,7 +243,7 @@ func TerminateAllUserSessions(userID string) (bool, error) {
 
 	eventData := map[string]interface{}{"type": "all_sessions_terminated"}
 	broadcastData, _ := json.Marshal(eventData)
-	SendToUser(userID, websocket.TextMessage, broadcastData)
+	websockets.SendToUser(userID, websocket.TextMessage, broadcastData)
 	return true, nil
 }
 

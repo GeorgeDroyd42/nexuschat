@@ -16,31 +16,6 @@ import (
 
 
 
-func BroadcastToAll(messageType int, data []byte) {
-	websockets.Manager.Mu.RLock()
-	var failedSessions []string
-
-	for sessionID, conn := range websockets.Manager.Connections {
-		if conn != nil && conn.Conn != nil {
-			conn.WriteMu.Lock()
-			err := conn.Conn.WriteMessage(messageType, data)
-			conn.WriteMu.Unlock()
-			if err != nil {
-				failedSessions = append(failedSessions, sessionID)
-			}
-		}
-	}
-	websockets.Manager.Mu.RUnlock()
-
-	if len(failedSessions) > 0 {
-		websockets.Manager.Mu.Lock()
-		for _, sessionID := range failedSessions {
-			delete(websockets.Manager.Connections, sessionID)
-		}
-		websockets.Manager.Mu.Unlock()
-	}
-}
-
 func UpgradeAndRegister(c echo.Context, userID string) (*websockets.WebSocketConnection, string, error) {
 	ws, err := Upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
@@ -95,52 +70,19 @@ var Upgrader = websocket.Upgrader{
 
 
 func RemoveConnection(sessionID string) {
-	websockets.Manager.Mu.RLock()
-	conn := websockets.Manager.Connections[sessionID]
-	websockets.Manager.Mu.RUnlock()
-
-	var userID string
-	if conn != nil {
-		userID = conn.UserID
-	} else {
-		connectionData, found, _ := cache.Provider.GetWebSocketConnectionData(sessionID)
-		if found {
-			if uid, exists := connectionData["user_id"]; exists {
-				userID = uid
-			}
-		}
-	}
-
-	websockets.Manager.Mu.Lock()
-	delete(websockets.Manager.Connections, sessionID)
-	websockets.Manager.Mu.Unlock()
-
+	userID, channelIDs := websockets.RemoveConnection(sessionID)
+	
 	if userID != "" {
-		cache.Provider.RemoveWebSocketConnection(userID, sessionID)
-		channelIDs, _ := cache.Provider.RemoveUserFromAllTypingIndicators(userID)
 		if len(channelIDs) > 0 {
-			BroadcastTypingStatusForChannels(channelIDs)
+			for _, channelID := range channelIDs {
+				BroadcastTypingStatus(channelID)
+			}
 		}
 		HandleUserDisconnect(userID)
 	}
 }
 
-func SendToUser(userID string, messageType int, data []byte) {
 
-	websockets.Manager.Mu.RLock()
-	defer websockets.Manager.Mu.RUnlock()
-
-	for _, conn := range websockets.Manager.Connections {
-		if conn.UserID == userID {
-			conn.WriteMu.Lock()
-			err := conn.Conn.WriteMessage(messageType, data)
-			conn.WriteMu.Unlock()
-			if err != nil {
-				log(logrus.ErrorLevel, "WebSocket", "send_to_user", "", err)
-			}
-		}
-	}
-}
 func StartHeartbeat() {
 	go func() {
 		ticker := time.NewTicker(30 * time.Second)
@@ -230,7 +172,7 @@ func SendErrorToUser(userID string, errorCode int) {
 		"message":    errorMessage,
 	}
 	jsonData, _ := json.Marshal(eventData)
-	SendToUser(userID, websocket.TextMessage, jsonData)
+	websockets.SendToUser(userID, websocket.TextMessage, jsonData)
 }
 
 func SendEventToUser(userID, eventType, message string) {
@@ -239,7 +181,7 @@ func SendEventToUser(userID, eventType, message string) {
 		eventData["message"] = message
 	}
 	jsonData, _ := json.Marshal(eventData)
-	SendToUser(userID, websocket.TextMessage, jsonData)
+	websockets.SendToUser(userID, websocket.TextMessage, jsonData)
 }
 
 func GenerateWebSocketSessionID(userID string) string {
@@ -319,7 +261,7 @@ func BroadcastToGuildMembers(guildID string, data map[string]interface{}) error 
 	for _, member := range members {
 		isStillInGuild, err := IsUserInGuild(guildID, member.UserID)
 		if err == nil && isStillInGuild {
-			SendToUser(member.UserID, websocket.TextMessage, broadcastData)
+			websockets.SendToUser(member.UserID, websocket.TextMessage, broadcastData)
 		}
 	}
 

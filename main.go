@@ -16,6 +16,7 @@ import (
 	"auth.com/v4/internal/csrf"
 	"auth.com/v4/internal/invite"
 	"auth.com/v4/internal/webhook"
+	"auth.com/v4/internal/websockets"
 	"auth.com/v4/utils"
 	"github.com/go-redis/redis"
 	"github.com/labstack/echo/v4"
@@ -153,7 +154,7 @@ func startRedisSubscriber() {
 						json.Unmarshal(broadcastMsg.Data, &messageData)
 						utils.BroadcastToChannel(broadcastMsg.ChannelID, messageData)
 					} else {
-						utils.BroadcastToAll(broadcastMsg.Type, broadcastMsg.Data)
+						websockets.BroadcastToAll(broadcastMsg.Type, broadcastMsg.Data)
 					}
 
 				case "user_messages":
@@ -164,7 +165,7 @@ func startRedisSubscriber() {
 					}
 
 					json.Unmarshal([]byte(msg.GetPayload()), &userMsg)
-					utils.SendToUser(userMsg.UserID, userMsg.Type, userMsg.Data)
+					websockets.SendToUser(userMsg.UserID, userMsg.Type, userMsg.Data)
 				}
 			}
 

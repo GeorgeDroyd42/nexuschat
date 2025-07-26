@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
-
+	"auth.com/v4/internal/websockets"
 	"auth.com/v4/cache"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
@@ -208,7 +208,7 @@ func SendInitialStatusesToUser(userID string) {
 					continue
 				}
 
-				SendToUser(userID, websocket.TextMessage, statusJSON)
+				websockets.SendToUser(userID, websocket.TextMessage, statusJSON)
 				guildSent++
 				totalSent++
 			}
