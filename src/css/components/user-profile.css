@@ -21,4 +21,19 @@
 .user-info p {
   @apply m-0 text-sm text-gray-500;
 }
+
+#modal-bio {
+  @apply px-4 py-3 mx-2 text-sm text-gray-300 italic;
+  background-color: rgba(139, 163, 232, 0.15);
+  border: 1px solid rgba(139, 163, 232, 0.3);
+  border-radius: 16px;
+  min-height: 2rem;
+  display: flex;
+  align-items: center;
+}
+
+#modal-bio:empty::before {
+  content: "No bio set";
+  @apply text-gray-500;
+}
 }

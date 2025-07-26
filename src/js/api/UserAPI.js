@@ -8,12 +8,6 @@ async getCurrentUser() {
     return await BaseAPI.get('/api/user/me', { 'Accept': 'application/json' });
 },
 
-async uploadProfilePicture(profilePictureFile) {
-    const formData = new FormData();
-    formData.append('profile_picture', profilePictureFile);
-    return await BaseAPI.post('/api/user/profile-picture', formData, true);
-},
-
 async getUsersList(page = 1, limit = 50) {
     return await BaseAPI.get(`/api/user/getusers?page=${page}&limit=${limit}`);
 },

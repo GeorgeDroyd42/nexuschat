@@ -55,8 +55,10 @@ const authFiles = [
     'src/js/auth/ui.js'
 ];
 const adminFiles = [
-    'src/js/admin.js'
-];
+    'src/js/admin/search.js',
+    'src/js/admin/ui.js',
+    'src/js/admin/buttons.js',    
+    'src/js/admin.js'];
 
 function createBundle(files, outputName) {
     let bundledContent = '';

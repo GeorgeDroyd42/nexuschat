@@ -1,5 +1,7 @@
-let currentPage = 1;
-let totalPages = 1;
+window.adminState = {
+    currentPage: 1,
+    totalPages: 1
+};
 window.confirmCallback = null;
 
 async function loadUsers(page = 1) {
@@ -7,13 +9,13 @@ async function loadUsers(page = 1) {
         const data = await UserAPI.getUsersList(page, 50);
         const currentUser = await window.profileManager.loadUserData();
         
-        currentPage = page;
-        totalPages = Math.ceil(data.total_count / 50);
+        window.adminState.currentPage = page;
+        window.adminState.totalPages = Math.ceil(data.total_count / 50);
         
         document.getElementById('total-users').textContent = data.total_count;
-        document.getElementById('page-info').textContent = `Page ${currentPage} of ${totalPages}`;
-        document.getElementById('prev-btn').disabled = currentPage === 1;
-        document.getElementById('next-btn').disabled = currentPage >= totalPages;
+        document.getElementById('page-info').textContent = `Page ${window.adminState.currentPage} of ${window.adminState.totalPages}`;
+        document.getElementById('prev-btn').disabled = window.adminState.currentPage === 1;
+        document.getElementById('next-btn').disabled = window.adminState.currentPage >= window.adminState.totalPages;
         
         const userTableBody = document.getElementById('user-list-body');
         if (data.users.length === 0) {
@@ -59,92 +61,12 @@ async function loadUsers(page = 1) {
             '<tr><td colspan="5">Error loading user data</td></tr>';
     }
 }
-function setupSearch() {
-    const searchInput = document.getElementById('user-search');
-    const clearBtn = document.getElementById('clear-search');
-    
-    if (!searchInput) return;
-    
-    searchInput.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase().trim();
-        const rows = document.querySelectorAll('#user-list-body tr');
-        
-        rows.forEach(row => {
-            const username = row.querySelector('.member-name')?.textContent?.toLowerCase() || '';
-            row.style.display = !term || username.startsWith(term) ? '' : 'none';
-        });
-    });
-    
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            searchInput.value = '';
-            document.querySelectorAll('#user-list-body tr').forEach(row => {
-                row.style.display = '';
-            });
-        });
-    }
-}
+window.loadUsers = loadUsers;
 document.addEventListener('DOMContentLoaded', async function() {    
     const userData = await window.profileManager.loadUserData();
     if (userData) {
         document.getElementById('admin-username').textContent = userData.username;
     }
-        
-    document.getElementById('prev-btn').addEventListener('click', () => {
-        if (currentPage > 1) loadUsers(currentPage - 1);
-    });
-            document.getElementById('user-list-body').addEventListener('click', async function(e) {
-                if (e.target.classList.contains('make-admin-btn')) {
-                    const username = e.target.getAttribute('data-username');
-                    showConfirmationDialog(`Are you sure you want to make ${username} an admin?`, async () => {
-                        try {
-                            await UserAPI.makeUserAdmin(username);
-                            displayErrorMessage(`${username} is now an admin`, 'error-container', 'success');
-                            loadUsers(currentPage);
-                        } catch (error) {
-                            displayErrorMessage('Failed to make user an admin', 'error-container', 'error');
-                        }
-                    });
-                } else if (e.target.classList.contains('demote-admin-btn')) {
-                    const username = e.target.getAttribute('data-username');
-                    showConfirmationDialog(`Are you sure you want to revoke admin privileges from ${username}?`, async () => {
-                        try {
-                            await UserAPI.demoteUserAdmin(username);
-                            displayErrorMessage(`${username} is no longer an admin`, 'error-container', 'success');
-                            loadUsers(currentPage);
-                        } catch (error) {
-                            displayErrorMessage('Failed to revoke admin privileges', 'error-container', 'error');
-                        }
-                    });
-                } else if (e.target.classList.contains('ban-btn')) {
-                    const username = e.target.getAttribute('data-username');
-                    const userID = e.target.getAttribute('data-userid');
-                    showConfirmationDialog(`Are you sure you want to ban ${username}?`, async () => {
-                        try {
-                            await UserAPI.banUser(userID);
-                            loadUsers(currentPage);
-                        } catch (error) {
-                            alert('Failed to ban user');
-                        }
-                    });
-                } else if (e.target.classList.contains('unban-btn')) {
-                    const username = e.target.getAttribute('data-username');
-                    const userID = e.target.getAttribute('data-userid');
-                    showConfirmationDialog(`Are you sure you want to unban ${username}?`, async () => {
-                        try {
-                            await UserAPI.unbanUser(userID);
-                            loadUsers(currentPage);
-                        } catch (error) {
-                            alert('Failed to unban user');
-                        }
-                    });
-                }
-
-            });    
-    
-    document.getElementById('next-btn').addEventListener('click', () => {
-        if (currentPage < totalPages) loadUsers(currentPage + 1);
-    });
     
     window.modalManager.setupModal('confirm-modal', null, 'close-confirm-modal');
     window.modalManager.setupModal('confirm-modal', null, 'confirm-no');
@@ -156,7 +78,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
         window.modalManager.closeModal('confirm-modal');
     });
-    setupSearch();
+    AdminSearch.setupSearch();
     loadUsers(1);
 });
 

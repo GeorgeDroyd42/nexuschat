@@ -77,23 +77,6 @@ const API = {
         joinByInvite: (inviteCode) => BaseAPI.post(`/api/invite/join/${inviteCode}`),
     },
 
-    
-
-    auth: {
-        login: (formData) => BaseAPI.request('/api/auth/login', { method: 'POST', body: formData, isFormData: true, throwOnError: false }),
-        register: (formData) => BaseAPI.request('/api/auth/register', { method: 'POST', body: formData, isFormData: true, throwOnError: false }),
-        logout: () => BaseAPI.post('/api/auth/logout'),
-        refresh: () => BaseAPI.request('/api/auth/refresh', { method: 'POST', requiresAuth: false })
-    },
-
-    user: {
-        getProfile: (userId) => BaseAPI.get(`/api/user/${userId}/profile`),
-        getCurrentUser: () => BaseAPI.get('/api/user/me'),
-        uploadProfilePicture: (formData) => BaseAPI.post('/api/user/profile-picture', formData, true),
-        makeAdmin: (username) => BaseAPI.post(`/api/user/${username}/make-admin`),
-        demoteAdmin: (username) => BaseAPI.post(`/api/user/${username}/demote-admin`)
-    },
-
     utils: {
             processTimestamps: (container) => {
                 container.querySelectorAll('p').forEach(paragraph => {

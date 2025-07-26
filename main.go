@@ -240,6 +240,8 @@ func main() {
 		{Method: "POST", Path: "/api/auth/login", Handler: api.LoginHandler, AuthLevel: AUTH_NONE},
 		{Method: "POST", Path: "/api/auth/logout", Handler: api.LogoutHandler, AuthLevel: AUTH_NONE},
 		{Method: "POST", Path: "/api/webhook/:webhookid/:token", Handler: api.ExecuteWebhookHandler, AuthLevel: AUTH_NONE},
+		{Method: "POST", Path: "/api/invite/join/:code", Handler: api.JoinByInviteHandler, AuthLevel: AUTH_USER},
+
 	}
 
 	wsRoutes := []Route{
@@ -283,7 +285,6 @@ func main() {
 		{Method: "POST", Path: "/api/user/update-username", Handler: api.UpdateUsernameHandler, AuthLevel: AUTH_USER},
 		{Method: "GET", Path: "/i/:code", Handler: api.GetInviteInfoHandler, AuthLevel: AUTH_NONE},
 		{Method: "POST", Path: "/api/invite/generate/:guild_id", Handler: api.GenerateInviteHandler, AuthLevel: AUTH_USER},
-		{Method: "POST", Path: "/api/invite/join/:code", Handler: api.JoinByInviteHandler, AuthLevel: AUTH_USER},
 		{Method: "POST", Path: "/api/user/profile-picture", Handler: api.UploadProfilePictureHandler, AuthLevel: AUTH_USER},
 		{Method: "POST", Path: "/api/terminate/session/:sessionid", Handler: api.TerminateSessionHandler, AuthLevel: AUTH_ADMIN},
 		{Method: "POST", Path: "/api/terminate/user/:userid", Handler: api.TerminateUserSessionsHandler, AuthLevel: AUTH_ADMIN},

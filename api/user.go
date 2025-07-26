@@ -330,17 +330,26 @@ func GetUserProfileHandler(c echo.Context) error {
 	}
 
 	var profilePicture sql.NullString
-	found, err := utils.QueryRow("GetUserProfilePicture", &profilePicture,
-		"SELECT profile_picture FROM users WHERE user_id = $1", userID)
+	var bio sql.NullString
+	err = utils.GetDB().QueryRow(`
+		SELECT profile_picture, bio 
+		FROM users WHERE user_id = $1
+	`, userID).Scan(&profilePicture, &bio)
 
 	profilePictureValue := ""
-	if err == nil && found && profilePicture.Valid {
+	if err == nil && profilePicture.Valid {
 		profilePictureValue = profilePicture.String
+	}
+
+	bioValue := ""
+	if err == nil && bio.Valid {
+		bioValue = bio.String
 	}
 
 	return c.JSON(200, map[string]interface{}{
 		"username":        username,
 		"profile_picture": profilePictureValue,
+		"bio":             bioValue,
 	})
 }
 

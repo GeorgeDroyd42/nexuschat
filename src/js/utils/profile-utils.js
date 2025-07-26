@@ -27,7 +27,8 @@ updateAllElements(userData) {
         '#username-display': userData.username,
         '#modal-username': userData.username,
         '#admin-username': userData.username,
-        '#user-display-name': userData.username
+        '#user-display-name': userData.username,
+        '#modal-bio': userData.bio || 'No bio set'
     };
 
     Object.entries(textElements).forEach(([selector, text]) => {
