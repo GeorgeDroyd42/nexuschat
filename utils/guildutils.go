@@ -254,21 +254,17 @@ func BroadcastMemberEvent(guildID, eventType, userID, username string) {
 		profilePictureValue = profilePicture.String
 	}
 
-	memberData := map[string]interface{}{
-		"type":     eventType,
-		"guild_id": guildID,
-		"member": map[string]string{
-			"user_id":         userID,
-			"username":        username,
-			"profile_picture": profilePictureValue,
-		},
-	}
-	broadcastData, _ := json.Marshal(memberData)
+memberData := map[string]interface{}{
+    "type":     eventType,
+    "guild_id": guildID,
+    "member": map[string]string{
+        "user_id":         userID,
+        "username":        username,
+        "profile_picture": profilePictureValue,
+    },
+}
 
-	members, _, _ := GetGuildMembersPaginated(guildID, 1, AppConfig.AllMembers)
-	for _, member := range members {
-		websockets.SendToUser(member.UserID, websocket.TextMessage, broadcastData)
-	}
+BroadcastToGuildMembers(guildID, memberData)
 }
 
 func NotifyUserGuildAdded(userID, guildID string) {
