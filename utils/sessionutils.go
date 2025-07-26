@@ -223,7 +223,7 @@ func TerminateSessionWithNotification(sessionID string, sendNotification bool) (
 	ExecuteQuery("DeleteSession", "DELETE FROM sessions WHERE session_id = $1", sessionID)
 
 	if found && sendNotification {
-		SendEventToSpecificSession(userID, token, "session_terminated", ErrorMessages[ErrSessionTerminated])
+		websockets.SendEventToSpecificSession(userID, token, "session_terminated", "Your session was terminated. Please log in again.")
 	}
 	return userID, true, nil
 }

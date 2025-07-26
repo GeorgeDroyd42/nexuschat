@@ -3,7 +3,7 @@ package utils
 import (
 	"fmt"
 	"time"
-
+	"auth.com/v4/internal/websockets"
 	"auth.com/v4/cache"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -72,8 +72,8 @@ func SetUserBanStatus(userID string, isBanned bool) error {
 	}
 
 	if isBanned {
-		SendEventToUser(userID, "user_banned", ErrorMessages[ErrAccountSuspended])
-		CleanupUserWebSocketConnections(userID)
+		websockets.SendEventToUser(userID, "user_banned", ErrorMessages[ErrAccountSuspended])
+		websockets.CleanupUserWebSocketConnections(userID)
 	}
 
 	rows, _ := db.Query("SELECT token FROM sessions WHERE user_id = $1", userID)

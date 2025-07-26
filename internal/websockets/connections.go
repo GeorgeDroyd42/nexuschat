@@ -58,3 +58,25 @@ func RemoveConnection(sessionID string) (string, []string) {
 	
 	return "", nil
 }
+
+func CleanupUserWebSocketConnections(userID string) {
+	connections, found, _ := cache.Provider.GetWebSocketConnections(userID)
+
+	Manager.Mu.Lock()
+	for sessionID, conn := range Manager.Connections {
+		if conn.UserID == userID {
+			conn.Conn.Close()
+			delete(Manager.Connections, sessionID)
+		}
+	}
+	Manager.Mu.Unlock()
+
+	if found {
+		for _, sessionID := range connections {
+			cache.Provider.RemoveWebSocketConnection(userID, sessionID)
+		}
+	}
+}
+func GenerateWebSocketSessionID(userID string) string {
+	return fmt.Sprintf("%s_%d", userID, time.Now().UnixNano())
+}

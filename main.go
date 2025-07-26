@@ -207,7 +207,7 @@ func main() {
 	perms.InitService(utils.GetDB())
 
 	startRedisSubscriber()
-	utils.StartHeartbeat()
+	websockets.StartHeartbeat()
 	if err != nil {
 		log.Fatalf("Failed to initialize Redis: %v", err)
 	}
@@ -316,7 +316,7 @@ func main() {
 
 		e.DefaultHTTPErrorHandler(err, c)
 	}
-	utils.StartHeartbeat()
+	websockets.StartHeartbeat()
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
