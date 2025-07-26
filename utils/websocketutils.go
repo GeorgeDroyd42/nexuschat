@@ -158,10 +158,7 @@ func BroadcastToGuildMembers(guildID string, data map[string]interface{}) error 
 	broadcastData, _ := json.Marshal(data)
 
 	for _, member := range members {
-		isStillInGuild, err := IsUserInGuild(guildID, member.UserID)
-		if err == nil && isStillInGuild {
-			websockets.SendToUser(member.UserID, websocket.TextMessage, broadcastData)
-		}
+		websockets.SendToUser(member.UserID, websocket.TextMessage, broadcastData)
 	}
 
 	return nil
