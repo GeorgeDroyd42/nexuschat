@@ -261,7 +261,6 @@ err := cache.Initialize(redisOptions, utils.GetDB(), cacheLogger)
 	}
 
 	apiRoutes := []Route{
-		{Method: "GET", Path: "/api/test", Handler: func(c echo.Context) error { return c.String(http.StatusOK, "hi") }, AuthLevel: AUTH_NONE},
 		{Method: "GET", Path: "/api/user/getusers", Handler: api.GetUserList, AuthLevel: AUTH_ADMIN},
 		{Method: "POST", Path: "/api/user/:username/make-admin", Handler: api.MakeUserAdmin, AuthLevel: AUTH_ADMIN},
 		{Method: "POST", Path: "/api/user/:username/demote-admin", Handler: api.DemoteUserAdmin, AuthLevel: AUTH_ADMIN},
