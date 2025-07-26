@@ -38,7 +38,11 @@ func UpgradeAndRegister(c echo.Context, userID string) (*websockets.WebSocketCon
 	sessionID := websockets.GenerateWebSocketSessionID(userID)
 	wsConn := websockets.RegisterConnection(ws, userID, sessionID, httpSessionToken)
 	
-	log(logrus.InfoLevel, "WebSocket", "user_connected", userID, nil)
+	logrus.WithFields(logrus.Fields{
+		"module":  "websocket",
+		"action":  "user_connected",
+		"user_id": userID,
+	}).Info("User connected via WebSocket")
 	BroadcastUserStatusChange(userID, true)
 	go func() {
 		SendInitialStatusesToUser(userID)

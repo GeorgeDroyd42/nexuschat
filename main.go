@@ -18,6 +18,7 @@ import (
 	"auth.com/v4/internal/webhook"
 	"auth.com/v4/internal/websockets"
 	"auth.com/v4/utils"
+	"github.com/sirupsen/logrus"
 	"github.com/go-redis/redis"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -198,7 +199,18 @@ func main() {
 		ReadTimeout:  3 * time.Second,
 		WriteTimeout: 3 * time.Second,
 	}
-	err := cache.Initialize(redisOptions, utils.GetDB(), utils.Log)
+	cacheLogger := func(level logrus.Level, module, operation, message string, err error) {
+	fields := logrus.Fields{"module": module}
+	if operation != "" {
+		fields["operation"] = operation
+	}
+	entry := logrus.WithFields(fields)
+	if err != nil {
+		entry = entry.WithError(err)
+	}
+	entry.Log(level, message)
+}
+err := cache.Initialize(redisOptions, utils.GetDB(), cacheLogger)
 	
 	csrf.Initialize(cache.Provider, csrf.DefaultKeys)
 	invite.Initialize(utils.GetDB())

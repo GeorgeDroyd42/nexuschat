@@ -20,11 +20,19 @@ func BroadcastUserStatusChange(userID string, isOnline bool) {
 	if isOnline {
 		statusText = "online"
 	}
-	log(logrus.InfoLevel, "Status", "broadcast_start", userID, fmt.Errorf("broadcasting %s status for user %s", statusText, userID))
+	logrus.WithFields(logrus.Fields{
+	"module":  "status",
+	"action":  "broadcast_start", 
+	"user_id": userID,
+	}).Infof("Broadcasting %s status for user %s", statusText, userID)
 
 	userGuilds, err := GetUserGuilds(userID)
 	if err != nil {
-		log(logrus.ErrorLevel, "Status", "get_guilds_error", userID, err)
+		logrus.WithFields(logrus.Fields{
+		"module":  "status",
+		"action":  "get_guilds_error",
+		"user_id": userID,
+	}).WithError(err).Error("Failed to get user guilds")
 		return
 	}
 
@@ -40,23 +48,42 @@ func BroadcastUserStatusChange(userID string, isOnline bool) {
 
 			err := BroadcastToGuildMembers(guildID, statusData)
 			if err != nil {
-				log(logrus.ErrorLevel, "Status", "broadcast_error", userID, fmt.Errorf("failed broadcast to guild %s: %v", guildID, err))
+				logrus.WithFields(logrus.Fields{
+				"module":   "status",
+				"action":   "broadcast_error",
+				"user_id":  userID,
+				"guild_id": guildID,
+			}).WithError(err).Error("Failed broadcast to guild")
 			} else {
 				broadcastCount++
 			}
 		}
 	}
 
-	log(logrus.InfoLevel, "Status", "broadcast_complete", userID, fmt.Errorf("broadcasted %s status to %d guilds for user %s", statusText, broadcastCount, userID))
+	logrus.WithFields(logrus.Fields{
+	"module":         "status",
+	"action":         "broadcast_complete",
+	"user_id":        userID,
+	"status":         statusText,
+	"broadcast_count": broadcastCount,
+}).Info("Status broadcast completed")
 }
 
 // SendInitialStatusesToUser sends current online status of all guild members to a newly connected user
 func SendInitialStatusesToUser(userID string) {
-	log(logrus.InfoLevel, "Status", "send_initial_statuses", userID, fmt.Errorf("sending initial statuses to user %s", userID))
+	logrus.WithFields(logrus.Fields{
+	"module":  "status",
+	"action":  "send_initial_statuses",
+	"user_id": userID,
+}).Info("Sending initial statuses to user")
 
 	userGuilds, err := GetUserGuilds(userID)
 	if err != nil {
-		log(logrus.ErrorLevel, "Status", "get_guilds_error", userID, err)
+		logrus.WithFields(logrus.Fields{
+		"module":  "status",
+		"action":  "get_guilds_error",
+		"user_id": userID,
+	}).WithError(err).Error("Failed to get user guilds")
 		return
 	}
 
@@ -70,7 +97,12 @@ func SendInitialStatusesToUser(userID string) {
 				}
 			}
 			if err != nil {
-				log(logrus.ErrorLevel, "Status", "get_members_error", userID, fmt.Errorf("guild %s: %v", guildID, err))
+				logrus.WithFields(logrus.Fields{
+				"module":   "status",
+				"action":   "get_members_error", 
+				"user_id":  userID,
+				"guild_id": guildID,
+			}).WithError(err).Error("Failed to get guild members")
 				continue
 			}
 
@@ -85,7 +117,11 @@ func SendInitialStatusesToUser(userID string) {
 
 				statusJSON, err := json.Marshal(statusData)
 				if err != nil {
-					log(logrus.ErrorLevel, "Status", "marshal_error", userID, err)
+					logrus.WithFields(logrus.Fields{
+					"module":  "status",
+					"action":  "marshal_error",
+					"user_id": userID,
+				}).WithError(err).Error("Failed to marshal status data")
 					continue
 				}
 
@@ -93,11 +129,22 @@ func SendInitialStatusesToUser(userID string) {
 				guildSent++
 				totalSent++
 			}
-			log(logrus.DebugLevel, "Status", "guild_statuses_sent", userID, fmt.Errorf("sent %d statuses for guild %s", guildSent, guildID))
+			logrus.WithFields(logrus.Fields{
+				"module":       "status",
+				"action":       "guild_statuses_sent",
+				"user_id":      userID,
+				"guild_id":     guildID,
+				"statuses_sent": guildSent,
+			}).Debug("Guild statuses sent")
 		}
 	}
 
-	log(logrus.InfoLevel, "Status", "initial_statuses_complete", userID, fmt.Errorf("sent %d total statuses to user %s", totalSent, userID))
+	logrus.WithFields(logrus.Fields{
+		"module":      "status",
+		"action":      "initial_statuses_complete",
+		"user_id":     userID,
+		"total_sent":  totalSent,
+	}).Info("Initial statuses sending completed")
 }
 
 

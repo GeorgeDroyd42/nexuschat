@@ -107,20 +107,27 @@ func createSessionCookie(token string, expires time.Time) *http.Cookie {
 func SetAuthCookie(c echo.Context, userID string) error {
 	token, err := GenerateSessionToken()
 	if err != nil {
-		log(logrus.ErrorLevel, ModuleSession, "GenerateSessionToken", "", err)
+		logrus.WithFields(logrus.Fields{"module": "session", "action": "generate_token"}).WithError(err).Error("Failed to generate session token")
 		return err
 	}
 
 	err = CreateSession(token, userID)
 	if err != nil {
-		log(logrus.ErrorLevel, ModuleSession, "CreateSession", "", err)
+		logrus.WithFields(logrus.Fields{
+			"module": "session",
+			"action": "create_session",
+		}).WithError(err).Error("Failed to create session")
 		return err
 	}
 
 	cookie := createSessionCookie(token, time.Now().Add(AppConfig.SessionExpiryDuration))
 	c.SetCookie(cookie)
 
-	log(logrus.InfoLevel, ModuleSession, "SetAuthCookie", "Auth cookie set for user: "+userID, nil)
+	logrus.WithFields(logrus.Fields{
+		"module": "session",
+		"action": "set_auth_cookie", 
+		"user_id": userID,
+	}).Info("Auth cookie set for user")
 	return nil
 }
 func ClearAuthCookie(c echo.Context) {

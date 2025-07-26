@@ -21,14 +21,13 @@ type UserData struct {
 }
 
 func Initialize() {
-	InitLogger()
 	InitAppConfig()
 
 	err := InitDB()
 	if err != nil {
-		log(logrus.ErrorLevel, ModuleAuth, "InitDB", "", err)
+		logrus.WithFields(logrus.Fields{"module": "auth", "action": "init_db"}).WithError(err).Error("Failed to initialize auth database")
 	} else {
-		log(logrus.InfoLevel, ModuleAuth, "Initialize", "Database initialized successfully", nil)
+		logrus.WithFields(logrus.Fields{"module": "auth", "action": "initialize"}).Info("Database initialized successfully")
 	}
 }
 
@@ -68,11 +67,17 @@ func ExtractCredentials(c echo.Context) (string, string) {
 
 func AsyncOperation(operation string, fn func() error) {
 	go func() {
-		if err := fn(); err != nil {
-			log(logrus.ErrorLevel, ModuleAuth, operation, "", err)
-		} else {
-			log(logrus.InfoLevel, ModuleAuth, operation, "Async operation completed successfully", nil)
-		}
+	if err := fn(); err != nil {
+		logrus.WithFields(logrus.Fields{
+			"module": "auth",
+			"operation": operation,
+		}).WithError(err).Error("Async operation failed")
+	} else {
+		logrus.WithFields(logrus.Fields{
+			"module": "auth", 
+			"operation": operation,
+		}).Info("Async operation completed successfully")
+	}
 	}()
 }
 
