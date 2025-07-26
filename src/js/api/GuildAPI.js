@@ -11,9 +11,9 @@ class GuildAPI {
         return BaseAPI.get(`/api/channels/get?guild_id=${guildId}`);
     }
 
-    static getMembers(guildId) {
-        return BaseAPI.get(`/api/guild/${guildId}/members?page=1&limit=200`);
-    }
+static getMembers(guildId, page = 1) {
+    return BaseAPI.get(`/api/guild/${guildId}/members?page=${page}`);
+}
 
     static leave(guildId) {
         return BaseAPI.post(`/api/guild/leave/${guildId}`);

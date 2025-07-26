@@ -2,20 +2,27 @@ const GuildMembers = {
     currentGuildId: null,
     isLoadingMembers: false,
     hasMoreMembers: true,
+    currentPage: 1,
+    allMembers: [],
     
-    async loadGuildMembers(guildID) {
+    async loadGuildMembers(guildID, page = 1) {
         if (this.isLoadingMembers) return;
         
         this.currentGuildId = guildID;
         this.isLoadingMembers = true;
-        this.hasMoreMembers = true;
         
         try {
-            const data = await GuildAPI.getMembers(guildID);
+            const data = await GuildAPI.getMembers(guildID, page);
             
             if (data.success) {
+                if (page === 1) {
+                    this.allMembers = data.members;
+                } else {
+                    this.allMembers = [...this.allMembers, ...data.members];
+                }
                 this.hasMoreMembers = data.has_more;
-                updateMembersList(data.members, guildID);
+                this.currentPage = page;
+                updateMembersList(this.allMembers, guildID);
             } else if (data.error) {
                 console.error('Error loading members:', data.error);
             }
@@ -24,6 +31,11 @@ const GuildMembers = {
         } finally {
             this.isLoadingMembers = false;
         }
+    },
+
+    async loadMoreMembers() {
+        if (!this.hasMoreMembers || this.isLoadingMembers) return;
+        await this.loadGuildMembers(this.currentGuildId, this.currentPage + 1);
     },
 
     async getUsernameByID(userID) {
@@ -48,6 +60,15 @@ const GuildMembers = {
         if (window.innerWidth > 768) {
             document.getElementById('members-sidebar').classList.add('visible');
             document.querySelector('.main-content').classList.add('with-members');
+            
+            const sidebar = document.getElementById('members-sidebar');
+            sidebar.removeEventListener('scroll', this.scrollHandler);
+            this.scrollHandler = () => {
+                if (sidebar.scrollTop + sidebar.clientHeight >= sidebar.scrollHeight - 50) {
+                    this.loadMoreMembers();
+                }
+            };
+            sidebar.addEventListener('scroll', this.scrollHandler);
         }
         this.loadGuildMembers(guildId);
     }

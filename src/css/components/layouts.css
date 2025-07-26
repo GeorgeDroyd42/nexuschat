@@ -1,7 +1,7 @@
 @layer components {
 
-  .members-sidebar {
-    @apply fixed right-0 top-0 w-60 h-screen z-[100] overflow-hidden transition-transform duration-300 border-l-0;
+.members-sidebar {
+  @apply fixed right-0 top-0 w-60 h-screen z-[100] overflow-y-auto transition-transform duration-300 border-l-0;
     background-color: #1e2330;
     transform: translateX(100vw);
   }
