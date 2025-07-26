@@ -24,6 +24,8 @@ var AppConfig struct {
 	AllowedOrigins          []string
 	UsersPerPage            int
 	MaxGuildsPerUser        int
+	MembersPerPage          int 
+	AllMembers              int
 }
 
 func InitAppConfig() {
@@ -32,7 +34,10 @@ func InitAppConfig() {
 	AppConfig.SessionCookieName = "session"
 	AppConfig.MaxWSMessageSize = 16384
 	AppConfig.MaxGuildsPerUser = 300
+	
 	AppConfig.UsersPerPage = 50 // ADD THIS LINE
+	AppConfig.MembersPerPage = 25  // ADD THIS LINE
+	AppConfig.AllMembers = -1
 	AppConfig.MaxWSMessagesPerMinute = 60
 	AppConfig.SessionCookiePath = "/"
 	AppConfig.SessionCookieSecure = true

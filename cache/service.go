@@ -26,8 +26,3 @@ func (s *cacheService) UpdateGuildOnlineCount(userID string, isOnline bool) erro
 	// Implementation will use the Provider methods
 	return nil
 }
-
-func (s *cacheService) GetGuildStats(guildID string) (int, int, error) {
-	// Get member count from DB, online count from cache
-	return 0, 0, nil
-}

@@ -6,9 +6,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strconv"
 	"time"
-
+	"strconv"
 	"auth.com/v4/cache"
 	"auth.com/v4/utils"
 	"github.com/labstack/echo/v4"
@@ -321,28 +320,26 @@ func GetGuildMembersHandler(c echo.Context) error {
 	}
 
 	page := 1
-	if p := c.QueryParam("page"); p != "" {
-		if parsed, err := strconv.Atoi(p); err == nil && parsed > 0 {
-			page = parsed
+	if pageParam := c.QueryParam("page"); pageParam != "" {
+		if p, err := strconv.Atoi(pageParam); err == nil && p > 0 {
+			page = p
 		}
 	}
+	limit := utils.AppConfig.MembersPerPage
 
-	limit := 25
-	if l := c.QueryParam("limit"); l != "" {
-		if parsed, err := strconv.Atoi(l); err == nil && parsed > 0 && parsed <= 500 {
-			limit = parsed
-		}
-	}
-
-	members, totalCount, err := utils.GetGuildMembersWithStatus(guildID, page, limit)
+	members, totalCount, err := utils.GetGuildMembersPaginated(guildID, page, limit)
 	if err != nil {
 		return utils.SendErrorResponse(c, utils.ErrDatabaseError)
 	}
 
+	totalPages := (totalCount + limit - 1) / limit
 	return c.JSON(200, map[string]interface{}{
+		"success":     true,
 		"members":     members,
-		"count":       len(members),
+		"has_more":    len(members) == limit,
 		"total_count": totalCount,
+		"total_pages": totalPages,
+		"current_page": page,
 	})
 }
 

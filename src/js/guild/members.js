@@ -1,16 +1,28 @@
 const GuildMembers = {
+    currentGuildId: null,
+    isLoadingMembers: false,
+    hasMoreMembers: true,
+    
     async loadGuildMembers(guildID) {
+        if (this.isLoadingMembers) return;
+        
+        this.currentGuildId = guildID;
+        this.isLoadingMembers = true;
+        this.hasMoreMembers = true;
+        
         try {
             const data = await GuildAPI.getMembers(guildID);
             
-            if (data.error) {
+            if (data.success) {
+                this.hasMoreMembers = data.has_more;
+                updateMembersList(data.members, guildID);
+            } else if (data.error) {
                 console.error('Error loading members:', data.error);
-                return;
             }
-            
-            updateMembersList(data.members, guildID);
         } catch (error) {
             console.error('Error loading guild members:', error);
+        } finally {
+            this.isLoadingMembers = false;
         }
     },
 

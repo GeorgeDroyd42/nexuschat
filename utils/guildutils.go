@@ -222,7 +222,7 @@ func GetGuildMembersPaginated(guildID string, page, limit int) ([]MemberData, in
 
 	members := []MemberData{}
 	var rows *sql.Rows
-	if limit <= 0 {
+	if limit == AppConfig.AllMembers {
 		rows, err = tx.Query("SELECT gm.user_id, u.username, COALESCE(u.profile_picture, '') as profile_picture, gm.joined_at FROM guild_members gm JOIN users u ON gm.user_id = u.user_id WHERE gm.guild_id = $1 ORDER BY gm.joined_at DESC", guildID)
 	} else {
 		rows, err = tx.Query("SELECT gm.user_id, u.username, COALESCE(u.profile_picture, '') as profile_picture, gm.joined_at FROM guild_members gm JOIN users u ON gm.user_id = u.user_id WHERE gm.guild_id = $1 ORDER BY gm.joined_at DESC LIMIT $2 OFFSET $3", guildID, limit, offset)
@@ -265,7 +265,7 @@ func BroadcastMemberEvent(guildID, eventType, userID, username string) {
 	}
 	broadcastData, _ := json.Marshal(memberData)
 
-	members, _, _ := GetGuildMembersPaginated(guildID, 1, 200)
+	members, _, _ := GetGuildMembersPaginated(guildID, 1, AppConfig.AllMembers)
 	for _, member := range members {
 		websockets.SendToUser(member.UserID, websocket.TextMessage, broadcastData)
 	}
@@ -306,7 +306,7 @@ func BroadcastChannelEvent(guildID, eventType, channelID, channelName, channelDe
 	}
 	broadcastData, _ := json.Marshal(channelData)
 
-	members, _, _ := GetGuildMembersPaginated(guildID, 1, 200)
+	members, _, _ := GetGuildMembersPaginated(guildID, 1, AppConfig.AllMembers)
 	for _, member := range members {
 		websockets.SendToUser(member.UserID, websocket.TextMessage, broadcastData)
 	}

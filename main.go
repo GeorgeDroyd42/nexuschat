@@ -187,7 +187,6 @@ func getCORSMiddleware() echo.MiddlewareFunc {
 
 func main() {
 	utils.Initialize()
-	utils.CleanupUserStatusesOnServerStart()
 	redisOptions := &redis.Options{
 		Addr:         utils.AppConfig.RedisHost + ":" + utils.AppConfig.RedisPort,
 		Password:     utils.AppConfig.RedisPassword,

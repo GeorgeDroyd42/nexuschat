@@ -39,7 +39,7 @@ func UpgradeAndRegister(c echo.Context, userID string) (*websockets.WebSocketCon
 	wsConn := websockets.RegisterConnection(ws, userID, sessionID, httpSessionToken)
 	
 	log(logrus.InfoLevel, "WebSocket", "user_connected", userID, nil)
-	HandleUserConnect(userID)
+	BroadcastUserStatusChange(userID, true)
 	go func() {
 		SendInitialStatusesToUser(userID)
 	}()
@@ -78,7 +78,7 @@ func RemoveConnection(sessionID string) {
 				BroadcastTypingStatus(channelID)
 			}
 		}
-		HandleUserDisconnect(userID)
+		BroadcastUserStatusChange(userID, false)
 	}
 }
 
@@ -146,7 +146,7 @@ func BroadcastToChannel(channelID string, data map[string]interface{}) error {
 }
 
 func BroadcastToGuildMembers(guildID string, data map[string]interface{}) error {
-	members, _, err := GetGuildMembersPaginated(guildID, 1, 0)
+	members, _, err := GetGuildMembersPaginated(guildID, 1, AppConfig.AllMembers)
 	if err != nil {
 		return err
 	}
@@ -241,21 +241,14 @@ func HandleWebSocketMessage(userID string, rawMessage []byte) error {
 	}
 
 	if jsonMsg["type"] == "status_update" {
-		statusData := map[string]interface{}{
-			"type":      "user_status_changed",
+		// Frontend explicitly requesting status update broadcast
+		logrus.WithFields(logrus.Fields{
+			"component": "WebSocket",
+			"action":    "status_update_request",
 			"user_id":   userID,
-			"is_online": true,
-		}
-
-		userGuilds, err := GetUserGuilds(userID)
-		if err == nil {
-			for _, guild := range userGuilds {
-				if guildID, ok := guild["guild_id"].(string); ok {
-					statusData["guild_id"] = guildID
-					BroadcastToGuildMembers(guildID, statusData)
-				}
-			}
-		}
+		}).Info("Frontend requested status update")
+		
+		BroadcastUserStatusChange(userID, true)
 		return nil
 	}
 

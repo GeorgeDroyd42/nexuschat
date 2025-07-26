@@ -176,27 +176,7 @@ func init() {
 		},
 	})
 
-	RegisterMigration(Migration{
-		Name: "add_user_online_status",
-		Up: func(db *sql.DB) error {
-			_, err := db.Exec(`
-				ALTER TABLE users 
-				ADD COLUMN IF NOT EXISTS is_online BOOLEAN DEFAULT FALSE,
-				ADD COLUMN IF NOT EXISTS last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-			`)
-			return err
-		},
-	})
-	RegisterMigration(Migration{
-		Name: "add_connection_count",
-		Up: func(db *sql.DB) error {
-			_, err := db.Exec(`
-				ALTER TABLE users 
-				ADD COLUMN IF NOT EXISTS connection_count INTEGER DEFAULT 0
-			`)
-			return err
-		},
-	})
+
 	RegisterMigration(Migration{
 		Name: "modify_messages_for_webhooks",
 		Up: func(db *sql.DB) error {
