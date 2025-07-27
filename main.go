@@ -16,7 +16,6 @@ import (
 	"auth.com/v4/internal/csrf"
 	"auth.com/v4/internal/invite"
 	"auth.com/v4/internal/webhook"
-	"auth.com/v4/internal/websockets"
 	"auth.com/v4/utils"
 	"github.com/sirupsen/logrus"
 	"github.com/go-redis/redis"
@@ -153,9 +152,15 @@ func startRedisSubscriber() {
 					if broadcastMsg.Secure && broadcastMsg.ChannelID != "" {
 						var messageData map[string]interface{}
 						json.Unmarshal(broadcastMsg.Data, &messageData)
-						utils.BroadcastToChannel(broadcastMsg.ChannelID, messageData)
+					if messageData["type"] == "channel_deleted" || messageData["type"] == "username_changed" {
+							if guildID, ok := messageData["guild_id"].(string); ok {
+								utils.BroadcastToGuildMembers(guildID, messageData)
+							}
 					} else {
-						websockets.BroadcastToAll(broadcastMsg.Type, broadcastMsg.Data)
+							utils.BroadcastToChannel(broadcastMsg.ChannelID, messageData)
+					}
+					} else {
+						utils.BroadcastToAll(broadcastMsg.Type, broadcastMsg.Data)
 					}
 
 				case "user_messages":
@@ -166,7 +171,7 @@ func startRedisSubscriber() {
 					}
 
 					json.Unmarshal([]byte(msg.GetPayload()), &userMsg)
-					websockets.SendToUser(userMsg.UserID, userMsg.Type, userMsg.Data)
+					utils.SendToUser(userMsg.UserID, userMsg.Type, userMsg.Data)
 				}
 			}
 
@@ -218,7 +223,7 @@ err := cache.Initialize(redisOptions, utils.GetDB(), cacheLogger)
 	perms.InitService(utils.GetDB())
 
 	startRedisSubscriber()
-	websockets.StartHeartbeat()
+	utils.StartHeartbeat()
 	if err != nil {
 		log.Fatalf("Failed to initialize Redis: %v", err)
 	}
@@ -326,7 +331,7 @@ err := cache.Initialize(redisOptions, utils.GetDB(), cacheLogger)
 
 		e.DefaultHTTPErrorHandler(err, c)
 	}
-	websockets.StartHeartbeat()
+	utils.StartHeartbeat()
 
 	e.Logger.Fatal(e.Start(":8080"))
 }

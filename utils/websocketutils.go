@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"auth.com/v4/cache"
-	"auth.com/v4/internal/websockets"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
@@ -16,7 +15,7 @@ import (
 
 
 
-func UpgradeAndRegister(c echo.Context, userID string) (*websockets.WebSocketConnection, string, error) {
+func UpgradeAndRegister(c echo.Context, userID string) (*WebSocketConnection, string, error) {
 	ws, err := Upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
 		return nil, "", err
@@ -35,8 +34,8 @@ func UpgradeAndRegister(c echo.Context, userID string) (*websockets.WebSocketCon
 		httpSessionToken = cookie.Value
 	}
 
-	sessionID := websockets.GenerateWebSocketSessionID(userID)
-	wsConn := websockets.RegisterConnection(ws, userID, sessionID, httpSessionToken)
+	sessionID := GenerateWebSocketSessionID(userID)
+	wsConn := RegisterWebSocketConnection(ws, userID, sessionID, httpSessionToken)
 	
 	logrus.WithFields(logrus.Fields{
 		"module":  "websocket",
@@ -71,20 +70,6 @@ var Upgrader = websocket.Upgrader{
 	},
 }
 
-
-
-func RemoveConnection(sessionID string) {
-	userID, channelIDs := websockets.RemoveConnection(sessionID)
-	
-	if userID != "" {
-		if len(channelIDs) > 0 {
-			for _, channelID := range channelIDs {
-				BroadcastTypingStatus(channelID)
-			}
-		}
-		BroadcastUserStatusChange(userID, false)
-	}
-}
 
 
 func HandleMessageEvent(userID string, data map[string]interface{}) error {
@@ -158,7 +143,7 @@ func BroadcastToGuildMembers(guildID string, data map[string]interface{}) error 
 	broadcastData, _ := json.Marshal(data)
 
 	for _, member := range members {
-		websockets.SendToUser(member.UserID, websocket.TextMessage, broadcastData)
+		SendToUser(member.UserID, websocket.TextMessage, broadcastData)
 	}
 
 	return nil
@@ -234,7 +219,7 @@ func HandleWebSocketMessage(userID string, rawMessage []byte) error {
 		}
 
 		broadcastJSON, _ := json.Marshal(result.Data)
-		websockets.BroadcastWithRedis(1, broadcastJSON)
+		BroadcastWithRedis(1, broadcastJSON)
 
 		BroadcastTypingStatus(channelID)
 

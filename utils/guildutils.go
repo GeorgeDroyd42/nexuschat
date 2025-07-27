@@ -8,7 +8,6 @@ import (
 	"strconv"
 
 	"auth.com/v4/cache"
-	"auth.com/v4/internal/websockets"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 )
@@ -232,14 +231,25 @@ func GetGuildMembersPaginated(guildID string, page, limit int) ([]MemberData, in
 	}
 	defer rows.Close()
 
+	var onlineMembers []MemberData
+	var offlineMembers []MemberData
+
 	for rows.Next() {
 		var member MemberData
 		if err := rows.Scan(&member.UserID, &member.Username, &member.ProfilePicture, &member.JoinedAt); err != nil {
 			continue
 		}
-		member.IsOnline = websockets.IsUserOnline(member.UserID)
-		members = append(members, member)
+		member.IsOnline = IsUserOnline(member.UserID)
+		
+		if member.IsOnline {
+			onlineMembers = append(onlineMembers, member)
+		} else {
+			offlineMembers = append(offlineMembers, member)
+		}
 	}
+
+	// Combine: online first, then offline (both already alphabetically sorted from SQL)
+	members = append(onlineMembers, offlineMembers...)
 
 	tx.Commit()
 	return members, totalCount, nil
@@ -256,16 +266,14 @@ func BroadcastMemberEvent(guildID, eventType, userID, username string) {
 	}
 
 memberData := map[string]interface{}{
-    "type":     eventType,
-    "guild_id": guildID,
-    "member": map[string]string{
-        "user_id":         userID,
-        "username":        username,
-        "profile_picture": profilePictureValue,
-    },
+    "type":            eventType,
+    "guild_id":        guildID,
+    "user_id":         userID,
+    "username":        username,
+    "profile_picture": profilePictureValue,
 }
-
-BroadcastToGuildMembers(guildID, memberData)
+broadcastData, _ := json.Marshal(memberData)
+BroadcastWithRedis(1, broadcastData)
 }
 
 func NotifyUserGuildAdded(userID, guildID string) {
@@ -279,7 +287,7 @@ func NotifyUserGuildAdded(userID, guildID string) {
 		"guild": guild,
 	}
 	broadcastData, _ := json.Marshal(guildData)
-	websockets.SendToUser(userID, websocket.TextMessage, broadcastData)
+	SendToUser(userID, websocket.TextMessage, broadcastData)
 }
 
 func NotifyUserGuildRemoved(userID, guildID string) {
@@ -288,25 +296,7 @@ func NotifyUserGuildRemoved(userID, guildID string) {
 		"guild_id": guildID,
 	}
 	broadcastData, _ := json.Marshal(guildData)
-	websockets.SendToUser(userID, websocket.TextMessage, broadcastData)
-}
-
-func BroadcastChannelEvent(guildID, eventType, channelID, channelName, channelDescription string) {
-	channelData := map[string]interface{}{
-		"type":     eventType,
-		"guild_id": guildID,
-		"channel": map[string]string{
-			"channel_id":  channelID,
-			"name":        channelName,
-			"description": channelDescription,
-		},
-	}
-	broadcastData, _ := json.Marshal(channelData)
-
-	members, _, _ := GetGuildMembersPaginated(guildID, 1, AppConfig.AllMembers)
-	for _, member := range members {
-		websockets.SendToUser(member.UserID, websocket.TextMessage, broadcastData)
-	}
+	SendToUser(userID, websocket.TextMessage, broadcastData)
 }
 
 func RequireGuildMembership(c echo.Context, userID, guildID string) error {

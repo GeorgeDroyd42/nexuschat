@@ -44,26 +44,25 @@ function renderMembersList() {
     
     membersList.innerHTML = '';
     
-    const onlineUsers = currentGuildMembers.filter(member => member.is_online);
-    const offlineUsers = currentGuildMembers.filter(member => !member.is_online);
+    let separatorAdded = false;
+    let foundOfflineUser = false;
     
-    onlineUsers.sort((a, b) => a.username.localeCompare(b.username));
-    offlineUsers.sort((a, b) => a.username.localeCompare(b.username));
-    
-    onlineUsers.forEach(member => {
-        const memberElement = createMemberElement(member.user_id, member.username, member.profile_picture, true);
-        membersList.appendChild(memberElement);
-    });
-    
-if (onlineUsers.length > 0 && offlineUsers.length > 0) {
-    const separator = document.createElement('div');
-    separator.className = 'sidebar-separator';
-    separator.style.margin = '8px 0';
-    membersList.appendChild(separator);
-}
-    
-    offlineUsers.forEach(member => {
-        const memberElement = createMemberElement(member.user_id, member.username, member.profile_picture, false);
+    currentGuildMembers.forEach(member => {
+        // Add separator when we encounter first offline user after online users
+        if (!member.is_online && !foundOfflineUser && !separatorAdded) {
+            foundOfflineUser = true;
+            // Check if there were any online users before this
+            const hasOnlineUsers = currentGuildMembers.some(m => m.is_online);
+            if (hasOnlineUsers) {
+                const separator = document.createElement('div');
+                separator.className = 'sidebar-separator';
+                separator.style.margin = '8px 0';
+                membersList.appendChild(separator);
+                separatorAdded = true;
+            }
+        }
+        
+        const memberElement = createMemberElement(member.user_id, member.username, member.profile_picture, member.is_online);
         membersList.appendChild(memberElement);
     });
 }

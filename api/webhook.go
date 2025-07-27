@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"auth.com/v4/utils"
 	"auth.com/v4/internal/perms"
 	"auth.com/v4/internal/webhook"
@@ -44,6 +45,20 @@ func CreateWebhookHandler(c echo.Context) error {
 	if err != nil {
 		return utils.SendErrorResponse(c, utils.ErrDatabaseError)
 	}
+
+	var guildID string
+	utils.QueryRow("GetGuildFromChannel", &guildID,
+		"SELECT guild_id FROM channels WHERE channel_id = $1", channelID)
+
+	webhookData := map[string]interface{}{
+		"type":       "webhook_created",
+		"channel_id": channelID,
+		"guild_id":   guildID,
+		"webhook_id": webhookID,
+		"name":       name,
+	}
+	broadcastData, _ := json.Marshal(webhookData)
+	utils.BroadcastWithRedis(1, broadcastData)
 
 	return c.JSON(200, map[string]interface{}{
 		"success":    true,
@@ -145,7 +160,13 @@ func DeleteWebhookHandler(c echo.Context) error {
 		return utils.SendErrorResponse(c, utils.ErrDatabaseError)
 	}
 
-	utils.BroadcastChannelEvent(guildID, "webhook_deleted", channelID, "", "")
+	webhookData := map[string]interface{}{
+		"type":       "webhook_deleted",
+		"channel_id": channelID,
+		"guild_id":   guildID,
+	}
+	broadcastData, _ := json.Marshal(webhookData)
+	utils.BroadcastWithRedis(1, broadcastData)
 
 	return c.JSON(200, map[string]interface{}{
 		"success": true,

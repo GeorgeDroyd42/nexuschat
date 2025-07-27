@@ -55,10 +55,20 @@ type CacheProvider interface {
 	PublishMessage(channel string, message interface{}) error
 	Subscribe(channels ...string) (PubSubSubscription, error)
 	SetNX(key string, value interface{}, expiration time.Duration) bool
+// Guild user status operations
+	AddUserToGuildOnline(guildID, userID, username string) error
+	RemoveUserFromGuildOnline(guildID, userID string) error
+	AddUserToGuildOffline(guildID, userID, username string) error
+	RemoveUserFromGuildOffline(guildID, userID string) error
+	GetGuildOnlineUsers(guildID string, offset, limit int) ([]string, error)
+	GetGuildOfflineUsers(guildID string, offset, limit int) ([]string, error)
+	GetGuildOnlineCount(guildID string) (int, error)	
 }
 
 type KeyGenerator interface {
 	User(username string) string
+	GuildOnlineUsers(guildID string) string
+	GuildOfflineUsers(guildID string) string	
 	Admin(userID string) string
 	Session(tokenOrID string) string
 	UserSessions(userID string) string

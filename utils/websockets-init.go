@@ -1,4 +1,4 @@
-package websockets
+package utils
 
 import (
 	"sync"
@@ -17,6 +17,6 @@ type ConnectionManager struct {
 	Mu          sync.RWMutex
 }
 
-var Manager = &ConnectionManager{
+var WebSocketManager = &ConnectionManager{
 	Connections: make(map[string]*WebSocketConnection),
 }

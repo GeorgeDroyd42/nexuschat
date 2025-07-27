@@ -104,6 +104,12 @@ function handleMessage(data) {
                     break;
                 case 'typing_update':
                     handleTypingUpdate(data);
+                    break;
+                case 'webhook_created':
+                    handleWebhookCreated(data);
+                    break;
+                case 'webhook_deleted':
+                    handleWebhookDeleted(data);
                     break;                    
             }
 }
@@ -128,14 +134,19 @@ function initWebSocket() {
     connectWebSocket();
 }
 function handleMemberJoined(data) {
-    if (data.member && data.guild_id) {
-        addMemberToList(data.member, data.guild_id);
+    if (data.user_id && data.guild_id) {
+        const member = {
+            user_id: data.user_id,
+            username: data.username,
+            profile_picture: data.profile_picture
+        };
+        addMemberToList(member, data.guild_id);
     }
 }
 
 function handleMemberLeft(data) {
-    if (data.member && data.guild_id) {
-        removeMemberFromList(data.member.user_id, data.guild_id);
+    if (data.user_id && data.guild_id) {
+        removeMemberFromList(data.user_id, data.guild_id);
     }
 }
 
@@ -160,14 +171,14 @@ function handleGuildRemoved(data) {
 }
 
 function handleChannelCreated(data) {
-    if (data.channel && data.guild_id && window.channelManager) {
+    if (data.channel_id && data.guild_id && window.channelManager) {
         window.ChannelUI.loadChannels(data.guild_id, window.channelManager);
     }
 }
 
 async function handleChannelDeleted(data) {
-    if (data.channel && data.guild_id && window.channelManager) {
-        if (isCurrentChannel(data.guild_id, data.channel.channel_id)) {
+    if (data.channel_id && data.guild_id && window.channelManager) {
+        if (isCurrentChannel(data.guild_id, data.channel_id)) {
             const channelsData = await GuildAPI.getChannels(data.guild_id);
             if (channelsData.channels && channelsData.channels.length > 0) {
                 await window.ChannelHandlers.handleChannelSelect(channelsData.channels[0], window.channelManager);
@@ -180,24 +191,24 @@ async function handleChannelDeleted(data) {
 }
 
 function handleChannelUpdated(data) {
-    if (data.channel && data.guild_id && window.channelManager) {
-        if (isCurrentChannel(data.guild_id, data.channel.channel_id)) {
+    if (data.channel_id && data.guild_id && window.channelManager) {
+        if (isCurrentChannel(data.guild_id, data.channel_id)) {
             const channelTitle = document.querySelector('.channel-title');
             if (channelTitle) {
                 const nameElement = channelTitle.querySelector('h2');
                 const descElement = channelTitle.querySelector('p');
                 
                 if (nameElement) {
-                    nameElement.textContent = `# ${data.channel.name}`;
+                    nameElement.textContent = `# ${data.name}`;
                 }
                 
-                if (data.channel.description) {
+                if (data.description) {
                     if (descElement) {
-                        descElement.textContent = data.channel.description;
+                        descElement.textContent = data.description;
                         descElement.style.display = 'block';
                     } else {
                         const newDesc = document.createElement('p');
-                        newDesc.textContent = data.channel.description;
+                        newDesc.textContent = data.description;
                         channelTitle.appendChild(newDesc);
                     }
                 } else if (descElement) {
@@ -281,5 +292,19 @@ function sendMessage(data) {
 document.addEventListener('DOMContentLoaded', () => {
     initWebSocket();
 });
+
+function handleWebhookCreated(data) {
+    if (data.channel_id && window.location.pathname.includes('/webhooks/')) {
+        // Refresh webhook list if currently viewing webhooks
+        location.reload();
+    }
+}
+
+function handleWebhookDeleted(data) {
+    if (data.channel_id && window.location.pathname.includes('/webhooks/')) {
+        // Refresh webhook list if currently viewing webhooks  
+        location.reload();
+    }
+}
 window.socket = websocket;
 window.sendMessage = sendMessage;

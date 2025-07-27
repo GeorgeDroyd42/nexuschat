@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"encoding/json"
 
 	"auth.com/v4/cache"
 	"auth.com/v4/utils"
@@ -273,7 +274,13 @@ func UpdateUsernameHandler(c echo.Context) error {
 	if err == nil {
 		for _, guild := range userGuilds {
 			if guildID, ok := guild["guild_id"].(string); ok {
-				utils.BroadcastToGuildMembers(guildID, usernameChangeData)
+				guildUsernameData := make(map[string]interface{})
+				for k, v := range usernameChangeData {
+					guildUsernameData[k] = v
+				}
+				guildUsernameData["guild_id"] = guildID
+				broadcastData, _ := json.Marshal(guildUsernameData)
+				utils.BroadcastWithRedis(1, broadcastData)
 			}
 		}
 	}

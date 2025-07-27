@@ -6,7 +6,6 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
-	"auth.com/v4/internal/websockets"
 	"auth.com/v4/cache"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
@@ -93,7 +92,7 @@ func SendInitialStatusesToUser(userID string) {
 			members, _, err := GetGuildMembersPaginated(guildID, 1, AppConfig.MembersPerPage)
 			if err == nil {
 				for i := range members {
-					members[i].IsOnline = websockets.IsUserOnline(members[i].UserID)
+					members[i].IsOnline = IsUserOnline(members[i].UserID)
 				}
 			}
 			if err != nil {
@@ -125,7 +124,7 @@ func SendInitialStatusesToUser(userID string) {
 					continue
 				}
 
-				websockets.SendToUser(userID, websocket.TextMessage, statusJSON)
+				SendToUser(userID, websocket.TextMessage, statusJSON)
 				guildSent++
 				totalSent++
 			}

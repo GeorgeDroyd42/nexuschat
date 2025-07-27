@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -106,8 +107,16 @@ func EditChannelHandler(c echo.Context) error {
 	}
 
 	// Broadcast the channel update event
-	utils.BroadcastChannelEvent(guildID, "channel_updated", channelID, name, description)
-
+	channelData := map[string]interface{}{
+		"type":        "channel_updated",
+		"channel_id":  channelID,
+		"guild_id":    guildID,
+		"name":        name,
+		"description": description,
+	}
+	broadcastData, _ := json.Marshal(channelData)
+	utils.BroadcastWithRedis(1, broadcastData)
+	
 	return utils.SendSuccessResponse(c, "Channel updated successfully")
 }
 
@@ -369,7 +378,15 @@ func CreateChannelHandler(c echo.Context) error {
 		return utils.SendErrorResponse(c, utils.ErrDatabaseError)
 	}
 
-	utils.BroadcastChannelEvent(guildID, "channel_created", channelID, name, description)
+	channelData := map[string]interface{}{
+		"type":        "channel_created",
+		"channel_id":  channelID,
+		"guild_id":    guildID,
+		"name":        name,
+		"description": description,
+	}
+	broadcastData, _ := json.Marshal(channelData)
+	utils.BroadcastWithRedis(1, broadcastData)
 
 	return utils.SendSuccessResponse(c, "Channel created successfully")
 }
@@ -406,7 +423,15 @@ func DeleteChannelHandler(c echo.Context) error {
 		return utils.SendErrorResponse(c, utils.ErrDatabaseError)
 	}
 
-	utils.BroadcastChannelEvent(guildID, "channel_deleted", channelID, name, description)
+	channelData := map[string]interface{}{
+		"type":        "channel_deleted",
+		"channel_id":  channelID,
+		"guild_id":    guildID,
+		"name":        name,
+		"description": description,
+	}
+broadcastData, _ := json.Marshal(channelData)
+utils.BroadcastWithRedis(1, broadcastData)
 
 	return utils.SendSuccessResponse(c, "Channel deleted successfully")
 }

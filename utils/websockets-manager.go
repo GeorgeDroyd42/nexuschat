@@ -1,4 +1,4 @@
-package websockets
+package utils
 
 import (
 	"encoding/json"
@@ -10,10 +10,10 @@ import (
 
 
 func SendToUser(userID string, messageType int, data []byte) {
-	Manager.Mu.RLock()
-	defer Manager.Mu.RUnlock()
+	WebSocketManager.Mu.RLock()
+	defer WebSocketManager.Mu.RUnlock()
 
-	for _, conn := range Manager.Connections {
+	for _, conn := range WebSocketManager.Connections {
 		if conn.UserID == userID {
 			conn.WriteMu.Lock()
 			err := conn.Conn.WriteMessage(messageType, data)
@@ -30,10 +30,10 @@ func SendToUser(userID string, messageType int, data []byte) {
 }
 
 func BroadcastToAll(messageType int, data []byte) {
-	Manager.Mu.RLock()
+	WebSocketManager.Mu.RLock()
 	var failedSessions []string
 
-	for sessionID, conn := range Manager.Connections {
+	for sessionID, conn := range WebSocketManager.Connections {
 		if conn != nil && conn.Conn != nil {
 			conn.WriteMu.Lock()
 			err := conn.Conn.WriteMessage(messageType, data)
@@ -43,14 +43,14 @@ func BroadcastToAll(messageType int, data []byte) {
 			}
 		}
 	}
-	Manager.Mu.RUnlock()
+	WebSocketManager.Mu.RUnlock()
 
 	if len(failedSessions) > 0 {
-		Manager.Mu.Lock()
+		WebSocketManager.Mu.Lock()
 		for _, sessionID := range failedSessions {
-			delete(Manager.Connections, sessionID)
+			delete(WebSocketManager.Connections, sessionID)
 		}
-		Manager.Mu.Unlock()
+		WebSocketManager.Mu.Unlock()
 	}
 }
 
@@ -61,10 +61,10 @@ func SendEventToSpecificSession(userID, sessionToken, eventType, message string)
 	}
 	jsonData, _ := json.Marshal(eventData)
 
-	Manager.Mu.RLock()
-	defer Manager.Mu.RUnlock()
+	WebSocketManager.Mu.RLock()
+	defer WebSocketManager.Mu.RUnlock()
 
-	for _, conn := range Manager.Connections {
+	for _, conn := range WebSocketManager.Connections {
 		if conn.UserID == userID {
 			connectionData, found, _ := cache.Provider.GetWebSocketConnectionData(conn.SessionID)
 			if found {
@@ -84,23 +84,14 @@ func SendEventToSpecificSession(userID, sessionToken, eventType, message string)
 	}
 }
 
-func SendEventToUser(userID, eventType, message string) {
-	eventData := map[string]string{"type": eventType}
-	if message != "" {
-		eventData["message"] = message
-	}
-	jsonData, _ := json.Marshal(eventData)
-	SendToUser(userID, websocket.TextMessage, jsonData)
-}
-
 func StartHeartbeat() {
 	go func() {
 		ticker := time.NewTicker(30 * time.Second)
 		defer ticker.Stop()
 
 		for range ticker.C {
-			Manager.Mu.RLock()
-			for _, conn := range Manager.Connections {
+			WebSocketManager.Mu.RLock()
+			for _, conn := range WebSocketManager.Connections {
 				conn.WriteMu.Lock()
 				err := conn.Conn.WriteMessage(websocket.PingMessage, []byte{})
 				conn.WriteMu.Unlock()
@@ -110,21 +101,21 @@ func StartHeartbeat() {
 						"action":    "heartbeat",
 					}).Debug("Ping failed, connection may be stale: ", err)
 					go func(sessionID string) {
-						RemoveConnection(sessionID)
+						RemoveWebSocketConnection(sessionID)
 					}(conn.SessionID)
 				}
 			}
-			Manager.Mu.RUnlock()
+			WebSocketManager.Mu.RUnlock()
 		}
 	}()
 }
 
 // IsUserOnline checks if user has any active WebSocket connections
 func IsUserOnline(userID string) bool {
-	Manager.Mu.RLock()
-	defer Manager.Mu.RUnlock()
+	WebSocketManager.Mu.RLock()
+	defer WebSocketManager.Mu.RUnlock()
 	
-	for _, conn := range Manager.Connections {
+	for _, conn := range WebSocketManager.Connections {
 		if conn.UserID == userID {
 			return true
 		}
@@ -134,14 +125,14 @@ func IsUserOnline(userID string) bool {
 
 // GetOnlineUsersInGuild returns list of online userIDs for a specific guild
 func GetOnlineUsersInGuild(guildID string, allGuildMembers []string) []string {
-	Manager.Mu.RLock()
-	defer Manager.Mu.RUnlock()
+	WebSocketManager.Mu.RLock()
+	defer WebSocketManager.Mu.RUnlock()
 	
 	onlineUsers := make([]string, 0)
 	onlineUserMap := make(map[string]bool)
 	
 	// Build map of online users
-	for _, conn := range Manager.Connections {
+	for _, conn := range WebSocketManager.Connections {
 		onlineUserMap[conn.UserID] = true
 	}
 	

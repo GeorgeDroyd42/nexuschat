@@ -21,7 +21,7 @@ func HandleAuthWebSocket(c echo.Context) error {
 		return nil
 	}
 	defer wsConn.Conn.Close()
-	defer utils.RemoveConnection(sessionID)
+	defer utils.RemoveWebSocketConnection(sessionID)
 	messageCount := 0
 	resetTime := time.Now().Add(time.Minute)
 	messageProcessCount := 0

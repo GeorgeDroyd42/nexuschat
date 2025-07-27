@@ -1,10 +1,11 @@
 package utils
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
-	"auth.com/v4/internal/websockets"
 	"auth.com/v4/cache"
+	"github.com/gorilla/websocket"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -72,8 +73,10 @@ func SetUserBanStatus(userID string, isBanned bool) error {
 	}
 
 	if isBanned {
-		websockets.SendEventToUser(userID, "user_banned", ErrorMessages[ErrAccountSuspended])
-		websockets.CleanupUserWebSocketConnections(userID)
+		eventData := map[string]string{"type": "user_banned", "message": ErrorMessages[ErrAccountSuspended]}
+		jsonData, _ := json.Marshal(eventData)
+		SendToUser(userID, websocket.TextMessage, jsonData)
+		CleanupUserWebSocketConnections(userID)
 	}
 
 	rows, _ := db.Query("SELECT token FROM sessions WHERE user_id = $1", userID)

@@ -1,4 +1,4 @@
-package websockets
+package utils
 
 import (
 	"fmt"
@@ -8,16 +8,16 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func RegisterConnection(conn *websocket.Conn, userID, sessionID, httpSessionToken string) *WebSocketConnection {
+func RegisterWebSocketConnection(conn *websocket.Conn, userID, sessionID, httpSessionToken string) *WebSocketConnection {
 	wsConn := &WebSocketConnection{
 		Conn:      conn,
 		UserID:    userID,
 		SessionID: sessionID,
 	}
 
-	Manager.Mu.Lock()
-	Manager.Connections[sessionID] = wsConn
-	Manager.Mu.Unlock()
+	WebSocketManager.Mu.Lock()
+	WebSocketManager.Connections[sessionID] = wsConn
+	WebSocketManager.Mu.Unlock()
 
 	cache.Provider.AddWebSocketConnection(userID, sessionID, map[string]string{
 		"user_id":            userID,
@@ -29,10 +29,10 @@ func RegisterConnection(conn *websocket.Conn, userID, sessionID, httpSessionToke
 	return wsConn
 }
 
-func RemoveConnection(sessionID string) (string, []string) {
-	Manager.Mu.RLock()
-	conn := Manager.Connections[sessionID]
-	Manager.Mu.RUnlock()
+func RemoveWebSocketConnection(sessionID string) {
+	WebSocketManager.Mu.RLock()
+	conn := WebSocketManager.Connections[sessionID]
+	WebSocketManager.Mu.RUnlock()
 
 	var userID string
 	if conn != nil {
@@ -46,30 +46,32 @@ func RemoveConnection(sessionID string) (string, []string) {
 		}
 	}
 
-	Manager.Mu.Lock()
-	delete(Manager.Connections, sessionID)
-	Manager.Mu.Unlock()
+	WebSocketManager.Mu.Lock()
+	delete(WebSocketManager.Connections, sessionID)
+	WebSocketManager.Mu.Unlock()
 
 	if userID != "" {
 		cache.Provider.RemoveWebSocketConnection(userID, sessionID)
 		channelIDs, _ := cache.Provider.RemoveUserFromAllTypingIndicators(userID)
-		return userID, channelIDs
+		
+		if len(channelIDs) > 0 {
+			BroadcastTypingStatusForChannels(channelIDs)
+		}
+		BroadcastUserStatusChange(userID, false)
 	}
-	
-	return "", nil
 }
 
 func CleanupUserWebSocketConnections(userID string) {
 	connections, found, _ := cache.Provider.GetWebSocketConnections(userID)
 
-	Manager.Mu.Lock()
-	for sessionID, conn := range Manager.Connections {
+	WebSocketManager.Mu.Lock()
+	for sessionID, conn := range WebSocketManager.Connections {
 		if conn.UserID == userID {
 			conn.Conn.Close()
-			delete(Manager.Connections, sessionID)
+			delete(WebSocketManager.Connections, sessionID)
 		}
 	}
-	Manager.Mu.Unlock()
+	WebSocketManager.Mu.Unlock()
 
 	if found {
 		for _, sessionID := range connections {
@@ -77,6 +79,7 @@ func CleanupUserWebSocketConnections(userID string) {
 		}
 	}
 }
+
 func GenerateWebSocketSessionID(userID string) string {
 	return fmt.Sprintf("%s_%d", userID, time.Now().UnixNano())
 }

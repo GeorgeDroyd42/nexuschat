@@ -8,7 +8,6 @@ import (
 	"math/big"
 	"net/http"
 	"time"
-	"auth.com/v4/internal/websockets"
 	"auth.com/v4/cache"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -230,7 +229,7 @@ func TerminateSessionWithNotification(sessionID string, sendNotification bool) (
 	ExecuteQuery("DeleteSession", "DELETE FROM sessions WHERE session_id = $1", sessionID)
 
 	if found && sendNotification {
-		websockets.SendEventToSpecificSession(userID, token, "session_terminated", "Your session was terminated. Please log in again.")
+		SendEventToSpecificSession(userID, token, "session_terminated", "Your session was terminated. Please log in again.")
 	}
 	return userID, true, nil
 }
@@ -250,7 +249,7 @@ func TerminateAllUserSessions(userID string) (bool, error) {
 
 	eventData := map[string]interface{}{"type": "all_sessions_terminated"}
 	broadcastData, _ := json.Marshal(eventData)
-	websockets.SendToUser(userID, websocket.TextMessage, broadcastData)
+	SendToUser(userID, websocket.TextMessage, broadcastData)
 	return true, nil
 }
 
