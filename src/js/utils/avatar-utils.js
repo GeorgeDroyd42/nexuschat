@@ -11,15 +11,6 @@ function show404guild(guildName) {
     return createInitialFallback(guildName, 'guild-initial');
 }
 
-function createAvatarHTML(username, profilePicture) {
-    if (profilePicture && profilePicture.trim() !== '') {
-        const fallback = show404pfp(username);
-        return `<img src="${profilePicture}" alt="${username}" class="member-avatar" onerror="this.outerHTML='${fallback.replace(/'/g, '&apos;')}'">`;
-    } else {
-        return show404pfp(username);
-    }
-}
-
 function setupAvatarWithFallback(imgElement, username, profilePicture) {
     if (profilePicture && profilePicture.trim() !== '') {
         imgElement.src = profilePicture;
@@ -32,7 +23,6 @@ function setupAvatarWithFallback(imgElement, username, profilePicture) {
 }
 
 window.AvatarUtils = {
-    createAvatarHTML,
     setupAvatarWithFallback,
     show404pfp,
     show404guild

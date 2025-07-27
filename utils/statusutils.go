@@ -45,17 +45,24 @@ func BroadcastUserStatusChange(userID string, isOnline bool) {
 				"guild_id":  guildID,
 			}
 
-			err := BroadcastToGuildMembers(guildID, statusData)
-			if err != nil {
-				logrus.WithFields(logrus.Fields{
-				"module":   "status",
-				"action":   "broadcast_error",
-				"user_id":  userID,
-				"guild_id": guildID,
-			}).WithError(err).Error("Failed broadcast to guild")
-			} else {
-				broadcastCount++
-			}
+	statusData["guild_id"] = guildID
+				messageBytes, _ := json.Marshal(statusData)
+				err := cache.Provider.PublishMessage("broadcast", map[string]interface{}{
+					"type":       1,
+					"data":       messageBytes,
+					"channel_id": "",
+					"secure":     true,
+				})
+				if err != nil {
+					logrus.WithFields(logrus.Fields{
+					"module":   "status",
+					"action":   "broadcast_error",
+					"user_id":  userID,
+					"guild_id": guildID,
+				}).WithError(err).Error("Failed broadcast to guild")
+				} else {
+					broadcastCount++
+				}
 		}
 	}
 

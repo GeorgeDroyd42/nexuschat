@@ -72,7 +72,12 @@ func BroadcastTypingStatus(channelID string) error {
 		return err
 	}
 
-	return BroadcastToGuildMembers(guildID, typingData)
+	messageBytes, err := json.Marshal(typingData)
+		if err != nil {
+			return err
+		}
+		BroadcastWithRedis(1, messageBytes)
+		return nil
 }
 
 func HandleRequestTypingState(userID string, data map[string]interface{}) error {

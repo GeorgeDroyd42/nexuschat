@@ -152,10 +152,10 @@ func startRedisSubscriber() {
 					if broadcastMsg.Secure && broadcastMsg.ChannelID != "" {
 						var messageData map[string]interface{}
 						json.Unmarshal(broadcastMsg.Data, &messageData)
-					if messageData["type"] == "channel_deleted" || messageData["type"] == "username_changed" {
+					if messageData["type"] == "channel_deleted" || messageData["type"] == "username_changed" || messageData["type"] == "user_status_changed" {
 							if guildID, ok := messageData["guild_id"].(string); ok {
-								utils.BroadcastToGuildMembers(guildID, messageData)
-							}
+							utils.BroadcastToGuildMembers(guildID, messageData)
+						}
 					} else {
 							utils.BroadcastToChannel(broadcastMsg.ChannelID, messageData)
 					}

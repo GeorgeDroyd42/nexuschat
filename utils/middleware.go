@@ -139,7 +139,7 @@ func CreateAuthMiddleware(config AuthMiddlewareConfig) echo.MiddlewareFunc {
 			cookie, err = c.Cookie("session")
 			if err == nil {
 
-				GlobalSessionManager.ExtendSessionSafe(cookie.Value)
+				GlobalSessionManager.ExtendSession(cookie.Value, AppConfig.SessionExpiryDuration)
 			}
 
 			return next(c)

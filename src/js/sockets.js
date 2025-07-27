@@ -50,6 +50,24 @@ websocket.onclose = function(event) {
         }
     };
 }
+function refreshGuildSettingsMembers() {
+    if (window.guildMenuAPI && window.guildMenuAPI.currentGuildId === getCurrentGuildId()) {
+        const settingsMembersList = document.querySelector('.members-list-container');
+        const searchInput = document.querySelector('.members-search-input');
+        if (settingsMembersList && searchInput) {
+            window.guildMenuAPI.loadGuildMembers(settingsMembersList, searchInput);
+        }
+    }
+}
+
+function refreshMainMemberList() {
+    if (typeof getCurrentGuildId === 'function' && window.GuildMembers) {
+        const currentGuildId = getCurrentGuildId();
+        if (currentGuildId) {
+            window.GuildMembers.loadGuildMembers(currentGuildId);
+        }
+    }
+}
 
 function handleMessage(data) {
     switch(data.type) {
@@ -118,6 +136,8 @@ function handleUserStatusChanged(data) {
         if (window.updateMemberStatus) {
             window.updateMemberStatus(data.user_id, data.is_online, data.guild_id);
         }
+        
+        refreshGuildSettingsMembers();
     }
 }
 function redirectToLogin(message) {
@@ -262,12 +282,9 @@ function handleUsernameChanged(data) {
             loadUserGuilds();
         }
         
-        if (typeof getCurrentGuildId === 'function' && typeof loadGuildMembers === 'function') {
-            const currentGuildId = getCurrentGuildId();
-            if (currentGuildId) {
-                loadGuildMembers(currentGuildId);
-            }
-        }
+        refreshMainMemberList();
+        
+        refreshGuildSettingsMembers();
         
         if (window.MessageManager && window.MessageManager.currentChannelId && typeof window.MessageManager.loadChannelMessages === 'function') {
             window.MessageManager.loadChannelMessages(window.MessageManager.currentChannelId);

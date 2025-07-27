@@ -270,7 +270,9 @@ func HandleWebSocketMessage(userID string, rawMessage []byte) error {
 			"message_id": messageID,
 			"channel_id": channelID,
 		}
-		return BroadcastToChannel(channelID, deleteData)
+		messageBytes, _ := json.Marshal(deleteData)
+		BroadcastWithRedis(1, messageBytes)
+		return nil
 	}
 
 	if jsonMsg["type"] == "request_typing_state" {
