@@ -5,10 +5,9 @@ package utils
 
 import (
 	"encoding/json"
-	"fmt"
 	"auth.com/v4/cache"
+	"errors"
 	"github.com/gorilla/websocket"
-	"github.com/sirupsen/logrus"
 )
 
 
@@ -19,19 +18,11 @@ func BroadcastUserStatusChange(userID string, isOnline bool) {
 	if isOnline {
 		statusText = "online"
 	}
-	logrus.WithFields(logrus.Fields{
-	"module":  "status",
-	"action":  "broadcast_start", 
-	"user_id": userID,
-	}).Infof("Broadcasting %s status for user %s", statusText, userID)
+	Log.Info("status", "broadcast_start", "Broadcasting "+statusText+" status for user "+userID, map[string]interface{}{"user_id": userID})
 
 	userGuilds, err := GetUserGuilds(userID)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-		"module":  "status",
-		"action":  "get_guilds_error",
-		"user_id": userID,
-	}).WithError(err).Error("Failed to get user guilds")
+		Log.Error("status", "get_guilds_error", "Failed to get user guilds", err, map[string]interface{}{"user_id": userID})
 		return
 	}
 
@@ -54,42 +45,23 @@ func BroadcastUserStatusChange(userID string, isOnline bool) {
 					"secure":     true,
 				})
 				if err != nil {
-					logrus.WithFields(logrus.Fields{
-					"module":   "status",
-					"action":   "broadcast_error",
-					"user_id":  userID,
-					"guild_id": guildID,
-				}).WithError(err).Error("Failed broadcast to guild")
+					Log.Error("status", "broadcast_error", "Failed broadcast to guild", err, map[string]interface{}{"user_id": userID, "guild_id": guildID})
 				} else {
 					broadcastCount++
 				}
 		}
 	}
 
-	logrus.WithFields(logrus.Fields{
-	"module":         "status",
-	"action":         "broadcast_complete",
-	"user_id":        userID,
-	"status":         statusText,
-	"broadcast_count": broadcastCount,
-}).Info("Status broadcast completed")
+	Log.Info("status", "broadcast_complete", "Status broadcast completed", map[string]interface{}{"user_id": userID, "status": statusText, "broadcast_count": broadcastCount})
 }
 
 // SendInitialStatusesToUser sends current online status of all guild members to a newly connected user
 func SendInitialStatusesToUser(userID string) {
-	logrus.WithFields(logrus.Fields{
-	"module":  "status",
-	"action":  "send_initial_statuses",
-	"user_id": userID,
-}).Info("Sending initial statuses to user")
+	Log.Info("status", "send_initial_statuses", "Sending initial statuses to user", map[string]interface{}{"user_id": userID})
 
 	userGuilds, err := GetUserGuilds(userID)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-		"module":  "status",
-		"action":  "get_guilds_error",
-		"user_id": userID,
-	}).WithError(err).Error("Failed to get user guilds")
+		Log.Error("status", "get_guilds_error", "Failed to get user guilds", err, map[string]interface{}{"user_id": userID})
 		return
 	}
 
@@ -103,12 +75,7 @@ func SendInitialStatusesToUser(userID string) {
 				}
 			}
 			if err != nil {
-				logrus.WithFields(logrus.Fields{
-				"module":   "status",
-				"action":   "get_members_error", 
-				"user_id":  userID,
-				"guild_id": guildID,
-			}).WithError(err).Error("Failed to get guild members")
+				Log.Error("status", "get_members_error", "Failed to get guild members", err, map[string]interface{}{"user_id": userID, "guild_id": guildID})
 				continue
 			}
 
@@ -123,11 +90,7 @@ func SendInitialStatusesToUser(userID string) {
 
 				statusJSON, err := json.Marshal(statusData)
 				if err != nil {
-					logrus.WithFields(logrus.Fields{
-					"module":  "status",
-					"action":  "marshal_error",
-					"user_id": userID,
-				}).WithError(err).Error("Failed to marshal status data")
+					Log.Error("status", "marshal_error", "Failed to marshal status data", err, map[string]interface{}{"user_id": userID})
 					continue
 				}
 
@@ -135,34 +98,25 @@ func SendInitialStatusesToUser(userID string) {
 				guildSent++
 				totalSent++
 			}
-			logrus.WithFields(logrus.Fields{
-				"module":       "status",
-				"action":       "guild_statuses_sent",
-				"user_id":      userID,
-				"guild_id":     guildID,
-				"statuses_sent": guildSent,
-			}).Debug("Guild statuses sent")
+			Log.Debug("status", "guild_statuses_sent", "Guild statuses sent", map[string]interface{}{"user_id": userID, "guild_id": guildID, "statuses_sent": guildSent})
 		}
 	}
 
-	logrus.WithFields(logrus.Fields{
-		"module":      "status",
-		"action":      "initial_statuses_complete",
-		"user_id":     userID,
-		"total_sent":  totalSent,
-	}).Info("Initial statuses sending completed")
+	Log.Info("status", "initial_statuses_complete", "Initial statuses sending completed", map[string]interface{}{"user_id": userID, "total_sent": totalSent})
 }
 
 
 func ValidateWebSocketSession(userID, sessionID string) (bool, error) {
 	connectionData, found, err := cache.Provider.GetWebSocketConnectionData(sessionID)
 	if err != nil || !found {
-		return false, fmt.Errorf("websocket connection data not found")
+		Log.Error("websocket", "validate_session", "WebSocket connection data not found", nil, map[string]interface{}{"user_id": userID, "session_id": sessionID})
+return false, errors.New("websocket connection data not found")
 	}
 
 	storedToken, exists := connectionData["http_session_token"]
 	if !exists || storedToken == "" {
-		return false, fmt.Errorf("no session token stored for websocket")
+		Log.Error("websocket", "validate_session", "No session token stored for websocket", nil, map[string]interface{}{"session_id": sessionID})
+return false, errors.New("no session token stored for websocket")
 	}
 
 	validatedUserID, isValid, err := ValidateSessionToken(storedToken)
@@ -171,7 +125,8 @@ func ValidateWebSocketSession(userID, sessionID string) (bool, error) {
 	}
 
 	if validatedUserID != userID {
-		return false, fmt.Errorf("user ID mismatch")
+		Log.Error("websocket", "validate_session", "User ID mismatch in websocket session", nil, map[string]interface{}{"expected_user": userID, "actual_user": validatedUserID})
+return false, errors.New("user ID mismatch")
 	}
 
 	return true, nil

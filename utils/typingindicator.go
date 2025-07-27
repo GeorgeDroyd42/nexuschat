@@ -1,14 +1,13 @@
 package utils
 
 import (
-	"encoding/json"
-	"fmt"
-	"time"
+    "encoding/json"
+    "errors"
+    "time"
 
-	"auth.com/v4/cache"
-	"github.com/gorilla/websocket"
+    "auth.com/v4/cache"
+    "github.com/gorilla/websocket"
 )
-
 func createTypingData(channelID string) (map[string]interface{}, error) {
 	typingUserIDs, err := cache.Provider.GetTypingUsers(channelID)
 	if err != nil {
@@ -33,7 +32,8 @@ func createTypingData(channelID string) (map[string]interface{}, error) {
 func HandleTypingStart(userID string, data map[string]interface{}) error {
 	channelID, ok := data["channel_id"].(string)
 	if !ok || channelID == "" {
-		return fmt.Errorf("invalid_channel_id")
+		Log.Error("typing", "start_typing", "Invalid channel ID for typing start", nil, map[string]interface{}{"user_id": userID, "channel_id": channelID})
+return errors.New("invalid_channel_id")
 	}
 
 	err := cache.Provider.AddTypingUser(channelID, userID, 15*time.Second)
@@ -47,7 +47,8 @@ func HandleTypingStart(userID string, data map[string]interface{}) error {
 func HandleTypingStop(userID string, data map[string]interface{}) error {
 	channelID, ok := data["channel_id"].(string)
 	if !ok || channelID == "" {
-		return fmt.Errorf("invalid_channel_id")
+		Log.Error("typing", "stop_typing", "Invalid channel ID for typing stop", nil, map[string]interface{}{"user_id": userID, "channel_id": channelID})
+return errors.New("invalid_channel_id")
 	}
 
 	err := cache.Provider.RemoveTypingUser(channelID, userID)
@@ -83,7 +84,8 @@ func BroadcastTypingStatus(channelID string) error {
 func HandleRequestTypingState(userID string, data map[string]interface{}) error {
 	channelID, ok := data["channel_id"].(string)
 	if !ok || channelID == "" {
-		return fmt.Errorf("invalid_channel_id")
+		Log.Error("typing", "request_typing_state", "Invalid channel ID for typing state request", nil, map[string]interface{}{"user_id": userID, "channel_id": channelID})
+return errors.New("invalid_channel_id")
 	}
 
 	typingData, err := createTypingData(channelID)

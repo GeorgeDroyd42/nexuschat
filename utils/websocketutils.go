@@ -3,14 +3,13 @@ package utils
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"net/http"
 	"time"
 
 	"auth.com/v4/cache"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
 )
 
 
@@ -37,11 +36,7 @@ func UpgradeAndRegister(c echo.Context, userID string) (*WebSocketConnection, st
 	sessionID := GenerateWebSocketSessionID(userID)
 	wsConn := RegisterWebSocketConnection(ws, userID, sessionID, httpSessionToken)
 	
-	logrus.WithFields(logrus.Fields{
-		"module":  "websocket",
-		"action":  "user_connected",
-		"user_id": userID,
-	}).Info("User connected via WebSocket")
+	Log.Info("websocket", "user_connected", "User connected via WebSocket", map[string]interface{}{"user_id": userID})
 	BroadcastUserStatusChange(userID, true)
 	go func() {
 		SendInitialStatusesToUser(userID)
@@ -75,13 +70,13 @@ var Upgrader = websocket.Upgrader{
 func HandleMessageEvent(userID string, data map[string]interface{}) error {
 	channelID, ok := data["channel_id"].(string)
 	if !ok {
-		return fmt.Errorf("invalid channel_id")
-	}
+		Log.Error("websocket", "handle_message", "Invalid channel ID", nil, map[string]interface{}{"user_id": userID})
+return errors.New("invalid channel_id")	}
 
 	content, ok := data["content"].(string)
 	if !ok {
-		return fmt.Errorf("invalid content")
-	}
+		Log.Error("websocket", "handle_message", "Invalid content", nil, map[string]interface{}{"user_id": userID})
+return errors.New("invalid content")	}
 
 	var username string
 	var profilePicture string
@@ -169,15 +164,16 @@ type MessageResult struct {
 func HandleWebSocketMessage(userID string, rawMessage []byte) error {
 	var jsonMsg map[string]interface{}
 	if json.Unmarshal(rawMessage, &jsonMsg) != nil {
-		return fmt.Errorf("invalid_message_format")
-	}
+		Log.Error("websocket", "parse_message", "Invalid message format", nil, map[string]interface{}{"user_id": userID})
+return errors.New("invalid_message_format")	}
 
 	if jsonMsg["type"] == "message" {
 		channelID, ok1 := jsonMsg["channel_id"].(string)
 		content, ok2 := jsonMsg["content"].(string)
 
 		if !ok1 || !ok2 || channelID == "" || content == "" {
-			return fmt.Errorf("invalid_message_data")
+			Log.Error("websocket", "validate_message", "Invalid message data", nil, map[string]interface{}{"user_id": userID})
+			return errors.New("invalid_message_data")
 		}
 
 		cache.Provider.RemoveTypingUser(channelID, userID)
@@ -228,11 +224,7 @@ func HandleWebSocketMessage(userID string, rawMessage []byte) error {
 
 	if jsonMsg["type"] == "status_update" {
 		// Frontend explicitly requesting status update broadcast
-		logrus.WithFields(logrus.Fields{
-			"component": "WebSocket",
-			"action":    "status_update_request",
-			"user_id":   userID,
-		}).Info("Frontend requested status update")
+		Log.Info("websocket", "status_update_request", "Frontend requested status update", map[string]interface{}{"user_id": userID})
 		
 		BroadcastUserStatusChange(userID, true)
 		return nil
@@ -249,16 +241,16 @@ func HandleWebSocketMessage(userID string, rawMessage []byte) error {
 	if jsonMsg["type"] == "delete_message" {
 		messageID, ok := jsonMsg["message_id"].(string)
 		if !ok || messageID == "" {
-			return fmt.Errorf("invalid_message_id")
-		}
+			Log.Error("websocket", "delete_message", "Invalid message ID", nil, map[string]interface{}{"user_id": userID})
+return errors.New("invalid_message_id")		}
 
 		var channelID string
 		found, _ := QueryRow("GetMessageChannel", &channelID,
 			"SELECT channel_id FROM messages WHERE message_id = $1", messageID)
 
 		if !found {
-			return fmt.Errorf("message not found")
-		}
+			Log.Error("websocket", "delete_message", "Message not found", nil, map[string]interface{}{"message_id": messageID})
+return errors.New("message not found")		}
 
 		err := DeleteMessage(messageID, userID)
 		if err != nil {
@@ -279,7 +271,7 @@ func HandleWebSocketMessage(userID string, rawMessage []byte) error {
 		return HandleRequestTypingState(userID, jsonMsg)
 	}
 
-	return fmt.Errorf("unsupported_message_type")
-
+	Log.Error("websocket", "handle_message", "Unsupported message type", nil, map[string]interface{}{"user_id": userID})
+return errors.New("unsupported_message_type")
 }
 

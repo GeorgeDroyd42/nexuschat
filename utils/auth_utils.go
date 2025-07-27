@@ -12,7 +12,6 @@ import (
 
 	"auth.com/v4/cache"
 	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
 )
 
 type UserData struct {
@@ -25,9 +24,9 @@ func Initialize() {
 
 	err := InitDB()
 	if err != nil {
-		logrus.WithFields(logrus.Fields{"module": "auth", "action": "init_db"}).WithError(err).Error("Failed to initialize auth database")
+		Log.Error("auth", "init_db", "Failed to initialize auth database", err)
 	} else {
-		logrus.WithFields(logrus.Fields{"module": "auth", "action": "initialize"}).Info("Database initialized successfully")
+		Log.Info("auth", "initialize", "Database initialized successfully")
 	}
 }
 
@@ -68,15 +67,13 @@ func ExtractCredentials(c echo.Context) (string, string) {
 func AsyncOperation(operation string, fn func() error) {
 	go func() {
 	if err := fn(); err != nil {
-		logrus.WithFields(logrus.Fields{
-			"module": "auth",
+		Log.Error("auth", "async_operation", "Async operation failed", err, map[string]interface{}{
 			"operation": operation,
-		}).WithError(err).Error("Async operation failed")
+		})
 	} else {
-		logrus.WithFields(logrus.Fields{
-			"module": "auth", 
+		Log.Info("auth", "async_operation", "Async operation completed successfully", map[string]interface{}{
 			"operation": operation,
-		}).Info("Async operation completed successfully")
+		})
 	}
 	}()
 }

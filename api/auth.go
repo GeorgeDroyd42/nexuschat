@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 
 	"auth.com/v4/internal/csrf"
@@ -50,11 +49,11 @@ func GetCSRFToken(c echo.Context) error {
 func RefreshSessionHandler(c echo.Context) error {
 	// Debug: Print the cookie being received
 	cookie, err := c.Cookie("session")
-	if err == nil {
-		fmt.Printf("🍪 Refresh received cookie: %s\n", cookie.Value[:12]+"...")
-	} else {
-		fmt.Printf("🍪 Refresh NO COOKIE: %v\n", err)
-	}
+if err == nil {
+			utils.Log.Debug("auth", "session_refresh", "Session refresh received cookie", map[string]interface{}{"cookie_prefix": cookie.Value[:12] + "..."})
+		} else {
+			utils.Log.Error("auth", "session_refresh", "Session refresh missing cookie", err)
+		}
 
 	userID := utils.GetUserID(c)
 	if userID == "" {

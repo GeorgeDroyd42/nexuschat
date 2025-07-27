@@ -3,6 +3,7 @@ package utils
 import (
 	"database/sql"
 	"fmt"
+	"errors"
 )
 
 type Migration struct {
@@ -274,7 +275,8 @@ func AddIfNotExists(columnName string) error {
 	}
 
 	if !found {
-		return fmt.Errorf("column %s not found in schema", columnName)
+		Log.Error("migration", "add_column", "Column not found in database schema", nil, map[string]interface{}{"column_name": columnName})
+return errors.New("column not found in schema")
 	}
 
 	var exists bool

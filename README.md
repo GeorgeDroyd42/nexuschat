@@ -8,6 +8,8 @@ Currently in development, Nexus includes:
 - Real-time messaging (WebSocket-based)
 - Custom profile pictures and presence
 - Admin dashboard for managing bans, webhooks, and users
+- Settings pages for guilds, channels, and users
+- User Bios
 - Modular frontend (vanilla JS + Tailwind)
 - Backend in Go using Echo, with Redis and PostgreSQL
 

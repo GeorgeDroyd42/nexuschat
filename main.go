@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"html/template"
 	"io"
-	"log"
 	"net/http"
 	"time"
 	"auth.com/v4/internal/perms"
@@ -125,7 +124,7 @@ func startRedisSubscriber() {
 		for {
 			subscription, err := cache.Provider.Subscribe("broadcast", "user_messages")
 			if err != nil {
-				log.Printf("Failed to subscribe: %v", err)
+				utils.Log.Error("redis", "subscribe", "Failed to subscribe", err)
 				time.Sleep(5 * time.Second)
 				continue
 			}
@@ -133,7 +132,7 @@ func startRedisSubscriber() {
 			for {
 				msg, err := subscription.ReceiveMessage()
 				if err != nil {
-					log.Printf("Subscription error: %v", err)
+					utils.Log.Error("redis", "subscription", "Subscription error", err)
 					subscription.Close()
 					break
 				}
@@ -205,16 +204,17 @@ func main() {
 		WriteTimeout: 3 * time.Second,
 	}
 	cacheLogger := func(level logrus.Level, module, operation, message string, err error) {
-	fields := logrus.Fields{"module": module}
-	if operation != "" {
-		fields["operation"] = operation
+		switch level {
+		case logrus.ErrorLevel:
+			utils.Log.Error(module, operation, message, err)
+		case logrus.InfoLevel:
+			utils.Log.Info(module, operation, message)
+		case logrus.DebugLevel:
+			utils.Log.Debug(module, operation, message)
+		default:
+			utils.Log.Info(module, operation, message)
+		}
 	}
-	entry := logrus.WithFields(fields)
-	if err != nil {
-		entry = entry.WithError(err)
-	}
-	entry.Log(level, message)
-}
 err := cache.Initialize(redisOptions, utils.GetDB(), cacheLogger)
 	
 	csrf.Initialize(cache.Provider, csrf.DefaultKeys)
@@ -225,7 +225,8 @@ err := cache.Initialize(redisOptions, utils.GetDB(), cacheLogger)
 	startRedisSubscriber()
 	utils.StartHeartbeat()
 	if err != nil {
-		log.Fatalf("Failed to initialize Redis: %v", err)
+		utils.Log.Error("redis", "initialize", "Failed to initialize Redis", err)
+		panic("Failed to initialize Redis")
 	}
 
 	e := echo.New()

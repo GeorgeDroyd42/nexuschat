@@ -6,11 +6,10 @@ import (
 	"os"
 	"strconv"
 	"time"
-
+	"errors"
 	"auth.com/v4/cache"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
-	"github.com/sirupsen/logrus"
 )
 
 type UserRegistration struct {
@@ -42,7 +41,10 @@ func GetEnv(key string, defaultVal interface{}) interface{} {
 	if _, ok := defaultVal.(int); ok {
 		intVal, err := strconv.Atoi(val)
 		if err != nil || intVal <= 0 {
-			logrus.WithFields(logrus.Fields{"module": "database", "action": "config_parse", "key": key, "value": val}).Error("Invalid config value")
+			Log.Error("database", "config_parse", "Invalid config value", nil, map[string]interface{}{
+				"key": key,
+				"value": val,
+			})
 			return defaultVal
 		}
 		return intVal
@@ -58,9 +60,9 @@ func executeDBOperation(operation string, fn func() error) error {
 	if err != nil {
 		UnifiedDBErrorHandler(operation, err, nil, nil)
 	} else if duration > 100*time.Millisecond {
-		logrus.WithFields(logrus.Fields{"module": "database", "operation": operation, "duration_ms": duration.Milliseconds()}).Warn("Slow operation detected")
+		Log.LogWithFields(LogWarn, "database", operation, "Slow operation detected", nil, map[string]interface{}{"duration_ms": duration.Milliseconds()})
 	} else {
-		logrus.WithFields(logrus.Fields{"module": "database", "operation": operation, "duration_ms": duration.Milliseconds()}).Debug("Operation executed")
+		Log.LogWithFields(LogDebug, "database", operation, "Operation executed", nil, map[string]interface{}{"duration_ms": duration.Milliseconds()})
 	}
 
 	return err
@@ -166,30 +168,21 @@ func GetAllUsers(page, limit int) ([]map[string]interface{}, int, error) {
 func configureDBConnection(db *sql.DB) {
 	maxOpenConns := GetEnv("DB_MAX_OPEN_CONNS", 25).(int)
 	if maxOpenConns <= 0 {
-		logrus.WithFields(logrus.Fields{
-	"module": "database",
-	"action": "config",
-}).Warn("Invalid DB_MAX_OPEN_CONNS value, using default")
+		Log.LogWithFields(LogWarn, "database", "config", "Invalid DB_MAX_OPEN_CONNS value, using default", nil, nil)
 		maxOpenConns = 25
 	}
 	db.SetMaxOpenConns(maxOpenConns)
 
 	maxIdleConns := GetEnv("DB_MAX_IDLE_CONNS", 5).(int)
 	if maxIdleConns <= 0 || maxIdleConns > maxOpenConns {
-		logrus.WithFields(logrus.Fields{
-	"module": "database",
-	"action": "config", 
-}).Warn("Invalid DB_MAX_IDLE_CONNS value, using default")
+		Log.LogWithFields(LogWarn, "database", "config", "Invalid DB_MAX_IDLE_CONNS value, using default", nil, nil)
 		maxIdleConns = 5
 	}
 	db.SetMaxIdleConns(maxIdleConns)
 
 	connMaxLifetime := GetEnv("DB_CONN_MAX_LIFETIME", 30).(int)
 	if connMaxLifetime <= 0 {
-		logrus.WithFields(logrus.Fields{
-	"module": "database",
-	"action": "config",
-}).Warn("Invalid DB_CONN_MAX_LIFETIME value, using default")
+		Log.LogWithFields(LogWarn, "database", "config", "Invalid DB_CONN_MAX_LIFETIME value, using default", nil, nil)
 		connMaxLifetime = 30
 	}
 	db.SetConnMaxLifetime(time.Duration(connMaxLifetime) * time.Minute)
@@ -269,7 +262,8 @@ func InitDB() error {
 	db, err = sql.Open("postgres", connStr)
 	if err != nil {
 		UnifiedDBErrorHandler("open_connection", err, nil, nil)
-		return fmt.Errorf("unable to open database connection: %v", err)
+		Log.Error("database", "open_connection", "Unable to open database connection", err)
+return errors.New("unable to open database connection")
 	}
 
 	configureDBConnection(db)
@@ -277,10 +271,11 @@ func InitDB() error {
 	err = db.Ping()
 	if err != nil {
 		UnifiedDBErrorHandler("ping_database", err, nil, nil)
-		return fmt.Errorf("database connection failed: %v", err)
+		Log.Error("database", "ping_database", "Database connection failed", err)
+return errors.New("database connection failed")
 	}
 
-	logrus.WithFields(logrus.Fields{"module": "database", "action": "init_database"}).Info("Database connection established successfully")
+	Log.Info("database", "init_database", "Database connection established successfully")
 
 	err = RunMigrations()
 	if err != nil {
@@ -338,7 +333,7 @@ func UnifiedDBErrorHandler(operation string, err error, tx *sql.Tx, batch []*Use
 		return true, 0
 	}
 
-	logrus.WithFields(logrus.Fields{"module": "database", "operation": operation}).WithError(err).Error("Database operation failed")
+	Log.Error("database", operation, "Database operation failed", err)
 
 	if tx != nil {
 		tx.Rollback()

@@ -6,7 +6,6 @@ import (
 	"auth.com/v4/cache"
 
 	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
 )
 
 func createSessionCookie(token string, expires time.Time) *http.Cookie {
@@ -24,27 +23,20 @@ func createSessionCookie(token string, expires time.Time) *http.Cookie {
 func SetAuthCookie(c echo.Context, userID string) error {
 	token, err := GenerateSessionToken()
 	if err != nil {
-		logrus.WithFields(logrus.Fields{"module": "session", "action": "generate_token"}).WithError(err).Error("Failed to generate session token")
+		Log.Error("session", "generate_token", "Failed to generate session token", err)
 		return err
 	}
 
 	err = CreateSession(token, userID)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"module": "session",
-			"action": "create_session",
-		}).WithError(err).Error("Failed to create session")
+		Log.Error("session", "create_session", "Failed to create session", err)
 		return err
 	}
 
 	cookie := createSessionCookie(token, time.Now().Add(AppConfig.SessionExpiryDuration))
 	c.SetCookie(cookie)
 
-	logrus.WithFields(logrus.Fields{
-		"module": "session",
-		"action": "set_auth_cookie", 
-		"user_id": userID,
-	}).Info("Auth cookie set for user")
+	Log.Info("session", "set_auth_cookie", "Auth cookie set for user", map[string]interface{}{"user_id": userID})
 	return nil
 }
 

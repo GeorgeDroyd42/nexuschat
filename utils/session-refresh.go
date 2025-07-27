@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"fmt"
+	"errors"
 	"time"
 
 	"auth.com/v4/cache"
@@ -21,13 +21,15 @@ func (sm *SessionManager) validateSessionOwnership(token, userID string) error {
 		found, err = QueryRow("GetSessionUserID", &dbUserID,
 			"SELECT user_id FROM sessions WHERE token = $1", token)
 		if !found || err != nil {
-			return fmt.Errorf("session not found")
+			Log.Error("session", "validate_ownership", "Session not found in cache or database", nil, map[string]interface{}{"token_prefix": token[:12] + "..."})
+			return errors.New("session not found")
 		}
 		sessionUserID = dbUserID
 	}
 
 	if sessionUserID != userID {
-		return fmt.Errorf("session user mismatch")
+		Log.Error("session", "validate_ownership", "Session user mismatch", nil, map[string]interface{}{"expected_user": userID, "actual_user": sessionUserID})
+		return errors.New("session user mismatch")
 	}
 	return nil
 }
@@ -35,7 +37,8 @@ func (sm *SessionManager) validateSessionOwnership(token, userID string) error {
 func (sm *SessionManager) RefreshSession(c echo.Context, userID string) (time.Time, error) {
 	cookie, err := c.Cookie("session")
 	if err != nil {
-		return time.Time{}, fmt.Errorf("no session cookie")
+		Log.Error("session", "refresh_session", "No session cookie provided", err)
+		return time.Time{}, errors.New("no session cookie")
 	}
 	oldToken := cookie.Value
 
@@ -114,11 +117,11 @@ func (sm *SessionManager) ExtendSession(token string, duration time.Duration) er
 
 	// Actual session extension logic
 	newExpiresAt := time.Now().Add(duration)
-	fmt.Printf("📅 Session extended to: %s\n", newExpiresAt.Format("15:04:05"))
+	Log.Info("session", "extend_session", "Session extended", map[string]interface{}{"expires_at": newExpiresAt.Format("15:04:05")})
 
 	sessionID, found, err := GetSessionIDByTokenNoExpiry(token)
 	if !found || err != nil {
-		fmt.Printf("❌ ExtendSession failed - GetSessionIDByToken: found=%v err=%v\n", found, err)
+		Log.Error("session", "extend_session", "ExtendSession failed - GetSessionIDByToken", err, map[string]interface{}{"found": found})
 		return err
 	}
 	userID, found, err := GetUserBySessionID(sessionID)
@@ -130,7 +133,7 @@ func (sm *SessionManager) ExtendSession(token string, duration time.Duration) er
 		"UPDATE sessions SET expires_at = $1 WHERE token = $2",
 		newExpiresAt, token)
 	if err != nil {
-		fmt.Printf("❌ ExtendSession failed - Database UPDATE: %v\n", err)
+		Log.Error("session", "extend_session", "ExtendSession failed - Database UPDATE", err)
 		return err
 	}
 
@@ -162,7 +165,7 @@ func (sm *SessionManager) UpdateWebSocketTokens(userID, oldToken, newToken strin
 			if storedToken, exists := connectionData["http_session_token"]; exists && storedToken == oldToken {
 				connectionData["http_session_token"] = newToken
 				cache.Provider.AddWebSocketConnection(userID, wsSessionID, connectionData, 24*time.Hour)
-				fmt.Printf("🔄 Updated WebSocket token for session %s\n", wsSessionID)
+				Log.Info("websocket", "update_token", "Updated WebSocket token", map[string]interface{}{"session_id": wsSessionID})
 			}
 		}
 	}

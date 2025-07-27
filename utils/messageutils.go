@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"fmt"
+	"errors"
 	"time"
 	"auth.com/v4/internal/perms"
 )
@@ -9,14 +9,16 @@ import (
 func CreateMessage(channelID, userID, content string) (string, error) {
 	valid, errCode := ValidateMessageContent(content)
 	if !valid {
-		return "", fmt.Errorf("validation failed: %d", errCode)
+		Log.Error("message", "create_message", "Message validation failed", nil, map[string]interface{}{"user_id": userID, "channel_id": channelID, "error_code": errCode})
+return "", errors.New("validation failed")
 	}
 
 	// Skip channel access validation for webhook messages
 	if !isWebhookUser(userID) {
 		valid, errCode = ValidateChannelAccess(userID, channelID)
 		if !valid {
-			return "", fmt.Errorf("access denied: %d", errCode)
+			Log.Error("message", "create_message", "Channel access denied", nil, map[string]interface{}{"user_id": userID, "channel_id": channelID, "error_code": errCode})
+return "", errors.New("access denied")
 		}
 	}
 
@@ -115,7 +117,8 @@ func DeleteMessage(messageID, userID string) error {
 	}
 
 	if !found {
-		return fmt.Errorf("message not found")
+		Log.Error("message", "delete_message", "Message not found", nil, map[string]interface{}{"message_id": messageID, "user_id": userID})
+return errors.New("message not found")
 	}
 
 	// Store channel_id for later use
@@ -135,7 +138,8 @@ func DeleteMessage(messageID, userID string) error {
 	}
 
 	if !canDelete {
-		return fmt.Errorf("permission denied")
+		Log.Error("message", "delete_message", "Permission denied for message deletion", nil, map[string]interface{}{"message_id": messageID, "user_id": userID, "channel_id": channelID})
+return errors.New("permission denied")
 	}
 
 	// Delete the message

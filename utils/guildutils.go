@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"errors"
 	"strconv"
-
 	"auth.com/v4/cache"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -63,7 +63,8 @@ func GetValidUserID(userID string) (string, error) {
 	}
 
 	if !found || !exists {
-		return "", fmt.Errorf("user ID %s does not exist", userID)
+		Log.Error("validation", "check_user_exists", "User ID does not exist", nil, map[string]interface{}{"user_id": userID})
+return "", errors.New("user does not exist")
 	}
 
 	return userID, nil

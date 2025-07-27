@@ -5,7 +5,6 @@ import (
 	"time"
 	"auth.com/v4/cache"
 	"github.com/gorilla/websocket"
-	"github.com/sirupsen/logrus"
 )
 
 
@@ -19,11 +18,7 @@ func SendToUser(userID string, messageType int, data []byte) {
 			err := conn.Conn.WriteMessage(messageType, data)
 			conn.WriteMu.Unlock()
 			if err != nil {
-				logrus.WithFields(logrus.Fields{
-					"component": "WebSocket",
-					"action":    "send_to_user",
-					"user_id":   userID,
-				}).Error("Failed to send message to user: ", err)
+				Log.Error("WebSocket", "send_to_user", "Failed to send message to user", err, map[string]interface{}{"user_id": userID})
 			}
 		}
 	}
@@ -73,10 +68,7 @@ func SendEventToSpecificSession(userID, sessionToken, eventType, message string)
 					err := conn.Conn.WriteMessage(websocket.TextMessage, jsonData)
 					conn.WriteMu.Unlock()
 					if err != nil {
-						logrus.WithFields(logrus.Fields{
-							"component": "WebSocket",
-							"action":    "send_to_specific_session",
-						}).Error("Failed to send to specific session: ", err)
+						Log.Error("WebSocket", "send_to_specific_session", "Failed to send to specific session", err)
 					}
 				}
 			}
@@ -96,10 +88,7 @@ func StartHeartbeat() {
 				err := conn.Conn.WriteMessage(websocket.PingMessage, []byte{})
 				conn.WriteMu.Unlock()
 				if err != nil {
-					logrus.WithFields(logrus.Fields{
-						"component": "WebSocket",
-						"action":    "heartbeat",
-					}).Debug("Ping failed, connection may be stale: ", err)
+					Log.Debug("WebSocket", "heartbeat", "Ping failed, connection may be stale")
 					go func(sessionID string) {
 						RemoveWebSocketConnection(sessionID)
 					}(conn.SessionID)
