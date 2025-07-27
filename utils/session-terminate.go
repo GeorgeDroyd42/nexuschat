@@ -10,13 +10,12 @@ import (
 func TerminateSessionWithNotification(sessionID string, sendNotification bool) (string, bool, error) {
 	userID, found, _ := GetUserBySessionID(sessionID)
 
-	var token string
-	QueryRow("GetTokenBySessionID", &token, "SELECT token FROM sessions WHERE session_id = $1", sessionID)
+	token, _, _ := GetTokenBySessionID(sessionID)
 
 	cache.Provider.DeleteSession(sessionID)
 	cache.Provider.DeleteSessionToken(token)
 
-	ExecuteQuery("DeleteSession", "DELETE FROM sessions WHERE session_id = $1", sessionID)
+	DeleteSession(sessionID)
 
 	if found && sendNotification {
 		SendEventToSpecificSession(userID, token, "session_terminated", "Your session was terminated. Please log in again.")
@@ -31,8 +30,7 @@ func TerminateAllUserSessions(userID string) (bool, error) {
 	}
 
 	for _, sessionID := range sessions {
-		var token string
-		QueryRow("GetTokenBySessionID", &token, "SELECT token FROM sessions WHERE session_id = $1", sessionID)
+		token, _, _ := GetTokenBySessionID(sessionID)
 
 		cache.Provider.DeleteSession(sessionID)
 		cache.Provider.DeleteSessionToken(token)

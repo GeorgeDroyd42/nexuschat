@@ -18,8 +18,7 @@ func (sm *SessionManager) validateSessionOwnership(token, userID string) error {
 
 	if !found {
 		var dbUserID string
-		found, err = QueryRow("GetSessionUserID", &dbUserID,
-			"SELECT user_id FROM sessions WHERE token = $1", token)
+		dbUserID, found, err = GetSessionUserID(token)
 		if !found || err != nil {
 			Log.Error("session", "validate_ownership", "Session not found in cache or database", nil, map[string]interface{}{"token_prefix": token[:12] + "..."})
 			return errors.New("session not found")
@@ -59,7 +58,7 @@ func (sm *SessionManager) RefreshSession(c echo.Context, userID string) (time.Ti
 
 	go func() {
 		time.Sleep(100 * time.Millisecond)
-		sessionID, found, _ := GetSessionIDByToken(oldToken)
+		sessionID, found, _ := GetSessionIDByToken(oldToken, true)
 		if found {
 			TerminateSessionWithNotification(sessionID, false)
 		}
@@ -82,9 +81,7 @@ func (sm *SessionManager) createNewSession(userID string) (string, error) {
 		return "", err
 	}
 
-	err = ExecuteQuery("CreateSession",
-		"INSERT INTO sessions (token, user_id, session_id, expires_at) VALUES ($1, $2, $3, $4)",
-		token, userID, sessionID, expiresAt)
+	err = CreateSession(token, userID, sessionID, expiresAt)
 	if err != nil {
 		return "", err
 	}
@@ -119,7 +116,7 @@ func (sm *SessionManager) ExtendSession(token string, duration time.Duration) er
 	newExpiresAt := time.Now().Add(duration)
 	Log.Info("session", "extend_session", "Session extended", map[string]interface{}{"expires_at": newExpiresAt.Format("15:04:05")})
 
-	sessionID, found, err := GetSessionIDByTokenNoExpiry(token)
+	sessionID, found, err := GetSessionIDByToken(token, false)
 	if !found || err != nil {
 		Log.Error("session", "extend_session", "ExtendSession failed - GetSessionIDByToken", err, map[string]interface{}{"found": found})
 		return err
@@ -129,9 +126,7 @@ func (sm *SessionManager) ExtendSession(token string, duration time.Duration) er
 		return err
 	}
 
-	err = ExecuteQuery("ExtendSession",
-		"UPDATE sessions SET expires_at = $1 WHERE token = $2",
-		newExpiresAt, token)
+	err = ExtendSession(token, newExpiresAt)
 	if err != nil {
 		Log.Error("session", "extend_session", "ExtendSession failed - Database UPDATE", err)
 		return err

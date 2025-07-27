@@ -88,29 +88,7 @@ func SetUserAdminStatus(userID string, isAdmin bool) error {
 	return err
 }
 
-func updateUserSessionAdminStatus(userID string, isAdmin bool) {
-	rows, _ := GetDB().Query("SELECT token FROM sessions WHERE user_id = $1", userID)
-	defer rows.Close()
-	for rows.Next() {
-		var token string
-		rows.Scan(&token)
-		sessionData, found, _ := cache.Provider.GetSessionWithUser(token)
-		if found {
-			sessionData.IsAdmin = isAdmin
-			cache.Provider.SetSessionWithUser(token, sessionData, time.Hour)
-		}
-	}
-}
 
-func ClearUserSessionCache(userID string) {
-	sessionIDs, _ := GetSessionsByUserID(userID)
-	for _, sessionID := range sessionIDs {
-		var token string
-		QueryRow("GetTokenBySessionID", &token, "SELECT token FROM sessions WHERE session_id = $1", sessionID)
-		cache.Provider.DeleteSession(sessionID)
-		cache.Provider.DeleteSessionToken(token)
-	}
-}
 
 func GetAllUsers(page, limit int) ([]map[string]interface{}, int, error) {
 	offset := (page - 1) * limit

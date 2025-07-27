@@ -133,3 +133,4 @@ func GetInviteInfoHandler(c echo.Context) error {
 
 	return c.Render(200, "invite.html", templateData)
 }
+

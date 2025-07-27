@@ -27,7 +27,9 @@ func SetAuthCookie(c echo.Context, userID string) error {
 		return err
 	}
 
-	err = CreateSession(token, userID)
+	sessionID := GenerateSessionID("session")
+	expiresAt := time.Now().Add(AppConfig.SessionExpiryDuration)
+	err = CreateSession(token, userID, sessionID, expiresAt)
 	if err != nil {
 		Log.Error("session", "create_session", "Failed to create session", err)
 		return err
@@ -68,7 +70,7 @@ func ValidateSessionToken(token string) (string, bool, error) {
 		return sessionData.UserID, true, nil
 	}
 
-	sessionID, found, err := GetSessionIDByToken(token)
+	sessionID, found, err := GetSessionIDByToken(token, true)
 	if !found || err != nil {
 		return "", false, err
 	}

@@ -51,7 +51,7 @@ func PerformLogoutBySessionID(sessionID string) {
 func PerformLogout(c echo.Context) {
 	cookie, err := c.Cookie("session")
 	if err == nil && cookie.Value != "" {
-		sessionID, found, _ := GetSessionIDByToken(cookie.Value)
+		sessionID, found, _ := GetSessionIDByToken(cookie.Value, true)
 		if found {
 			TerminateSessionWithNotification(sessionID, true)
 		}
