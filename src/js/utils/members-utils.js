@@ -10,16 +10,6 @@ function updateMembersList(members, guildId) {
 
 
 
-function updateMemberStatus(userId, isOnline, guildId) {
-    if (getCurrentGuildId() !== guildId) return;
-    
-    const member = currentGuildMembers.find(m => m.user_id === userId);
-    if (member) {
-        member.is_online = isOnline;
-        renderMembersList();
-    }
-}
-
 function addMemberToList(member, guildId) {
     if (getCurrentGuildId() !== guildId) return;
     
@@ -92,4 +82,3 @@ function createMemberElement(userID, username, profilePicture, isOnline) {
 window.updateMembersList = updateMembersList;
 window.addMemberToList = addMemberToList;
 window.removeMemberFromList = removeMemberFromList;
-window.updateMemberStatus = updateMemberStatus;

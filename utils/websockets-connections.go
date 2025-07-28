@@ -57,7 +57,10 @@ func RemoveWebSocketConnection(sessionID string) {
 		if len(channelIDs) > 0 {
 			BroadcastTypingStatusForChannels(channelIDs)
 		}
-		BroadcastUserStatusChange(userID, false)
+		// Only broadcast offline if no other connections exist
+		if !IsUserOnline(userID) {
+			BroadcastUserStatusChange(userID, false)
+		}
 	}
 }
 
@@ -111,6 +114,9 @@ func DisconnectWebSocketsByToken(userID, sessionToken string) {
 		if len(channelIDs) > 0 {
 			BroadcastTypingStatusForChannels(channelIDs)
 		}
-		BroadcastUserStatusChange(userID, false)
+		// Only broadcast offline if no other connections exist
+		if !IsUserOnline(userID) {
+			BroadcastUserStatusChange(userID, false)
+		}
 	}
 }

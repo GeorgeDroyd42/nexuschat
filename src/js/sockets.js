@@ -50,24 +50,7 @@ websocket.onclose = function(event) {
         }
     };
 }
-function refreshGuildSettingsMembers() {
-    if (window.guildMenuAPI && window.guildMenuAPI.currentGuildId === getCurrentGuildId()) {
-        const settingsMembersList = document.querySelector('.members-list-container');
-        const searchInput = document.querySelector('.members-search-input');
-        if (settingsMembersList && searchInput) {
-            window.guildMenuAPI.loadGuildMembers(settingsMembersList, searchInput);
-        }
-    }
-}
 
-function refreshMainMemberList() {
-    if (typeof getCurrentGuildId === 'function' && window.GuildMembers) {
-        const currentGuildId = getCurrentGuildId();
-        if (currentGuildId) {
-            window.GuildMembers.loadGuildMembers(currentGuildId);
-        }
-    }
-}
 
 function handleMessage(data) {
     switch(data.type) {
@@ -118,7 +101,7 @@ function handleMessage(data) {
                     handleUsernameChanged(data);
                     break;
                 case 'user_status_changed':
-                    handleUserStatusChanged(data);
+                    window.StatusSockets.handleUserStatusChanged(data);
                     break;
                 case 'typing_update':
                     handleTypingUpdate(data);
@@ -131,15 +114,7 @@ function handleMessage(data) {
                     break;                    
             }
 }
-function handleUserStatusChanged(data) {
-    if (isCurrentGuild(data.guild_id)) {
-        if (window.updateMemberStatus) {
-            window.updateMemberStatus(data.user_id, data.is_online, data.guild_id);
-        }
-        
-        refreshGuildSettingsMembers();
-    }
-}
+
 function redirectToLogin(message) {
     NavigationUtils.redirectToLogin(message);
 }
@@ -282,9 +257,9 @@ function handleUsernameChanged(data) {
             loadUserGuilds();
         }
         
-        refreshMainMemberList();
+        window.StatusUI.refreshMainMemberList();
         
-        refreshGuildSettingsMembers();
+        window.StatusUI.refreshGuildSettingsMembers();
         
         if (window.MessageManager && window.MessageManager.currentChannelId && typeof window.MessageManager.loadChannelMessages === 'function') {
             window.MessageManager.loadChannelMessages(window.MessageManager.currentChannelId);

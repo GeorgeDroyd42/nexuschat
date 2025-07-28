@@ -24,6 +24,9 @@ const coreFiles = [
 ];
 
 const guildFiles = [
+    'src/js/status/core.js',
+    'src/js/status/ui.js', 
+    'src/js/status/sockets.js',
     'src/js/guild/guild-manager.js',
     'src/js/guild/members.js',
     'src/js/guild/navigation.js',
