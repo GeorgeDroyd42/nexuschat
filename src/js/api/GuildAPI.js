@@ -37,8 +37,12 @@ static getMembers(guildId, page = 1) {
             if (data && window.guildMenuAPI) {
                 window.guildMenuAPI.renderButtons('guild-settings-modal', data);
                 
-                await new Promise(resolve => {
+                await new Promise((resolve, reject) => {
+                    let attempts = 0;
+                    const maxAttempts = 20;
+                    
                     const checkElements = () => {
+                        attempts++;
                         const nameElement = document.getElementById('guild-info-name');
                         const descElement = document.getElementById('guild-info-description');
                         const idElement = document.getElementById('guild-info-id');
@@ -48,6 +52,9 @@ static getMembers(guildId, page = 1) {
                             descElement.textContent = data.description || 'No description set';
                             idElement.textContent = data.guild_id;
                             resolve();
+                        } else if (attempts >= maxAttempts) {
+                            console.error('Guild settings elements not found after timeout');
+                            reject(new Error('Guild settings failed to load'));
                         } else {
                             setTimeout(checkElements, 50);
                         }
