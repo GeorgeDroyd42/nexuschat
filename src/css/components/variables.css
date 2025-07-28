@@ -30,6 +30,10 @@
     --padding-large: var(--spacing-lg);
     --margin-component: 4px;
     --margin-element: 8px;
+    /* ========== BORDER SYSTEM ========== */
+    
+    --border-light: #475569;
+
     /* ========== BORDER RADIUS SYSTEM ========== */
     
     --border-radius-sm: 6px;

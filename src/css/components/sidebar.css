@@ -103,17 +103,6 @@
 .user-profile-btn {
   @apply flex items-center flex-1 cursor-pointer;
 }
-
-.settings-btn {
-  @apply bg-transparent border-none text-lg cursor-pointer p-2 rounded transition-colors duration-200 flex;
-}
-
-.settings-btn:hover {
-  @apply bg-slate-700;
-}
-
-
-
 .main-content {
   @apply ml-0 mr-0 min-w-[300px] box-border overflow-hidden md:ml-[340px] flex flex-col h-screen;
 }

@@ -155,7 +155,6 @@ guildMenuAPI
 .addTab('members', 'Members')
 
 .addToTab('overview', { type: 'guild-info' })
-.addToTab('overview', { type: 'separator' })
 .addToTab('overview', { type: 'button', text: 'Create Invite', action: async () => {
     console.log('Create invite for guild:', guildMenuAPI.currentGuildId);
 }, color: '#4CAF50' })

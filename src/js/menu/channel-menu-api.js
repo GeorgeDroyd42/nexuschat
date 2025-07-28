@@ -219,8 +219,8 @@ renderWebhookList(panel) {
         createSection.appendChild(profileGroup);
         createSection.appendChild(input);
         createSection.appendChild(createBtn);
-        container.appendChild(list);
         container.appendChild(createSection);
+        container.appendChild(list);
         panel.appendChild(container);
         
         setupImageUpload('webhook-profile-picture', 'webhook-profile-preview', 'select-webhook-profile-btn');
@@ -376,5 +376,4 @@ channelMenuAPI
         console.error('Error updating channel:', error);
     }
 }, color: '#4CAF50' })
-.addToTab('overview', { type: 'separator' })
 .addToTab('webhooks', { type: 'webhook-list' })

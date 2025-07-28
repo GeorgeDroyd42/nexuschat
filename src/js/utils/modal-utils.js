@@ -22,8 +22,11 @@ openModal(modalId) {
     const modal = $(modalId);
     if (modal) {
         modal.style.display = 'flex';
-        modal.classList.add('active');
         this.openModals.add(modalId);
+        
+        requestAnimationFrame(() => {
+            modal.classList.add('active');
+        });
     }
 }
 
@@ -31,7 +34,11 @@ closeModal(modalId) {
     const modal = $(modalId);
     if (modal) {
         modal.classList.remove('active');
-        modal.style.display = 'none';
+        
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+        
         this.openModals.delete(modalId);
     }
 }
