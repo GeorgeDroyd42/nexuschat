@@ -121,6 +121,10 @@
     @apply shadow-md -translate-y-0.5 bg-slate-600;
   }
 
+  .settings-btn:focus {
+    @apply outline-none;
+  }
+
   .modal-close {
     @apply bg-transparent border-0 cursor-pointer text-2xl text-slate-500 transition-colors duration-200;
   }

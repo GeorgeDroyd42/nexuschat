@@ -35,8 +35,19 @@ const GuildNavigation = {
             if (channelsData.channels && channelsData.channels.length > 0) {
                 window.channelManager.focusedChannel = channelsData.channels[0].channel_id;
                 await window.ChannelHandlers.handleChannelSelect(channelsData.channels[0], window.channelManager);
-            } else {
-                await this.loadGuildContent(guildId);
+        } else {
+                const html = await GuildAPI.getPage(guildId);
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newContent = doc.querySelector('.main-content .container');
+                
+                if (newContent) {
+                    document.querySelector('.main-content .container').innerHTML = newContent.innerHTML;
+                    API.utils.processTimestamps(document.querySelector('.main-content .container'));
+                }
+                
+                history.pushState({guildId: guildId}, '', `/v/${guildId}`);
+                document.title = doc.title;
             }
                     
             setActiveGuild(guildId);
