@@ -185,9 +185,8 @@ func GetGuildMembersPaginated(guildID string, page, limit int) ([]MemberData, in
 	if page > 10000 {
 		page = 10000
 	}
-	// No backend limits - respect frontend request or use unlimited for internal calls
 	if limit > 1000 {
-		limit = 1000  // Reasonable safety limit only
+		limit = 1000
 	}
 
 	offset := (page - 1) * limit
@@ -204,37 +203,99 @@ func GetGuildMembersPaginated(guildID string, page, limit int) ([]MemberData, in
 		return []MemberData{}, 0, err
 	}
 
-	members := []MemberData{}
-	var rows *sql.Rows
 	if limit == AppConfig.AllMembers {
-		rows, err = tx.Query("SELECT gm.user_id, u.username, COALESCE(u.profile_picture, '') as profile_picture, gm.joined_at FROM guild_members gm JOIN users u ON gm.user_id = u.user_id WHERE gm.guild_id = $1 ORDER BY u.username ASC", guildID)
-	} else {
-		rows, err = tx.Query("SELECT gm.user_id, u.username, COALESCE(u.profile_picture, '') as profile_picture, gm.joined_at FROM guild_members gm JOIN users u ON gm.user_id = u.user_id WHERE gm.guild_id = $1 ORDER BY u.username ASC LIMIT $2 OFFSET $3", guildID, limit, offset)
+		members := []MemberData{}
+		rows, err := tx.Query("SELECT gm.user_id, u.username, COALESCE(u.profile_picture, '') as profile_picture, gm.joined_at FROM guild_members gm JOIN users u ON gm.user_id = u.user_id WHERE gm.guild_id = $1 ORDER BY u.username ASC", guildID)
+		if err != nil {
+			return members, totalCount, err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var member MemberData
+			if err := rows.Scan(&member.UserID, &member.Username, &member.ProfilePicture, &member.JoinedAt); err != nil {
+				continue
+			}
+			member.IsOnline = IsUserOnline(member.UserID)
+			members = append(members, member)
+		}
+
+		tx.Commit()
+		return members, totalCount, nil
 	}
+
+	var orderedUserIDs []string
+
+	onlineCount, err := cache.Provider.GetGuildOnlineCount(guildID)
+	if err != nil {
+		onlineCount = 0
+	}
+
+	if offset < onlineCount {
+		onlineUserIDs, err := cache.Provider.GetGuildOnlineUsers(guildID, offset, limit)
+		if err == nil {
+			orderedUserIDs = append(orderedUserIDs, onlineUserIDs...)
+		}
+		
+		if len(orderedUserIDs) < limit {
+			remainingLimit := limit - len(orderedUserIDs)
+			offlineUserIDs, err := cache.Provider.GetGuildOfflineUsers(guildID, 0, remainingLimit)
+			if err == nil {
+				orderedUserIDs = append(orderedUserIDs, offlineUserIDs...)
+			}
+		}
+	} else {
+		offlineOffset := offset - onlineCount
+		offlineUserIDs, err := cache.Provider.GetGuildOfflineUsers(guildID, offlineOffset, limit)
+		if err == nil {
+			orderedUserIDs = append(orderedUserIDs, offlineUserIDs...)
+		}
+	}
+
+	if len(orderedUserIDs) == 0 {
+		tx.Commit()
+		return []MemberData{}, totalCount, nil
+	}
+
+	members := []MemberData{}
+	userIDMap := make(map[string]int)
+	for i, userID := range orderedUserIDs {
+		userIDMap[userID] = i
+	}
+
+	placeholders := ""
+	args := []interface{}{guildID}
+	for i, userID := range orderedUserIDs {
+		if i > 0 {
+			placeholders += ","
+		}
+		placeholders += "$" + fmt.Sprintf("%d", i+2)
+		args = append(args, userID)
+	}
+
+	query := fmt.Sprintf("SELECT gm.user_id, u.username, COALESCE(u.profile_picture, '') as profile_picture, gm.joined_at FROM guild_members gm JOIN users u ON gm.user_id = u.user_id WHERE gm.guild_id = $1 AND gm.user_id IN (%s)", placeholders)
+	
+	rows, err := tx.Query(query, args...)
 	if err != nil {
 		return members, totalCount, err
 	}
 	defer rows.Close()
 
-	var onlineMembers []MemberData
-	var offlineMembers []MemberData
-
+	memberMap := make(map[string]MemberData)
 	for rows.Next() {
 		var member MemberData
 		if err := rows.Scan(&member.UserID, &member.Username, &member.ProfilePicture, &member.JoinedAt); err != nil {
 			continue
 		}
 		member.IsOnline = IsUserOnline(member.UserID)
-		
-		if member.IsOnline {
-			onlineMembers = append(onlineMembers, member)
-		} else {
-			offlineMembers = append(offlineMembers, member)
-		}
+		memberMap[member.UserID] = member
 	}
 
-	// Combine: online first, then offline (both already alphabetically sorted from SQL)
-	members = append(onlineMembers, offlineMembers...)
+	for _, userID := range orderedUserIDs {
+		if member, exists := memberMap[userID]; exists {
+			members = append(members, member)
+		}
+	}
 
 	tx.Commit()
 	return members, totalCount, nil

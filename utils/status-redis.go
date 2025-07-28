@@ -6,13 +6,18 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// BroadcastUserStatusChange sends status change to all guilds the user is in
 func BroadcastUserStatusChange(userID string, isOnline bool) {
 	statusText := "offline"
 	if isOnline {
 		statusText = "online"
 	}
 	Log.Info("status", "broadcast_start", "Broadcasting "+statusText+" status for user "+userID, map[string]interface{}{"user_id": userID})
+
+	username, err := GetUsernameByID(userID)
+	if err != nil {
+		Log.Error("status", "get_username_error", "Failed to get username", err, map[string]interface{}{"user_id": userID})
+		return
+	}
 
 	userGuilds, err := GetUserGuilds(userID)
 	if err != nil {
@@ -23,6 +28,12 @@ func BroadcastUserStatusChange(userID string, isOnline bool) {
 	broadcastCount := 0
 	for _, guild := range userGuilds {
 		if guildID, ok := guild["guild_id"].(string); ok {
+			if isOnline {
+				cache.Provider.AddUserToGuildOnline(guildID, userID, username)
+			} else {
+				cache.Provider.AddUserToGuildOffline(guildID, userID, username)
+			}
+
 			statusData := map[string]interface{}{
 				"type":      "user_status_changed",
 				"user_id":   userID,
@@ -30,26 +41,25 @@ func BroadcastUserStatusChange(userID string, isOnline bool) {
 				"guild_id":  guildID,
 			}
 
-	statusData["guild_id"] = guildID
-				messageBytes, _ := json.Marshal(statusData)
-				err := cache.Provider.PublishMessage("broadcast", map[string]interface{}{
-					"type":       1,
-					"data":       messageBytes,
-					"channel_id": "",
-					"secure":     true,
-				})
-				if err != nil {
-					Log.Error("status", "broadcast_error", "Failed broadcast to guild", err, map[string]interface{}{"user_id": userID, "guild_id": guildID})
-				} else {
-					broadcastCount++
-				}
+			statusData["guild_id"] = guildID
+			messageBytes, _ := json.Marshal(statusData)
+			err := cache.Provider.PublishMessage("broadcast", map[string]interface{}{
+				"type":       1,
+				"data":       messageBytes,
+				"channel_id": "",
+				"secure":     true,
+			})
+			if err != nil {
+				Log.Error("status", "broadcast_error", "Failed broadcast to guild", err, map[string]interface{}{"user_id": userID, "guild_id": guildID})
+			} else {
+				broadcastCount++
+			}
 		}
 	}
 
 	Log.Info("status", "broadcast_complete", "Status broadcast completed", map[string]interface{}{"user_id": userID, "status": statusText, "broadcast_count": broadcastCount})
 }
 
-// SendInitialStatusesToUser sends current online status of all guild members to a newly connected user
 func SendInitialStatusesToUser(userID string) {
 	Log.Info("status", "send_initial_statuses", "Sending initial statuses to user", map[string]interface{}{"user_id": userID})
 
@@ -65,7 +75,7 @@ func SendInitialStatusesToUser(userID string) {
 			members, _, err := GetGuildMembersPaginated(guildID, 1, AppConfig.MembersPerPage)
 			if err == nil {
 				for i := range members {
-					members[i].IsOnline = IsUserOnline(members[i].UserID)
+					members[i].IsOnline = IsUserOnlineRedis(members[i].UserID, guildID)
 				}
 			}
 			if err != nil {
@@ -97,4 +107,39 @@ func SendInitialStatusesToUser(userID string) {
 	}
 
 	Log.Info("status", "initial_statuses_complete", "Initial statuses sending completed", map[string]interface{}{"user_id": userID, "total_sent": totalSent})
+}
+
+func IsUserOnlineRedis(userID, guildID string) bool {
+	onlineUsers, err := cache.Provider.GetGuildOnlineUsers(guildID, 0, 10000)
+	if err != nil {
+		return IsUserOnline(userID)
+	}
+	
+	for _, onlineUserID := range onlineUsers {
+		if onlineUserID == userID {
+			return true
+		}
+	}
+	return false
+}
+
+
+func GetOnlineUsersInGuildRedis(guildID string) ([]string, error) {
+	return cache.Provider.GetGuildOnlineUsers(guildID, 0, 10000)
+}
+
+func EnsureGuildMembersInRedis(guildID string) error {
+	members, _, err := GetGuildMembersPaginated(guildID, 1, AppConfig.AllMembers)
+	if err != nil {
+		return err
+	}
+
+	for _, member := range members {
+		if IsUserOnline(member.UserID) {
+			cache.Provider.AddUserToGuildOnline(guildID, member.UserID, member.Username)
+		} else {
+			cache.Provider.AddUserToGuildOffline(guildID, member.UserID, member.Username)
+		}
+	}
+	return nil
 }

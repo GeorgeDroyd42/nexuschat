@@ -38,7 +38,18 @@ func UpgradeAndRegister(c echo.Context, userID string) (*WebSocketConnection, st
 	
 	Log.Info("websocket", "user_connected", "User connected via WebSocket", map[string]interface{}{"user_id": userID})
 	BroadcastUserStatusChange(userID, true)
+	
+	// Update Redis: add user to online in all their guilds
 	go func() {
+		username, _ := GetUsernameByID(userID)
+		userGuilds, err := GetUserGuilds(userID)
+		if err == nil {
+			for _, guild := range userGuilds {
+				if guildID, ok := guild["guild_id"].(string); ok {
+					cache.Provider.AddUserToGuildOnline(guildID, userID, username)
+				}
+			}
+		}
 		SendInitialStatusesToUser(userID)
 	}()
 	
