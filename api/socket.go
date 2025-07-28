@@ -55,10 +55,9 @@ func HandleAuthWebSocket(c echo.Context) error {
 		}
 		currentUserID := userID
 
-		isBanned, err := utils.IsUserBanned(currentUserID)
+isBanned, err := utils.IsUserBanned(currentUserID)
 		if err == nil && isBanned {
 			wsConn.Conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseUnsupportedData, utils.ErrorMessages[utils.ErrAccountSuspended]))
-			wsConn.Conn.Close()
 			return nil
 		}
 

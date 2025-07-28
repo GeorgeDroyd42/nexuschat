@@ -58,10 +58,11 @@ func JoinByInviteHandler(c echo.Context) error {
 	if err != nil {
 		return utils.SendErrorResponse(c, invite.ErrInvalidInviteCode)
 	}
-	validUser, err := utils.GetValidUserID(userID)
+	_, err = utils.GetUsernameByID(userID)
 	if err != nil {
 		return utils.SendErrorResponse(c, utils.ErrInvalidCredentials)
 	}
+	validUser := userID
 
 	guilds, err := utils.GetUserGuilds(validUser)
 	if err != nil {

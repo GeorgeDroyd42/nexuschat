@@ -63,23 +63,54 @@ func RemoveWebSocketConnection(sessionID string) {
 
 func CleanupUserWebSocketConnections(userID string) {
 	connections, found, _ := cache.Provider.GetWebSocketConnections(userID)
-
-	WebSocketManager.Mu.Lock()
-	for sessionID, conn := range WebSocketManager.Connections {
-		if conn.UserID == userID {
-			conn.Conn.Close()
-			delete(WebSocketManager.Connections, sessionID)
-		}
+	if !found {
+		return
 	}
-	WebSocketManager.Mu.Unlock()
 
-	if found {
-		for _, sessionID := range connections {
-			cache.Provider.RemoveWebSocketConnection(userID, sessionID)
-		}
+	for _, sessionID := range connections {
+		RemoveWebSocketConnection(sessionID)
 	}
 }
 
 func GenerateWebSocketSessionID(userID string) string {
 	return fmt.Sprintf("%s_%d", userID, time.Now().UnixNano())
+}
+
+func DisconnectWebSocketsByToken(userID, sessionToken string) {
+	connections, found, _ := cache.Provider.GetWebSocketConnections(userID)
+	if !found {
+		return
+	}
+
+	var sessionsToDisconnect []string
+
+	for _, wsSessionID := range connections {
+		connectionData, found, _ := cache.Provider.GetWebSocketConnectionData(wsSessionID)
+		if found {
+			if storedToken, exists := connectionData["http_session_token"]; exists && storedToken == sessionToken {
+				sessionsToDisconnect = append(sessionsToDisconnect, wsSessionID)
+			}
+		}
+	}
+
+	WebSocketManager.Mu.Lock()
+	for _, wsSessionID := range sessionsToDisconnect {
+		if conn, exists := WebSocketManager.Connections[wsSessionID]; exists {
+			conn.Conn.Close()
+			delete(WebSocketManager.Connections, wsSessionID)
+		}
+	}
+	WebSocketManager.Mu.Unlock()
+
+	for _, wsSessionID := range sessionsToDisconnect {
+		cache.Provider.RemoveWebSocketConnection(userID, wsSessionID)
+	}
+
+	if len(sessionsToDisconnect) > 0 {
+		channelIDs, _ := cache.Provider.RemoveUserFromAllTypingIndicators(userID)
+		if len(channelIDs) > 0 {
+			BroadcastTypingStatusForChannels(channelIDs)
+		}
+		BroadcastUserStatusChange(userID, false)
+	}
 }

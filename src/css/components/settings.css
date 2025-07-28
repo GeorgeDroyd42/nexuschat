@@ -26,17 +26,17 @@
 }
 
 .profile-menu-content {
-    @apply flex-1 p-8 overflow-y-auto;
+    @apply flex-1 p-0 overflow-y-auto;
+    height: calc(100vh - 80px);
 }
 
 .settings-layout {
-    @apply flex h-full gap-0 max-md:flex-col;
+    @apply flex h-full gap-0 max-md:flex-col max-md:h-auto;
 }
 
 .settings-sidebar {
-    @apply w-[200px] flex flex-col p-0;
-    border-right: 1px solid #475569;
-    @apply max-md:w-full max-md:order-first max-md:border-r-0 max-md:border-b max-md:border-[#475569] max-md:flex-row max-md:overflow-x-auto max-md:py-4 max-md:px-4 max-md:gap-3;
+    @apply w-[200px] flex flex-col p-0 border-r border-[#475569] h-full;
+    @apply max-md:w-full max-md:order-first max-md:border-r-0 max-md:border-b max-md:border-[#475569] max-md:flex-row max-md:overflow-x-auto max-md:py-4 max-md:px-4 max-md:gap-3 max-md:h-auto;
 }
 
 .settings-tab {
@@ -54,11 +54,11 @@
 }
 
 .settings-content {
-    @apply flex-1 p-6 overflow-y-auto flex flex-col items-center justify-start;
+  @apply flex-1 p-6 overflow-y-auto flex flex-col;
 }
 
 .settings-panel {
-    @apply hidden w-full max-w-[600px];
+  @apply hidden w-full;
 }
 
 .settings-panel.active {
@@ -139,7 +139,4 @@
     @apply opacity-80;
 }
 
-.settings-layout {
-    @apply flex h-full gap-0 max-md:flex-col max-md:h-auto;
-}
 }

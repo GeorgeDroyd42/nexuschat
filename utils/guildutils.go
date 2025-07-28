@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"errors"
 	"strconv"
 	"auth.com/v4/cache"
 	"github.com/gorilla/websocket"
@@ -53,22 +52,7 @@ func ValidateGuildExists(c echo.Context, guildID string, preferHTML bool) (map[s
 	return guild, nil
 }
 
-func GetValidUserID(userID string) (string, error) {
-	var exists bool
-	found, err := QueryRow("CheckUserExists", &exists,
-		"SELECT EXISTS(SELECT 1 FROM users WHERE user_id = $1)", userID)
 
-	if err != nil {
-		return "", err
-	}
-
-	if !found || !exists {
-		Log.Error("validation", "check_user_exists", "User ID does not exist", nil, map[string]interface{}{"user_id": userID})
-return "", errors.New("user does not exist")
-	}
-
-	return userID, nil
-}
 func AddGuildMember(guildID, userID string) error {
 	tx, err := GetDB().Begin()
 	if err != nil {

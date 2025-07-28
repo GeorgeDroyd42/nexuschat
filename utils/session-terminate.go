@@ -7,15 +7,17 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+func CleanupSession(sessionID, token string) {
+	cache.Provider.DeleteSession(sessionID)
+	cache.Provider.DeleteSessionToken(token)
+	DeleteSession(sessionID)
+}
 func TerminateSessionWithNotification(sessionID string, sendNotification bool) (string, bool, error) {
 	userID, found, _ := GetUserBySessionID(sessionID)
 
 	token, _, _ := GetTokenBySessionID(sessionID)
 
-	cache.Provider.DeleteSession(sessionID)
-	cache.Provider.DeleteSessionToken(token)
-
-	DeleteSession(sessionID)
+	CleanupSession(sessionID, token)
 
 	if found && sendNotification {
 		SendEventToSpecificSession(userID, token, "session_terminated", "Your session was terminated. Please log in again.")

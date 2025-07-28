@@ -54,6 +54,8 @@ func (sm *SessionManager) RefreshSession(c echo.Context, userID string) (time.Ti
 	newCookie := createSessionCookie(newToken, newExpiresAt)
 	c.SetCookie(newCookie)
 
+	DisconnectWebSocketsByToken(userID, oldToken)
+	
 	sm.UpdateWebSocketTokens(userID, oldToken, newToken)
 
 	go func() {

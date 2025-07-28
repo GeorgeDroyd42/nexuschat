@@ -167,10 +167,11 @@ func JoinGuildHandler(c echo.Context) error {
 
 	guildID := id
 
-	validUser, err := utils.GetValidUserID(user)
+	_, err = utils.GetUsernameByID(user)
 	if err != nil {
 		return utils.SendErrorResponse(c, utils.ErrInvalidCredentials)
 	}
+	validUser := user
 
 	guilds, err := utils.GetUserGuilds(validUser)
 	if err != nil {
