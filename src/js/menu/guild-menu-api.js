@@ -61,7 +61,7 @@ class GuildMenuAPI extends ChannelMenuAPI {
         if (!this.currentGuildId) return;
         
         try {
-            const data = await GuildAPI.getMembers(this.currentGuildId);
+            const data = await window.GuildAPI.getMembers(this.currentGuildId);
             if (data && data.members) {
                 this.displayMembers(data.members, membersList, searchInput);
             }

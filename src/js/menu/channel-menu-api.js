@@ -230,7 +230,7 @@ renderWebhookList(panel) {
 
 async loadWebhooks(container) {
     try {
-        const data = await BaseAPI.get(`/api/webhook/list/${this.currentChannelId}`);
+        const data = await window.BaseAPI.get(`/api/webhook/list/${this.currentChannelId}`);
         this.displayWebhooks(container, data.webhooks || []);
     } catch (error) {
         console.error('Error loading webhooks:', error);
@@ -305,7 +305,7 @@ refreshWebhookList() {
 }
 async deleteWebhook(webhookId) {
         try {
-            await BaseAPI.delete(`/api/webhook/delete/${webhookId}`);
+            await window.BaseAPI.delete(`/api/webhook/delete/${webhookId}`);
             this.refreshWebhookList();
         } catch (error) {
             displayErrorMessage('Failed to delete webhook', 'channel-settings-error-container', 'error');
@@ -325,7 +325,7 @@ async createWebhook() {
                     formData.append('profile_picture', profilePicture);
                 }
                 
-                const data = await BaseAPI.post(`/api/webhook/create/${this.currentChannelId}`, formData, true);
+                const data = await window.BaseAPI.post(`/api/webhook/create/${this.currentChannelId}`, formData, true);
                 displayErrorMessage(`Webhook created! ID: ${data.webhook_id} Token: ${data.token}`, 'channel-settings-error-container', 'success');
                 const list = document.querySelector('.webhook-list');
                 if (list) this.loadWebhooks(list);
@@ -364,7 +364,7 @@ channelMenuAPI
     const currentName = channelMenuAPI.currentChannelName;
     
     try {
-        const result = await ChannelAPI.edit(channelMenuAPI.currentChannelId, currentName, newDesc);
+        const result = await window.ChannelAPI.edit(channelMenuAPI.currentChannelId, currentName, newDesc);
         if (result.status === 'success') {
             const descElement = document.getElementById('channel-info-description');
             if (descElement) {

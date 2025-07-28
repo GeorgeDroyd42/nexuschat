@@ -30,19 +30,6 @@ async function fetchWithCSRF(url, options = {}) {
     return originalFetch(url, options);
 }
 
-async function submitFormWithCSRF(formData, url) {
-    try {
-        const response = await fetchWithCSRF(url, {
-            method: 'POST',
-            body: formData,
-            headers: {}
-        });
-        return await response.json();
-    } catch (error) {
-        console.error('Error submitting form:', error);
-        throw error;
-    }
-}
 
 window.fetch = async function(url, options = {}) {
     if (url.includes('/api/csrf-token')) {

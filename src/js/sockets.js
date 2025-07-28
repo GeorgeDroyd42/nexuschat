@@ -203,7 +203,7 @@ async function handleChannelDeleted(data) {
             if (channelsData.channels && channelsData.channels.length > 0) {
                 await window.ChannelHandlers.handleChannelSelect(channelsData.channels[0], window.channelManager);
             } else {
-                window.location.href = `/v/${data.guild_id}`;
+                await window.GuildNavigation.navigateToGuild(data.guild_id);
             }
         }
         window.ChannelUI.loadChannels(data.guild_id, window.channelManager);

@@ -92,21 +92,21 @@ case 'invite':
                 if (window.MessageManager) window.MessageManager.deleteMessage(this.currentMessageId);
                 break;
             case 'delete_channel':
-                ChannelAPI.delete(this.currentChannelId);
+                window.ChannelAPI.delete(this.currentChannelId);
                 break;
-case 'channel_settings':
-    window.ChannelUI.showChannelInfo(this.currentChannelId, this.currentChannelName, window.channelManager);
-    break;
+            case 'channel_settings':
+                window.ChannelUI.showChannelInfo(this.currentChannelId, this.currentChannelName, window.channelManager);
+                break;
             case 'leave_guild':
-                GuildAPI.leave(this.currentGuildId);
+                window.GuildAPI.leave(this.currentGuildId);
                 break;
-case 'guild_settings':
-    if (window.GuildAPI && window.GuildAPI.showGuildInfo) {
-        window.GuildAPI.showGuildInfo(this.currentGuildId);
-    }
-    break;
-        }
-    }
+            case 'guild_settings':
+                if (window.GuildAPI && window.GuildAPI.showGuildInfo) {
+                    window.GuildAPI.showGuildInfo(this.currentGuildId);
+                }
+                break;
+                }
+            }
 
     async generateInviteCode() {
         try {
