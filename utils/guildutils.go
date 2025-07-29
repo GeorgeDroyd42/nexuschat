@@ -73,6 +73,15 @@ func AddGuildMember(guildID, userID string) error {
 	err = tx.Commit()
 	if err == nil {
 		cache.Provider.Delete(fmt.Sprintf("guild:%s", guildID))
+		
+		username, usernameErr := GetUsernameByID(userID)
+		if usernameErr == nil {
+			if IsUserOnline(userID) {
+				cache.Provider.AddUserToGuildOnline(guildID, userID, username)
+			} else {
+				cache.Provider.AddUserToGuildOffline(guildID, userID, username)
+			}
+		}
 	}
 	return err
 }
@@ -231,24 +240,41 @@ func GetGuildMembersPaginated(guildID string, page, limit int) ([]MemberData, in
 		onlineCount = 0
 	}
 
+	seenUsers := make(map[string]bool)
+	
 	if offset < onlineCount {
 		onlineUserIDs, err := cache.Provider.GetGuildOnlineUsers(guildID, offset, limit)
 		if err == nil {
-			orderedUserIDs = append(orderedUserIDs, onlineUserIDs...)
+			for _, userID := range onlineUserIDs {
+				if !seenUsers[userID] {
+					orderedUserIDs = append(orderedUserIDs, userID)
+					seenUsers[userID] = true
+				}
+			}
 		}
 		
 		if len(orderedUserIDs) < limit {
 			remainingLimit := limit - len(orderedUserIDs)
 			offlineUserIDs, err := cache.Provider.GetGuildOfflineUsers(guildID, 0, remainingLimit)
 			if err == nil {
-				orderedUserIDs = append(orderedUserIDs, offlineUserIDs...)
+				for _, userID := range offlineUserIDs {
+					if !seenUsers[userID] && len(orderedUserIDs) < limit {
+						orderedUserIDs = append(orderedUserIDs, userID)
+						seenUsers[userID] = true
+					}
+				}
 			}
 		}
 	} else {
 		offlineOffset := offset - onlineCount
 		offlineUserIDs, err := cache.Provider.GetGuildOfflineUsers(guildID, offlineOffset, limit)
 		if err == nil {
-			orderedUserIDs = append(orderedUserIDs, offlineUserIDs...)
+			for _, userID := range offlineUserIDs {
+				if !seenUsers[userID] {
+					orderedUserIDs = append(orderedUserIDs, userID)
+					seenUsers[userID] = true
+				}
+			}
 		}
 	}
 

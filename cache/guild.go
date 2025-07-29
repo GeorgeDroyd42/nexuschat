@@ -6,12 +6,9 @@ import (
 
 func (c *RedisCache) AddUserToGuildOnline(guildID, userID, username string) error {
 	onlineKey := c.keys.GuildOnlineUsers(guildID)
-	offlineKey := c.keys.GuildOfflineUsers(guildID)
 	
-	// Remove from offline set first
-	c.client.ZRem(offlineKey, userID)
+	c.RemoveUserFromGuildOffline(guildID, userID)
 	
-	// Add to online set with username as score for lexicographical ordering
 	return c.client.ZAdd(onlineKey, redis.Z{
 		Score:  0,
 		Member: userID + ":" + username,

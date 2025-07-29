@@ -13,12 +13,8 @@ function updateMembersList(members, guildId) {
 function addMemberToList(member, guildId) {
     if (getCurrentGuildId() !== guildId) return;
     
-    const existingIndex = currentGuildMembers.findIndex(m => m.user_id === member.user_id);
-    if (existingIndex === -1) {
-        currentGuildMembers.push(member);
-        
-        renderMembersList();
-    }
+    currentGuildMembers.push(member);
+    renderMembersList();
 }
 
 function removeMemberFromList(userId, guildId) {
@@ -34,15 +30,20 @@ function renderMembersList() {
     
     membersList.innerHTML = '';
     
+    const sortedMembers = [...currentGuildMembers].sort((a, b) => {
+        if (a.is_online !== b.is_online) {
+            return a.is_online ? -1 : 1;
+        }
+        return a.username.toLowerCase().localeCompare(b.username.toLowerCase());
+    });
+    
     let separatorAdded = false;
     let foundOfflineUser = false;
     
-    currentGuildMembers.forEach(member => {
-        // Add separator when we encounter first offline user after online users
+    sortedMembers.forEach(member => {
         if (!member.is_online && !foundOfflineUser && !separatorAdded) {
             foundOfflineUser = true;
-            // Check if there were any online users before this
-            const hasOnlineUsers = currentGuildMembers.some(m => m.is_online);
+            const hasOnlineUsers = sortedMembers.some(m => m.is_online);
             if (hasOnlineUsers) {
                 const separator = document.createElement('div');
                 separator.className = 'sidebar-separator';
