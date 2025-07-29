@@ -35,8 +35,12 @@ func RemoveWebSocketConnection(sessionID string) {
 	WebSocketManager.Mu.RUnlock()
 
 	var userID string
+	var typingChannel string
 	if conn != nil {
 		userID = conn.UserID
+		if conn.IsTyping {
+			typingChannel = conn.TypingChannel
+		}
 	} else {
 		connectionData, found, _ := cache.Provider.GetWebSocketConnectionData(sessionID)
 		if found {
@@ -49,6 +53,10 @@ func RemoveWebSocketConnection(sessionID string) {
 	WebSocketManager.Mu.Lock()
 	delete(WebSocketManager.Connections, sessionID)
 	WebSocketManager.Mu.Unlock()
+
+	if typingChannel != "" {
+		broadcastTypingUpdate(typingChannel)
+	}
 
 	if userID != "" {
 		cache.Provider.RemoveWebSocketConnection(userID, sessionID)
