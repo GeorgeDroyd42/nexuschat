@@ -15,26 +15,15 @@ const GuildMembers = {
             const data = await GuildAPI.getMembers(guildID, page);
             
             if (data.success) {
-                console.log(`📄 Page ${page} received:`, {
-                    totalMembers: data.members.length,
-                    hasMore: data.has_more,
-                    onlineCount: data.members.filter(m => m.is_online).length,
-                    offlineCount: data.members.filter(m => !m.is_online).length
-                });
-                
-                console.log(`👥 Members on page ${page}:`, data.members.map(m => `${m.username}(${m.is_online ? 'online' : 'offline'})`));
-                
+
                 if (page === 1) {
                     this.allMembers = data.members;
-                    console.log(`🔄 Reset allMembers to page 1 data`);
                 } else {
                     this.allMembers = [...this.allMembers, ...data.members];
-                    console.log(`📎 Added page ${page} to existing members, total now: ${this.allMembers.length}`);
                 }
                 this.hasMoreMembers = data.has_more;
                 this.currentPage = page;
                 
-                console.log(`🎯 Final allMembers order:`, this.allMembers.map(m => `${m.username}(${m.is_online ? 'online' : 'offline'})`));
                 updateMembersList(this.allMembers, guildID);
             } else if (data.error) {
                 console.error('Error loading members:', data.error);
@@ -49,24 +38,6 @@ const GuildMembers = {
     async loadMoreMembers() {
         if (!this.hasMoreMembers || this.isLoadingMembers) return;
         await this.loadGuildMembers(this.currentGuildId, this.currentPage + 1);
-    },
-
-    async getUsernameByID(userID) {
-        try {
-            const data = await UserAPI.getUserProfile(userID);
-            return data.username || 'Unknown';
-        } catch {
-            return 'Unknown';
-        }
-    },
-
-    async getUserProfilePicture(userID) {
-        try {
-            const data = await UserAPI.getUserProfile(userID);
-            return data.profile_picture || '';
-        } catch {
-            return '';
-        }
     },
 
     setupMembersSidebar(guildId) {
