@@ -40,21 +40,10 @@ func (kg StandardKeyGenerator) SessionData(token string) string {
 	return fmt.Sprintf("session:data:%s", token)
 }
 
-func (kg StandardKeyGenerator) TypingIndicator(channelID string) string {
-	return fmt.Sprintf("typing:%s", channelID)
-}
 func (kg StandardKeyGenerator) GuildOnlineUsers(guildID string) string {
 	return fmt.Sprintf("guild:%s:online", guildID)
 }
 
 func (kg StandardKeyGenerator) GuildOfflineUsers(guildID string) string {
 	return fmt.Sprintf("guild:%s:offline", guildID)
-}
-
-func (kg StandardKeyGenerator) GlobalOnlineUsers() string {
-	return "global:online"
-}
-
-func (kg StandardKeyGenerator) GlobalOfflineUsers() string {
-	return "global:offline"
 }

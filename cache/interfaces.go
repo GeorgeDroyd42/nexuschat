@@ -48,10 +48,6 @@ type CacheProvider interface {
 	AddWebSocketConnection(userID, sessionID string, data map[string]string, expiration time.Duration) error
 	RemoveWebSocketConnection(userID, sessionID string) error
 	GetWebSocketConnectionData(sessionID string) (map[string]string, bool, error)
-	AddTypingUser(channelID, userID string, duration time.Duration) error
-	RemoveTypingUser(channelID, userID string) error
-	GetTypingUsers(channelID string) ([]string, error)
-	RemoveUserFromAllTypingIndicators(userID string) ([]string, error)
 	PublishMessage(channel string, message interface{}) error
 	Subscribe(channels ...string) (PubSubSubscription, error)
 	SetNX(key string, value interface{}, expiration time.Duration) bool
@@ -76,7 +72,6 @@ type KeyGenerator interface {
 	UserBan(userID string) string
 	WebSocketConnection(sessionID string) string
 	SessionData(token string) string
-	TypingIndicator(channelID string) string
 }
 
 // PubSubSubscription defines the interface for PubSub subscriptions

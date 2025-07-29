@@ -52,15 +52,12 @@ func RemoveWebSocketConnection(sessionID string) {
 
 	if userID != "" {
 		cache.Provider.RemoveWebSocketConnection(userID, sessionID)
-		channelIDs, _ := cache.Provider.RemoveUserFromAllTypingIndicators(userID)
 		
-		if len(channelIDs) > 0 {
-			BroadcastTypingStatusForChannels(channelIDs)
-		}
 		// Only broadcast offline if no other connections exist
 		if !IsUserOnline(userID) {
 			BroadcastUserStatusChange(userID, false)
 		}
+		
 	}
 }
 
@@ -110,10 +107,7 @@ func DisconnectWebSocketsByToken(userID, sessionToken string) {
 	}
 
 	if len(sessionsToDisconnect) > 0 {
-		channelIDs, _ := cache.Provider.RemoveUserFromAllTypingIndicators(userID)
-		if len(channelIDs) > 0 {
-			BroadcastTypingStatusForChannels(channelIDs)
-		}
+		
 		// Only broadcast offline if no other connections exist
 		if !IsUserOnline(userID) {
 			BroadcastUserStatusChange(userID, false)

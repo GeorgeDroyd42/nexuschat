@@ -187,7 +187,7 @@ return errors.New("invalid_message_format")	}
 			return errors.New("invalid_message_data")
 		}
 
-		cache.Provider.RemoveTypingUser(channelID, userID)
+		HandleTypingStop(userID, map[string]interface{}{"channel_id": channelID})
 
 		username, _ := GetUsernameByID(userID)
 
@@ -227,9 +227,6 @@ return errors.New("invalid_message_format")	}
 
 		broadcastJSON, _ := json.Marshal(result.Data)
 		BroadcastWithRedis(1, broadcastJSON)
-
-		BroadcastTypingStatus(channelID)
-
 		return nil
 	}
 

@@ -6,10 +6,12 @@ import (
 )
 
 type WebSocketConnection struct {
-	Conn      *websocket.Conn
-	UserID    string
-	SessionID string
-	WriteMu   sync.Mutex
+	Conn         *websocket.Conn
+	UserID       string
+	SessionID    string
+	WriteMu      sync.Mutex
+	IsTyping     bool
+	TypingChannel string
 }
 
 type ConnectionManager struct {
