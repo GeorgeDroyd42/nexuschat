@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"auth.com/v4/cache"
 	"github.com/gorilla/websocket"
+	"time"
 )
 
 func BroadcastUserStatusChange(userID string, isOnline bool) {
@@ -141,5 +142,41 @@ func EnsureGuildMembersInRedis(guildID string) error {
 			cache.Provider.AddUserToGuildOffline(guildID, member.UserID, member.Username)
 		}
 	}
+	return nil
+}
+
+func PopulateRedisOnStartup() error {
+	// Check if already populated
+	var dummy string
+	exists, _ := cache.Provider.Get("redis:populated:v1", &dummy)
+	if exists {
+		Log.Info("redis", "startup", "Redis already populated, skipping")
+		return nil
+	}
+	
+	Log.Info("redis", "startup", "Populating Redis with guild members...")
+	
+	// Get all guild IDs
+	rows, err := GetDB().Query("SELECT DISTINCT guild_id FROM guild_members")
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	
+	guildCount := 0
+	for rows.Next() {
+		var guildID string
+		if err := rows.Scan(&guildID); err != nil {
+			continue
+		}
+		
+		// Use existing function to populate each guild
+		EnsureGuildMembersInRedis(guildID)
+		guildCount++
+	}
+	
+	// Mark as populated
+	cache.Provider.Set("redis:populated:v1", "true", 24*time.Hour)
+	Log.Info("redis", "startup", "Redis population complete", map[string]interface{}{"guilds_populated": guildCount})
 	return nil
 }

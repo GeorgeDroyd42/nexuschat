@@ -224,6 +224,7 @@ err := cache.Initialize(redisOptions, utils.GetDB(), cacheLogger)
 
 	startRedisSubscriber()
 	utils.StartHeartbeat()
+	utils.PopulateRedisOnStartup()
 	if err != nil {
 		utils.Log.Error("redis", "initialize", "Failed to initialize Redis", err)
 		panic("Failed to initialize Redis")
