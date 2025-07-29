@@ -14,18 +14,9 @@ setupTypingIndicator() {
     }
 
 updateTypingUsers(users) {
-        console.log('DEBUG: updateTypingUsers called with:', users);
-        const currentUsername = window.profileManager?.currentUser?.username;
-        if (currentUsername) {
-            this.typingUsers = this.filterTypingUsers(users || [], currentUsername);
-            console.log('DEBUG: Filtered out current user:', currentUsername, 'Result:', this.typingUsers);
-        } else {
-            this.typingUsers = users || [];
-            console.log('DEBUG: No current user found - showing all users:', this.typingUsers);
-        }
-        this.renderTypingIndicator();
-    }
-
+    this.typingUsers = users || [];
+    this.renderTypingIndicator();
+}
     renderTypingIndicator() {
         const indicator = document.getElementById('typing-indicator');
         if (!indicator) return;

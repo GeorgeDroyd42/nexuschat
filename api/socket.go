@@ -71,7 +71,7 @@ isBanned, err := utils.IsUserBanned(currentUserID)
 
 			messageProcessCount++
 
-			err := utils.HandleWebSocketMessage(userID, message)
+			err := utils.HandleWebSocketMessage(userID, sessionID, message)
 			if err != nil {
 				errorMsg := fmt.Sprintf(`{"error":"%s"}`, err.Error())
 				wsConn.Conn.WriteMessage(websocket.TextMessage, []byte(errorMsg))

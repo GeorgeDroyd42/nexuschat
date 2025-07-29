@@ -172,7 +172,7 @@ type MessageResult struct {
 }
 
 
-func HandleWebSocketMessage(userID string, rawMessage []byte) error {
+func HandleWebSocketMessage(userID string, sessionID string, rawMessage []byte) error {
 	var jsonMsg map[string]interface{}
 	if json.Unmarshal(rawMessage, &jsonMsg) != nil {
 		Log.Error("websocket", "parse_message", "Invalid message format", nil, map[string]interface{}{"user_id": userID})
@@ -187,7 +187,7 @@ return errors.New("invalid_message_format")	}
 			return errors.New("invalid_message_data")
 		}
 
-		HandleTypingStop(userID, map[string]interface{}{"channel_id": channelID})
+		HandleTypingStop(userID, sessionID, map[string]interface{}{"channel_id": channelID})
 
 		username, _ := GetUsernameByID(userID)
 
@@ -239,11 +239,11 @@ return errors.New("invalid_message_format")	}
 	}
 
 	if jsonMsg["type"] == "typing_start" {
-		return HandleTypingStart(userID, jsonMsg)
+		return HandleTypingStart(userID, sessionID, jsonMsg)
 	}
 
 	if jsonMsg["type"] == "typing_stop" {
-		return HandleTypingStop(userID, jsonMsg)
+		return HandleTypingStop(userID, sessionID, jsonMsg)
 	}
 
 	if jsonMsg["type"] == "delete_message" {
@@ -276,7 +276,7 @@ return errors.New("message not found")		}
 	}
 
 	if jsonMsg["type"] == "request_typing_state" {
-		return HandleRequestTypingState(userID, jsonMsg)
+		return HandleRequestTypingState(userID, sessionID, jsonMsg)
 	}
 
 	Log.Error("websocket", "handle_message", "Unsupported message type", nil, map[string]interface{}{"user_id": userID})
