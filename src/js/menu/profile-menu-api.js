@@ -38,18 +38,14 @@ renderProfileInfo(panel) {
     const profileContainer = document.createElement('div');
     profileContainer.className = 'profile-picture-container';
     
-    const profilePic = document.createElement('img');
-    profilePic.className = 'profile-picture-large';
-    profilePic.alt = 'Profile Picture';
-    
-    profileContainer.appendChild(profilePic);
-    panel.appendChild(profileContainer);
-    
-    AvatarUtils.setupAvatarWithFallback(
-        profilePic, 
+    const avatarWrapper = AvatarUtils.createSecureAvatar(
         this.currentUser?.username || 'User',
-        this.currentUser?.profile_picture
+        this.currentUser?.profile_picture,
+        'profile-picture-large'
     );
+    
+    profileContainer.appendChild(avatarWrapper);
+    panel.appendChild(profileContainer);
 
 const fields = [
     { label: 'USERNAME', id: 'profile-info-username', value: this.currentUser?.username || 'Loading...' },

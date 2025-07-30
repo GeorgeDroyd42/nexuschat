@@ -49,9 +49,12 @@ createChannelElement(channel, channelManager) {
         channelElement.className = 'channel-item';
         channelElement.setAttribute('data-channel-id', channel.channel_id);
         channelElement.innerHTML = `
-            <span class="channel-name">#${window.truncateChannelName ? window.truncateChannelName(channel.name) : channel.name}</span>
-            <button class="settings-btn channel-settings-btn" title="Channel Settings" data-channel-id="${channel.channel_id}" data-channel-name="${channel.name}" style="display: none;">⚙️</button>
+            <span class="channel-name"></span>
+            <button class="settings-btn channel-settings-btn" title="Channel Settings" data-channel-id="${channel.channel_id}" style="display: none;">⚙️</button>
         `;
+        const channelNameSpan = channelElement.querySelector('.channel-name');
+        channelNameSpan.textContent = '#' + (window.truncateChannelName ? window.truncateChannelName(channel.name) : channel.name);
+        channelElement.querySelector('.channel-settings-btn').dataset.channelName = channel.name;
                 
         channelElement.addEventListener('click', (e) => {
             e.preventDefault();

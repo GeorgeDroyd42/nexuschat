@@ -5,17 +5,9 @@ const GuildManager = {
         guildElement.setAttribute('data-guild-id', guild.guild_id);
         
         const guildIcon = guildElement.querySelector('.guild-icon');
-        const guildIconHtml = guild.profile_picture_url && guild.profile_picture_url.trim() !== '' ?
-            `<img src="${guild.profile_picture_url}" alt="${guild.name}" class="guild-image">` :
-            (window.AvatarUtils ? window.AvatarUtils.show404guild(guild.name) : `<span class="guild-initial">${guild.name.charAt(0).toUpperCase()}</span>`);
-        guildIcon.innerHTML = guildIconHtml;
-
-        const imgEl = guildIcon.querySelector('img.guild-image');
-        if (imgEl) {
-            imgEl.onerror = function() {
-                this.outerHTML = window.AvatarUtils ? window.AvatarUtils.show404guild(guild.name) : `<span class="guild-initial">${guild.name.charAt(0).toUpperCase()}</span>`;
-            };
-        }
+        const guildAvatar = window.AvatarUtils.createSecureAvatar(guild.name, guild.profile_picture_url, 'guild-image');
+        guildIcon.innerHTML = '';
+        guildIcon.appendChild(guildAvatar);
         
         if (window.innerWidth > 768) {
             guildElement.addEventListener('mouseenter', () => {

@@ -49,7 +49,9 @@ const imageElements = ['#profile-preview', '#user-avatar'];
 imageElements.forEach(selector => {
     const el = document.querySelector(selector);
     if (el && window.AvatarUtils) {
-        window.AvatarUtils.setupAvatarWithFallback(el, userData.username, userData.profile_picture);
+        const newAvatar = window.AvatarUtils.createSecureAvatar(userData.username, userData.profile_picture);
+        const avatarContent = newAvatar.firstChild;
+        el.replaceWith(avatarContent);
     }
 });
 }

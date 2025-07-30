@@ -33,8 +33,9 @@ updateTypingUsers(users) {
                 <span></span>
                 <span></span>
             </div>
-            <span class="typing-text">${message}</span>
+            <span class="typing-text"></span>
         `;
+        indicator.querySelector('.typing-text').textContent = message;
         indicator.style.display = 'flex';
     }
 

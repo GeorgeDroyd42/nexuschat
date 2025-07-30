@@ -1,29 +1,29 @@
-function createInitialFallback(name, className) {
-    const initial = name ? name.charAt(0).toUpperCase() : '?';
-    return `<span class="${className}">${initial}</span>`;
-}
-
-function show404pfp(username) {
-    return createInitialFallback(username, 'member-initial');
-}
-
-function show404guild(guildName) {
-    return createInitialFallback(guildName, 'guild-initial');
-}
-
-function setupAvatarWithFallback(imgElement, username, profilePicture) {
+function createSecureAvatar(username, profilePicture, className = 'member-avatar') {
+    const container = document.createElement('div');
+    container.className = 'avatar-container';
+    
     if (profilePicture && profilePicture.trim() !== '') {
-        imgElement.src = profilePicture;
-        imgElement.onerror = () => {
-            imgElement.outerHTML = show404pfp(username);
+        const img = document.createElement('img');
+        img.className = className;
+        img.src = profilePicture;
+        img.alt = '';
+        
+        img.onerror = function() {
+            const initial = document.createElement('span');
+            initial.className = className.includes('guild') ? 'guild-initial' : className.replace('avatar', 'initial');
+            initial.textContent = username ? username.charAt(0).toUpperCase() : '?';
+            this.replaceWith(initial);
         };
+        
+        container.appendChild(img);
     } else {
-        imgElement.outerHTML = show404pfp(username);
+        const initial = document.createElement('span');
+        initial.className = className.includes('guild') ? 'guild-initial' : className.replace('avatar', 'initial');
+        initial.textContent = username ? username.charAt(0).toUpperCase() : '?';
+        container.appendChild(initial);
     }
+    
+    return container;
 }
 
-window.AvatarUtils = {
-    setupAvatarWithFallback,
-    show404pfp,
-    show404guild
-};
+window.AvatarUtils = { createSecureAvatar };

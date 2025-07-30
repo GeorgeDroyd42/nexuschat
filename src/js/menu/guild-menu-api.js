@@ -90,14 +90,21 @@ class GuildMenuAPI extends ChannelMenuAPI {
                 const memberElement = this.createElement('div', 'member-list-item');
                 const isOnline = member.is_online;
                 
-                memberElement.innerHTML = `
-                    <div class="member-avatar-container">
-                        ${window.createUserAvatarHTML ? window.createUserAvatarHTML(member.username, member.profile_picture) : `<span>${member.username.charAt(0)}</span>`}
-                        <div class="member-status ${isOnline ? 'online' : 'offline'}"></div>
-                    </div>
-                    <span class="member-name">${member.username}</span>
-                    <span class="member-role">${member.role || 'Member'}</span>
-                `;
+                const avatarContainer = this.createElement('div', 'member-avatar-container');
+                const avatar = window.AvatarUtils.createSecureAvatar(member.username, member.profile_picture);
+                const status = this.createElement('div', `member-status ${isOnline ? 'online' : 'offline'}`);
+                
+                avatarContainer.appendChild(avatar);
+                avatarContainer.appendChild(status);
+                
+                const nameSpan = this.createElement('span', 'member-name');
+                nameSpan.textContent = member.username;
+                const roleSpan = this.createElement('span', 'member-role');
+                roleSpan.textContent = member.role || 'Member';
+                
+                memberElement.appendChild(avatarContainer);
+                memberElement.appendChild(nameSpan);
+                memberElement.appendChild(roleSpan);
                 
                 membersList.appendChild(memberElement);
             });
@@ -116,20 +123,14 @@ class GuildMenuAPI extends ChannelMenuAPI {
         const guildContainer = document.createElement('div');
         guildContainer.className = 'profile-picture-container';
         
-        const guildPic = document.createElement('img');
-        guildPic.className = 'profile-picture-large';
-        guildPic.alt = 'Guild Picture';
+        const guildAvatarWrapper = window.AvatarUtils.createSecureAvatar(
+            this.currentGuild?.name || 'Guild',
+            this.currentGuild?.profile_picture_url,
+            'profile-picture-large'
+        );
         
-        guildContainer.appendChild(guildPic);
+        guildContainer.appendChild(guildAvatarWrapper);
         panel.appendChild(guildContainer);
-        
-        if (window.AvatarUtils) {
-            window.AvatarUtils.setupAvatarWithFallback(
-                guildPic, 
-                this.currentGuild?.name || 'Guild',
-                this.currentGuild?.profile_picture_url
-            );
-        }
 
         const fields = [
             { label: 'GUILD NAME', id: 'guild-info-name', value: this.currentGuild?.name || 'Loading...' },

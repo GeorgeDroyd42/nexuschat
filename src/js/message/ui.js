@@ -10,7 +10,7 @@ const MessageUI = {
         headerEl.className = 'message-header';
         
         // Create avatar - use same function for all avatars
-        let avatarEl = window.createUserAvatarElement(message.username, message.profile_picture);
+        let avatarEl = window.AvatarUtils.createSecureAvatar(message.username, message.profile_picture);
         
         // Create message info
         const infoEl = document.createElement('div');
@@ -20,7 +20,8 @@ const MessageUI = {
         usernameEl.className = 'message-username';
         
         if (message.is_webhook) {
-            usernameEl.innerHTML = `${message.username} <span class="bot-tag">BOT</span>`;
+            usernameEl.innerHTML = `<span class="bot-tag">BOT</span>`;
+            usernameEl.prepend(message.username + ' ');
         } else {
             usernameEl.textContent = message.username;
         }

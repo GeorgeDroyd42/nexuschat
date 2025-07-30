@@ -40,7 +40,7 @@ async function loadUsers(page = 1) {
                 <td>
                     <div class="user-info">
                         <div class="avatar-container"></div>
-                        <span class="member-name">${user.username}</span>
+                        <span class="member-name"></span>
                     </div>
                 </td>
                 <td>${formatTimestamp(user.created_at, 'datetime')}</td>
@@ -48,9 +48,10 @@ async function loadUsers(page = 1) {
                 <td>${user.is_banned ? 'Banned' : 'Active'}</td>
                 <td>${adminButton} ${banButton}</td>
             `;
+            userRow.querySelector('.member-name').textContent = user.username;
 
             const avatarContainer = userRow.querySelector('.avatar-container');
-            const avatarElement = window.createUserAvatarElement(user.username, user.profile_picture);
+            const avatarElement = window.AvatarUtils.createSecureAvatar(user.username, user.profile_picture);
             avatarContainer.appendChild(avatarElement);
             userTableBody.appendChild(userRow);
         });

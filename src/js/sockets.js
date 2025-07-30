@@ -248,7 +248,9 @@ function handleUsernameChanged(data) {
                 
                 const userAvatar = document.querySelector('#user-avatar');
                 if (userAvatar && window.AvatarUtils) {
-                    window.AvatarUtils.setupAvatarWithFallback(userAvatar, userData.username, userData.profile_picture);
+                    const newAvatar = window.AvatarUtils.createSecureAvatar(userData.username, userData.profile_picture);
+                    const avatarContent = newAvatar.firstChild;
+                    userAvatar.replaceWith(avatarContent);
                 }
             });
         }   

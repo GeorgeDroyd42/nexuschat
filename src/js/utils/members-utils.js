@@ -63,20 +63,22 @@ function createMemberElement(userID, username, profilePicture, isOnline) {
     memberElement.className = `member-item ${isOnline ? 'online' : 'offline'}`;
     memberElement.setAttribute('data-user-id', userID);
     
-    memberElement.innerHTML = `
-        <div class="member-avatar-container">
-            ${window.createUserAvatarHTML(username, profilePicture)}
-            <div class="member-status ${isOnline ? 'online' : 'offline'}"></div>
-        </div>
-        <span class="member-name">${username || 'Unknown'}</span>
-    `;
+    const avatarContainer = document.createElement('div');
+    avatarContainer.className = 'member-avatar-container';
     
-    const imgEl = memberElement.querySelector('img.member-avatar');
-    if (imgEl) {
-        imgEl.onerror = function() {
-            this.outerHTML = window.AvatarUtils ? window.AvatarUtils.show404pfp(username) : `<span class="member-initial">${username ? username.charAt(0).toUpperCase() : '?'}</span>`;
-        };
-    }
+    const avatar = window.AvatarUtils.createSecureAvatar(username, profilePicture);
+    const status = document.createElement('div');
+    status.className = `member-status ${isOnline ? 'online' : 'offline'}`;
+    
+    avatarContainer.appendChild(avatar);
+    avatarContainer.appendChild(status);
+    
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'member-name';
+    nameSpan.textContent = username || 'Unknown';
+    
+    memberElement.appendChild(avatarContainer);
+    memberElement.appendChild(nameSpan);
         
     return memberElement;
 }
