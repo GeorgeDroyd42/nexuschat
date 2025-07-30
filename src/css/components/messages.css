@@ -98,7 +98,7 @@
   line-height: 1.4;
 }
 #messages-list {
-  @apply overflow-y-auto flex flex-col gap-3 fixed top-[92px] left-[340px] right-0;
+  @apply overflow-y-auto flex flex-col gap-3 fixed top-0 left-[340px] right-0;
   bottom: var(--bottom-section-height);
   padding: 0;
   padding-bottom: 20px;
