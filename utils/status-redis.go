@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"auth.com/v4/cache"
+	"sync"
 	"github.com/gorilla/websocket"
 	"time"
 )
@@ -146,7 +147,6 @@ func EnsureGuildMembersInRedis(guildID string) error {
 }
 
 func PopulateRedisOnStartup() error {
-	// Check if already populated
 	var dummy string
 	exists, _ := cache.Provider.Get("redis:populated:v1", &dummy)
 	if exists {
@@ -154,29 +154,39 @@ func PopulateRedisOnStartup() error {
 		return nil
 	}
 	
+	startTime := time.Now()
 	Log.Info("redis", "startup", "Populating Redis with guild members...")
 	
-	// Get all guild IDs
 	rows, err := GetDB().Query("SELECT DISTINCT guild_id FROM guild_members")
 	if err != nil {
 		return err
 	}
 	defer rows.Close()
 	
+	var wg sync.WaitGroup
 	guildCount := 0
+	
 	for rows.Next() {
 		var guildID string
 		if err := rows.Scan(&guildID); err != nil {
 			continue
 		}
 		
-		// Use existing function to populate each guild
-		EnsureGuildMembersInRedis(guildID)
+		wg.Add(1)
+		go func(id string) {
+			defer wg.Done()
+			EnsureGuildMembersInRedis(id)
+		}(guildID)
 		guildCount++
 	}
 	
-	// Mark as populated
+	wg.Wait()
+	
 	cache.Provider.Set("redis:populated:v1", "true", 24*time.Hour)
-	Log.Info("redis", "startup", "Redis population complete", map[string]interface{}{"guilds_populated": guildCount})
+	duration := time.Since(startTime)
+	Log.Info("redis", "startup", "Redis population complete", map[string]interface{}{
+		"guilds_populated": guildCount,
+		"duration_ms": duration.Milliseconds(),
+	})
 	return nil
 }
