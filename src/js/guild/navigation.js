@@ -8,6 +8,7 @@ const GuildNavigation = {
             
             const channelsData = await window.GuildAPI.getChannels(guildId);
             await window.ChannelUI.loadChannels(guildId, window.channelManager);
+            await updateChannelsHeader(guildId);
             
             if (channelId) {
                 const channel = channelsData.channels?.find(c => c.channel_id === channelId);

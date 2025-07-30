@@ -42,7 +42,7 @@
 
     <div class="channels-sidebar{{if not .guild_id}} hidden{{end}}">
         <div class="channels-header">
-            <h3>Channels</h3>
+            <h3 id="channels-header" class="text-sm font-medium text-slate-300"></h3>
             <button id="create-channel-btn" class="btn-small">+</button>
         </div>
         <div id="channels-list" class="channels-list">
@@ -72,7 +72,7 @@
         <div class="channel-content messaging-layout">
             <div class="channel-title">
                 <h2># {{.name}}</h2>
-                {{if .description}}<p>{{.description}}</p>{{end}}
+                {{if .description}}<span class="channel-description">{{.description}}</span>{{end}}
             </div>
             <div id="messages-list" class="messages-list">
                             <!-- Messages will be loaded here -->

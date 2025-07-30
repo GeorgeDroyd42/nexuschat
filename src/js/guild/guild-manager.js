@@ -68,7 +68,7 @@ const GuildManager = {
 window.GuildManager = GuildManager;
 
 // initialize guild functionality when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const currentGuildId = getCurrentGuildId();
     if (currentGuildId) {
         GuildUI.highlightActiveGuild(currentGuildId);        
@@ -76,6 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.ChannelUI.loadChannels(currentGuildId, window.channelManager);
     }
     
-    // Always setup guild UI features
+    await updateChannelsHeader(currentGuildId);
     window.GuildUI.setupServerImageUpload();
 });

@@ -191,7 +191,7 @@ function handleChannelUpdated(data) {
             const channelTitle = document.querySelector('.channel-title');
             if (channelTitle) {
                 const nameElement = channelTitle.querySelector('h2');
-                const descElement = channelTitle.querySelector('p');
+                const descElement = channelTitle.querySelector('.channel-description');
                 
                 if (nameElement) {
                     nameElement.textContent = `# ${data.name}`;
@@ -202,7 +202,8 @@ function handleChannelUpdated(data) {
                         descElement.textContent = data.description;
                         descElement.style.display = 'block';
                     } else {
-                        const newDesc = document.createElement('p');
+                        const newDesc = document.createElement('span');
+                        newDesc.className = 'channel-description';
                         newDesc.textContent = data.description;
                         channelTitle.appendChild(newDesc);
                     }

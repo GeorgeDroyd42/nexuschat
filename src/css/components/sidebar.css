@@ -108,7 +108,7 @@
   @apply flex items-center flex-1 cursor-pointer;
 }
 .main-content {
-  @apply ml-0 mr-0 min-w-[300px] box-border overflow-hidden md:ml-[340px] flex flex-col h-screen;
+  @apply ml-0 mr-0 min-w-[300px] box-border md:ml-[340px] flex flex-col h-screen;
 }
 
 .no-channels {

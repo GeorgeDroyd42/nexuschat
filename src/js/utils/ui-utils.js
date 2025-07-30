@@ -1,3 +1,22 @@
+async function updateChannelsHeader(guildId = null) {
+    const channelsHeader = document.getElementById('channels-header');
+    if (!channelsHeader) return;
+    
+    if (guildId) {
+        try {
+            const guildInfo = await window.GuildAPI.getInfo(guildId);
+            if (guildInfo && guildInfo.name) {
+                channelsHeader.textContent = guildInfo.name;
+            }
+        } catch (error) {
+            console.error('Error updating channels header:', error);
+            channelsHeader.textContent = 'Channels';
+        }
+    } else {
+        channelsHeader.textContent = 'Channels';
+    }
+}
+
 function displayErrorMessage(message, containerId = 'error-container', type = 'error') {
     const container = document.getElementById(containerId);
     if (container) {

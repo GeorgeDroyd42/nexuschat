@@ -32,28 +32,14 @@
       @apply hidden !important;
     }
   }
-  
-  .channel-title {
-    @apply sticky top-0 z-10 flex flex-col justify-start items-start border-b border-slate-600 m-0 flex-shrink-0 shadow-lg;
+.channel-title {
+    @apply sticky top-0 z-10 flex flex-col justify-center items-start border-b border-slate-600 m-0 flex-shrink-0 shadow-lg;
     background: var(--bg-white);
     padding: 1rem;
-    height: var(--header-height, 60px);
-    overflow: hidden;
+    min-height: var(--header-height);
   }
-  .channel-title h2 {
-    @apply text-lg font-semibold m-0;
-    font-size: 1rem;
-    color: var(--text-dark);
-    line-height: 1.2;
-  }
-  
-  .channel-title p {
-    @apply text-xs font-normal opacity-80 m-0 mt-1 w-full;
-    font-size: 0.75rem;
-    color: #666;
-    line-height: 1.2;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
+.channel-description {
+    @apply text-xs font-normal opacity-80 m-0 w-full text-slate-500 leading-tight break-words block;
   }
   
   .channel-content {
