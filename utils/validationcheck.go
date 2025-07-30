@@ -8,6 +8,8 @@ import (
 	"auth.com/v4/internal/perms"
 	"mime/multipart"
 	"net/http"
+	"regexp"
+	"strings"
 	"time"
 )
 
@@ -79,6 +81,8 @@ func ValidateGuildData(name, description string) (bool, int) {
 }
 
 func ValidateChannelData(name, description string) (bool, int) {
+	name = strings.TrimSpace(regexp.MustCompile(`\s+`).ReplaceAllString(name, " "))
+	
 	if name == "" {
 		return false, ErrChannelNameRequired
 	}

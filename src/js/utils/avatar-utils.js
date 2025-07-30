@@ -10,7 +10,15 @@ function createSecureAvatar(username, profilePicture, className = 'member-avatar
         
         img.onerror = function() {
             const initial = document.createElement('span');
-            initial.className = className.includes('guild') ? 'guild-initial' : className.replace('avatar', 'initial');
+            let initialClass;
+if (className.includes('guild')) {
+    initialClass = 'guild-initial';
+} else if (className.includes('profile-picture-large')) {
+    initialClass = 'member-initial';
+} else {
+    initialClass = className.replace('avatar', 'initial');
+}
+initial.className = initialClass;
             initial.textContent = username ? username.charAt(0).toUpperCase() : '?';
             this.replaceWith(initial);
         };
@@ -18,7 +26,15 @@ function createSecureAvatar(username, profilePicture, className = 'member-avatar
         container.appendChild(img);
     } else {
         const initial = document.createElement('span');
-        initial.className = className.includes('guild') ? 'guild-initial' : className.replace('avatar', 'initial');
+        let initialClass;
+if (className.includes('guild')) {
+    initialClass = 'guild-initial';
+} else if (className.includes('profile-picture-large')) {
+    initialClass = 'member-initial';
+} else {
+    initialClass = className.replace('avatar', 'initial');
+}
+initial.className = initialClass;
         initial.textContent = username ? username.charAt(0).toUpperCase() : '?';
         container.appendChild(initial);
     }

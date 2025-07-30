@@ -72,11 +72,15 @@
 }
 
 .channel-item {
-  @apply p-2 rounded cursor-pointer transition-all duration-200 mb-1 w-full min-w-0 box-border flex items-center justify-between;
+  @apply p-2 rounded cursor-pointer transition-all duration-200 mb-1 w-full min-w-0 box-border flex items-center;
+}
+
+.channel-name {
+  @apply flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap;
 }
 
 .channel-settings-btn {
-  @apply opacity-0 invisible transition-all duration-200 bg-transparent border-none text-slate-400 cursor-pointer rounded text-sm flex-shrink-0 flex items-center justify-center w-6 h-6;
+  @apply opacity-0 invisible transition-all duration-200 bg-transparent border-none text-slate-400 cursor-pointer rounded text-sm flex-shrink-0 flex items-center justify-center w-6 h-6 ml-2;
 }
 .channel-btn-small {
   @apply bg-blue-600 text-white border-none rounded px-2 py-1 text-sm cursor-pointer transition-all duration-200;
