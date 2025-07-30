@@ -39,6 +39,9 @@ class GuildMenuAPI extends ChannelMenuAPI {
     }
 
     async renderMembersList(panel) {
+        // Show loading state immediately
+        panel.innerHTML = '<div class="loading-state"><p>Loading members...</p></div>';
+        
         const membersContainer = this.createElement('div', 'members-container');
         
         const searchContainer = this.createElement('div', 'members-search-container');
@@ -51,10 +54,13 @@ class GuildMenuAPI extends ChannelMenuAPI {
         searchContainer.appendChild(searchInput);
         membersContainer.appendChild(searchContainer);
         membersContainer.appendChild(membersList);
-        panel.appendChild(membersContainer);
         
         // Load and display members
-        this.loadGuildMembers(membersList, searchInput);
+        await this.loadGuildMembers(membersList, searchInput);
+        
+        // Replace loading state with actual content
+        panel.innerHTML = '';
+        panel.appendChild(membersContainer);
     }
 
     async loadGuildMembers(membersList, searchInput) {

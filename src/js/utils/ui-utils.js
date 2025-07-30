@@ -118,8 +118,13 @@ function updateResponsiveLayout() {
         if (isMobile) {
             membersSidebar.classList.remove('visible');
             mainContent.classList.remove('with-members');
-        } else if (membersSidebar.classList.contains('visible')) {
-            mainContent.classList.add('with-members');
+        } else {
+            // On desktop, restore members sidebar visibility if we're in a guild
+            const currentGuildId = getCurrentGuildId();
+            if (currentGuildId) {
+                membersSidebar.classList.add('visible');
+                mainContent.classList.add('with-members');
+            }
         }
     }
     
