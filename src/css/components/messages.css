@@ -34,28 +34,27 @@
   }
   
   .channel-title {
-      @apply sticky top-0 z-10 flex flex-col justify-start items-start border-b border-slate-600 m-0 flex-shrink-0 shadow-lg;
-      background: var(--bg-white);
-      padding: 1rem;
-      min-height: 60px;
-      height: auto;
-    }
+    @apply sticky top-0 z-10 flex flex-col justify-start items-start border-b border-slate-600 m-0 flex-shrink-0 shadow-lg;
+    background: var(--bg-white);
+    padding: 1rem;
+    height: var(--header-height, 60px);
+    overflow: hidden;
+  }
+  .channel-title h2 {
+    @apply text-lg font-semibold m-0;
+    font-size: 1rem;
+    color: var(--text-dark);
+    line-height: 1.2;
+  }
   
-    .channel-title h2 {
-      @apply text-xl md:text-2xl font-semibold m-0;
-      font-size: clamp(1.25rem, 4vw, 1.5rem);
-      color: var(--text-dark);
-      line-height: 1.2;
-    }
-  
-    .channel-title p {
-      @apply text-sm font-normal opacity-80 m-0 mt-2 w-full;
-      font-size: 0.85rem;
-      color: #666;
-      line-height: 1.4;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-    }
+  .channel-title p {
+    @apply text-xs font-normal opacity-80 m-0 mt-1 w-full;
+    font-size: 0.75rem;
+    color: #666;
+    line-height: 1.2;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
   
   .channel-content {
     @apply flex flex-col h-full w-full;

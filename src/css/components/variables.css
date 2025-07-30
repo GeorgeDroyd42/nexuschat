@@ -60,10 +60,11 @@
 --layout-left-offset: 400px;
 --layout-right-offset: 0px;
 --layout-right-offset-with-members: 240px;
+--header-height: 90px;
 }
 
 /* ========== COMMON HEADER STYLING ========== */
 .header-base {
-  @apply flex items-center justify-between h-[60px] p-4 border-b border-slate-600;
+  @apply flex items-center justify-between h-[90px] p-4 border-b border-slate-600;
   background: var(--bg-gradient-start);
 }
