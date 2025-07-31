@@ -1,0 +1,30 @@
+@layer components {
+  .message {
+    @apply mb-3 p-3 rounded-md break-words max-w-full transition-colors duration-200;
+    overflow-wrap: anywhere;
+    word-wrap: break-word;
+  }
+  
+  .message:hover {
+    @apply bg-slate-800/50;
+  }
+  
+  .message-header {
+    @apply flex items-baseline gap-2 mb-2;
+  }
+  
+  .message-username {
+    @apply font-semibold text-blue-400 text-sm;
+  }
+  
+  .message-time {
+    @apply text-xs text-slate-500 ml-auto;
+  }
+  
+  .message-content {
+    @apply break-words whitespace-pre-wrap max-w-full text-slate-200 leading-relaxed;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    hyphens: auto;
+  }
+}

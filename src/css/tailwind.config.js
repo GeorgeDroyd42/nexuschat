@@ -5,6 +5,7 @@ content: [
   "./components/**/*.css",
   "./guild/**/*.css",
   "./channel/**/*.css",
+  "./message/**/*.css",
   "./admin/**/*.css"
 ],
 

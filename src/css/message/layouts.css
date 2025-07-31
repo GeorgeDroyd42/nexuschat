@@ -1,0 +1,50 @@
+@layer components {
+  .messaging-layout {
+    @apply flex flex-col w-full h-full relative;
+  }
+  
+  .message-input-container {
+    @apply fixed bottom-0 left-0 right-0 z-20 border-t border-slate-600 bg-slate-800 p-2 md:p-3 shadow-lg;
+    height: var(--bottom-section-height);
+    margin-left: 340px;
+    margin-right: 0;
+  }
+
+  .main-content.with-members .message-input-container {
+    margin-right: 240px;
+  }
+
+  @media (max-width: 768px) {
+    .messaging-layout {
+      @apply h-screen;
+      height: 100dvh;
+    }
+    
+    .message-input-container {
+      @apply fixed bottom-0 left-0 right-0 p-4 min-h-[60px] z-50 border-t border-slate-600 bg-slate-800;
+      height: var(--bottom-section-height);
+      margin-left: 0;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+    }
+
+    body:has(#mobile-profile-page[style*="display: block"]) .message-input-container {
+      @apply hidden !important;
+    }
+  }
+
+  #messages-list {
+    @apply overflow-y-auto flex flex-col gap-3 fixed left-[340px] right-0;
+    top: 0;
+    padding-top: 92px;
+    bottom: var(--bottom-section-height);
+    padding-bottom: 20px;
+    background: var(--bg-white);
+  }
+  
+  @media (max-width: 768px) {
+    #messages-list {
+      @apply left-0;
+      bottom: var(--bottom-section-height);
+    }
+  }
+}

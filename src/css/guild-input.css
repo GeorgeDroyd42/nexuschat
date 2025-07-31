@@ -18,7 +18,11 @@
 @import './channel/headers.css';
 @import './channel/listitems.css';
 @import './channel/layouts.css';
-@import './components/messages.css';
+@import './message/layouts.css';
+@import './message/content.css';
+@import './message/embeds.css';
+@import './message/input.css';
+@import './message/scrollbars.css';
 @import './components/context-menu.css';
 @import './components/typing-indicator.css';
 @import './components/webhook.css';
