@@ -20,7 +20,7 @@ const ChannelHandlers = {
             validateForm: () => $('channel-name').value.trim() !== '',
             operationName: 'channel creation',
             onSuccess: async (result) => {
-                window.ChannelUI.closeModal(channelManager);
+                window.modalManager.closeModal('channel-modal');
                 window.ChannelUI.clearForm();
                 window.ChannelUI.hideError();
                 await window.ChannelUI.loadChannels(guildId, channelManager);

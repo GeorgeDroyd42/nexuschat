@@ -1,0 +1,50 @@
+@layer components {
+  .guild-list {
+      @apply mt-5 px-2.5 overflow-y-auto;
+      max-height: calc(100vh - 200px);
+  }
+
+.guild-list .guild-pill {
+    @apply w-full max-w-[180px] my-2.5 mx-auto flex flex-col cursor-pointer;
+}
+
+.guild-chevron {
+    @apply ml-2 text-xs transition-transform duration-200 ease-linear select-none;
+    color: var(--text-secondary);
+}
+
+.guild-chevron.expanded {
+    transform: rotate(90deg);
+}
+
+.sidebar-separator {
+    @apply h-px opacity-50 mx-[15px] mt-20 mb-[15px];
+    background: var(--border-light);
+}
+
+.guild-list::-webkit-scrollbar {
+    @apply w-1.5;
+}
+
+.guild-list::-webkit-scrollbar-track {
+    @apply bg-transparent;
+}
+
+.guild-list::-webkit-scrollbar-thumb {
+    @apply rounded opacity-50;
+    background: var(--border-light);
+}
+
+.guild-list::-webkit-scrollbar-thumb:hover {
+    @apply opacity-80;
+}
+
+.guild-chevron {
+    @apply hidden md:hidden;
+  }
+@media (max-width: 768px) {
+    .guild-chevron {
+      @apply block;
+    }
+  }
+}

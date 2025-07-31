@@ -1,0 +1,24 @@
+@layer components {
+  .guild-icon {
+    @apply flex items-center justify-center;
+  }
+
+  .guild-initial {
+    @apply w-[60px] h-[60px] rounded-full text-white flex text-xl font-bold m-0 transition-transform duration-300 ease-in-out items-center justify-center;
+    background: var(--primary-color);
+  }
+
+  .guild-image {
+    @apply w-[60px] h-[60px] rounded-full object-cover;
+  }
+
+  .guild-pill.active .guild-initial,
+  .guild-pill.active .guild-image {
+    border: 3px solid var(--primary-color);
+    box-shadow: 0 0 0 2px var(--bg-gradient-start), 0 0 8px var(--primary-color);
+  }
+
+  .guild-pill.active .guild-initial {
+    background: var(--primary-light);
+  }
+}

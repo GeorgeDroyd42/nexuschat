@@ -82,5 +82,7 @@ closeModal(modalId) {
     }
 }
 
+
+
 window.modalManager = new ModalManager();
 

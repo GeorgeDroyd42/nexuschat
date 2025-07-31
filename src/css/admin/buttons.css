@@ -1,0 +1,25 @@
+@layer components {
+.pagination-controls {
+  @apply flex justify-center items-center flex-shrink-0 gap-1 md:gap-2 py-2;
+}
+
+.pagination-controls button {
+  @apply bg-blue-600 text-white border-none rounded-md cursor-pointer font-medium transition-all duration-200 px-2 py-1.5 text-xs min-w-[60px] md:px-5 md:py-3 md:text-sm md:min-w-[100px];
+}
+
+.pagination-controls button:hover:not(:disabled) {
+  @apply bg-blue-700 -translate-y-px;
+}
+
+.pagination-controls button:disabled {
+  @apply bg-slate-600 text-slate-400 cursor-not-allowed transform-none;
+}
+
+.action-btn {
+  @apply py-2 px-3 text-sm m-1 min-w-[70px] md:min-w-[80px] touch-manipulation;
+}
+
+.admin-header .btn {
+  @apply px-3 py-2 text-sm md:px-4 md:py-2 md:text-base;
+}
+}

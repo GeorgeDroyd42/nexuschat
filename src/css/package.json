@@ -7,8 +7,10 @@
     "build-css-prod": "tailwindcss -i ./input.css -o ../../public/css/tailwind.css --minify",
     "build-guild": "tailwindcss -i ./guild-input.css -o ../../public/css/guild-tailwind.css --watch",
     "build-guild-prod": "tailwindcss -i ./guild-input.css -o ../../public/css/guild-tailwind.css --minify",
-    "build-all": "npm run build-css-prod && npm run build-guild-prod",
-    "build-all-watch": "npm run build-css & npm run build-guild"
+    "build-admin": "tailwindcss -i ./admin-input.css -o ../../public/css/admin-bundle.css --watch",
+    "build-admin-prod": "tailwindcss -i ./admin-input.css -o ../../public/css/admin-bundle.css --minify",
+    "build-all": "npm run build-css-prod && npm run build-guild-prod && npm run build-admin-prod",
+    "build-all-watch": "npm run build-css & npm run build-guild & npm run build-admin"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",

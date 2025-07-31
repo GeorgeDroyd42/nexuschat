@@ -9,7 +9,6 @@
 @import './components/sidebar.css';
 @import './components/modal.css';
 @import './components/response.css';
-@import './components/admin.css';
 
 @tailwind base;
 @tailwind components;

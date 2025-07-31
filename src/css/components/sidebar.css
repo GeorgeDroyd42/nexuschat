@@ -79,16 +79,6 @@
   @apply flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap;
 }
 
-.channel-settings-btn {
-  @apply opacity-0 invisible transition-all duration-200 bg-transparent border-none text-slate-400 cursor-pointer rounded text-sm flex-shrink-0 flex items-center justify-center w-6 h-6 ml-2;
-}
-.channel-btn-small {
-  @apply bg-blue-600 text-white border-none rounded px-2 py-1 text-sm cursor-pointer transition-all duration-200;
-}
-
-.channels-header {
-  @apply header-base;
-}
 .user-section {
   @apply fixed bottom-0 left-0 w-full px-4 flex items-center border-t border-slate-600 bg-slate-800 z-[150];
   height: var(--bottom-section-height);
@@ -127,8 +117,6 @@
   @apply bg-blue-400 text-white;
 }
 
-.channel-item:hover .channel-settings-btn {
-  @apply opacity-100 visible;
-}
+
 
 }

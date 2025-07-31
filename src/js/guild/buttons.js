@@ -49,13 +49,22 @@ const GuildButtons = {
         
         if (settingsBtn) {
             settingsBtn.addEventListener('click', () => {
-                window.profileManager.openProfile(true);
+                window.modalManager.openModal('profile-modal');
+                
+                window.profileManager.loadUserData().then(userData => {
+                    if (window.profileMenuAPI && userData) {
+                        window.profileMenuAPI.renderButtons('profile-modal', userData);
+                    }
+                });
             });
         }
     
         if (closeProfileBtn) {
             closeProfileBtn.addEventListener('click', () => {
-                window.profileManager.closeProfile();
+                window.modalManager.closeModal('profile-modal');
+                
+                const userModal = document.querySelector('#user-modal');
+                if (userModal) userModal.classList.remove('active');
             });
         }
     },

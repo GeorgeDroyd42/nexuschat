@@ -1,0 +1,49 @@
+@layer components {
+.admin-header {
+  @apply bg-slate-800 rounded-md shadow-lg flex-shrink-0 px-3 py-3 mb-3 md:px-6 md:py-4 md:mb-6;
+}
+
+.admin-header h1 {
+  @apply mt-0 mb-1 text-slate-200 text-lg md:text-2xl;
+}
+
+.header-content {
+  @apply flex flex-col gap-3 md:flex-row md:justify-between md:items-center;
+}
+
+.header-left {
+  @apply flex-1;
+}
+
+.header-right {
+  @apply flex flex-col gap-2 md:flex-row md:items-center md:gap-4;
+}
+
+.dashboard-title {
+  @apply text-2xl font-bold text-slate-200 mb-2;
+}
+
+.dashboard-subtitle {
+  @apply text-slate-400 text-base mb-0;
+}
+
+.admin-info {
+  @apply flex flex-col items-end text-sm text-slate-400;
+}
+
+.admin-label {
+  @apply text-slate-500;
+}
+
+.admin-name {
+  @apply text-slate-200 font-medium;
+}
+
+.admin-header .admin-info {
+  @apply text-center md:text-right;
+}
+
+.admin-header .header-right {
+  @apply items-center md:items-end;
+}
+}

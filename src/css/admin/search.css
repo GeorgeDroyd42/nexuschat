@@ -1,0 +1,25 @@
+@layer components {
+.search-container {
+  @apply relative flex items-center max-w-[300px] w-full;
+}
+
+.search-input {
+  @apply w-full border border-slate-600 rounded-xl bg-slate-800 transition-all duration-300 shadow-inner text-sm md:text-base py-2 px-3 pl-8 md:py-3 md:px-4 md:pl-10;
+}
+
+.search-input:focus {
+  @apply outline-none border-blue-400 bg-white text-slate-900 ring-4 ring-blue-300/30 transition-colors;
+}
+
+.search-clear {
+  @apply absolute right-2 bg-transparent border-none text-lg text-slate-500 cursor-pointer p-1 rounded-full w-6 h-6 flex items-center justify-center opacity-0 transition-all duration-200;
+}
+
+.search-input:not(:placeholder-shown) + .search-clear {
+  @apply opacity-100;
+}
+
+.search-clear:hover {
+  @apply bg-slate-600 text-slate-200;
+}
+}

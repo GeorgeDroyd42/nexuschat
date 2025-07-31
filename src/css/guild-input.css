@@ -8,6 +8,11 @@
 @import './components/user-profile.css';
 @import './components/modal.css';
 @import './components/response.css';
+@import './guild/buttons.css';
+@import './guild/icons.css';
+@import './guild/headers.css';
+@import './guild/navigation.css';
+@import './guild/channels.css';
 @import './components/guild.css';
 @import './components/messages.css';
 @import './components/context-menu.css';

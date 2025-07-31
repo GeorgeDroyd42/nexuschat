@@ -1,0 +1,42 @@
+@layer components {
+.guild-channels {
+    @apply mt-4 px-[15px] w-full box-border;
+}
+
+.guild-channel-item {
+    @apply rounded-lg font-medium cursor-pointer transition-all duration-200 ease-linear whitespace-nowrap overflow-hidden text-ellipsis flex items-center;
+    padding: var(--padding-component);
+    margin: var(--margin-component) 0;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+    font-size: var(--font-size-component);
+}
+
+.guild-channel-item:before {
+    @apply mr-1.5 font-normal opacity-70 text-slate-500;
+}
+
+.guild-channel-item:hover {
+    @apply bg-blue-600 border-blue-400 text-white translate-x-0.5 shadow-lg;
+    box-shadow: 0 2px 8px rgba(107, 138, 219, 0.3);
+}
+
+.guild-channel-item:hover:before {
+    @apply text-white opacity-100;
+}
+
+@media (max-width: 768px) {
+    .add-channel-mobile {
+      @apply inline-block ml-2 px-2 py-1 rounded-md text-sm min-w-6 h-6 font-semibold 
+             bg-[#6b8adb] text-white border border-[#8aa3e8] 
+             hover:bg-[#8aa3e8] hover:shadow-[0_2px_12px_rgba(107,138,219,0.4)];
+    }
+  }
+
+  @media (min-width: 769px) {
+    .add-channel-mobile {
+      display: none !important;
+    }
+  }
+}

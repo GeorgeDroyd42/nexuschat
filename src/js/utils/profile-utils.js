@@ -55,22 +55,6 @@ imageElements.forEach(selector => {
     }
 });
 }
-
-openProfile(isSettingsMode = false) {
-    window.modalManager.openModal('profile-modal');
-    
-    this.loadUserData().then(userData => {
-        if (window.profileMenuAPI && userData) {
-            window.profileMenuAPI.renderButtons('profile-modal', userData);
-        }
-    });
-}
-closeProfile() {
-    window.modalManager.closeModal('profile-modal');
-    
-    const userModal = document.querySelector('#user-modal');
-    if (userModal) userModal.classList.remove('active');
-}
 }
 
 window.profileManager = new ProfileManager();

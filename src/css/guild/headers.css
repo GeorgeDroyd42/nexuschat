@@ -1,0 +1,18 @@
+@layer components {
+  .header-base {
+    @apply flex items-center justify-between h-[75px] p-4 border-b border-slate-600;
+    background: var(--bg-gradient-start);
+  }
+
+  .guild-header {
+    @apply flex items-center justify-center h-[60px];
+  }
+
+  .channels-header {
+    @apply header-base;
+  }
+
+  .members-header {
+    @apply header-base;
+  }
+}

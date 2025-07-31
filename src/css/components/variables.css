@@ -63,8 +63,3 @@
 --header-height: 75px;
 }
 
-/* ========== COMMON HEADER STYLING ========== */
-.header-base {
-  @apply flex items-center justify-between h-[75px] p-4 border-b border-slate-600;
-  background: var(--bg-gradient-start);
-}

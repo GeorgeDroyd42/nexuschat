@@ -9,12 +9,6 @@ const ChannelUI = {
         $('channel-description').value = '';
     },
 
-    closeModal(channelManager) {
-        if (channelManager.modal) {
-            window.modalManager.closeModal(channelManager.modal.id);
-        }
-    },
-
     hideError() {
         const errorContainer = $('channel-error-container');
         if (errorContainer) {
@@ -50,7 +44,7 @@ createChannelElement(channel, channelManager) {
         channelElement.setAttribute('data-channel-id', channel.channel_id);
         channelElement.innerHTML = `
             <span class="channel-name"></span>
-            <button class="settings-btn channel-settings-btn" title="Channel Settings" data-channel-id="${channel.channel_id}" style="display: none;">⚙️</button>
+            <button class="btn-small channel-settings-btn" title="Channel Settings" data-channel-id="${channel.channel_id}" style="display: none;">⚙️</button>
         `;
         const channelNameSpan = channelElement.querySelector('.channel-name');
         channelNameSpan.textContent = '#' + (window.truncateChannelName ? window.truncateChannelName(channel.name) : channel.name);

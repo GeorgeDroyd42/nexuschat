@@ -27,9 +27,7 @@
     border-left: 1px solid #475569;
   }
 
-  .members-header {
-    @apply header-base;
-  }
+  
 
   .close-members {
     @apply hidden;
