@@ -169,7 +169,16 @@ renderTextarea(panel, item) {
     
     group.appendChild(label);
     group.appendChild(textarea);
+    
     panel.appendChild(group);
+    
+    if (item.maxLength) {
+        setTimeout(() => CharCountAPI.add(item.id, {
+            maxLength: item.maxLength,
+            warningThreshold: item.warningThreshold || Math.floor(item.maxLength * 0.9),
+            errorThreshold: item.errorThreshold || Math.floor(item.maxLength * 0.975)
+        }), 100);
+    }
 }
 
     renderSeparator(panel) {
@@ -358,7 +367,7 @@ channelMenuAPI
 
 .addToTab('overview', { type: 'channel-info' })
 .addToTab('overview', { type: 'separator' })
-.addToTab('overview', { type: 'textarea', label: 'DESCRIPTION', id: 'channel-desc-edit', value: '', placeholder: 'Enter channel description...', rows: 3 })
+.addToTab('overview', { type: 'textarea', label: 'DESCRIPTION', id: 'channel-desc-edit', value: '', placeholder: 'Enter channel description...', rows: 3, maxLength: 500 })
 .addToTab('overview', { type: 'button', text: 'Save Changes', action: async () => {
     const newDesc = document.getElementById('channel-desc-edit').value;
     const currentName = channelMenuAPI.currentChannelName;

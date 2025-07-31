@@ -145,6 +145,11 @@ const GuildButtons = {
         this.setupSettings();
         this.setupCreateServer();
         this.setupMobileHandlers();
+        
+        CharCountAPI.addMultiple([
+            { id: 'server-description', options: { maxLength: 500, warningThreshold: 450, errorThreshold: 480 } },
+            { id: 'channel-description', options: { maxLength: 500, warningThreshold: 450, errorThreshold: 480 } }
+        ]);
     }
 };
 

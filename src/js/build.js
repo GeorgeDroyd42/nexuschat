@@ -6,6 +6,7 @@ const coreFiles = [
     'src/js/utils/api-utils.js',
     'src/js/utils/format-utils.js',
     'src/js/utils/ui-utils.js',
+    'src/js/utils/char-count-api.js',
     'src/js/utils/session-utils.js',
     'src/js/utils/component-utils.js',
     'src/js/utils/members-utils.js',

@@ -98,7 +98,7 @@ profileMenuAPI
     }
 }, color: '#4CAF50' })
 .addToTab('settings', { type: 'separator' })
-.addToTab('settings', { type: 'textarea', label: 'BIO', id: 'bio-edit', value: '', placeholder: 'Tell us about yourself... (max 2000 characters)', rows: 4, spellcheck: false })
+.addToTab('settings', { type: 'textarea', label: 'BIO', id: 'bio-edit', value: '', placeholder: 'Tell us about yourself... (max 2000 characters)', rows: 4, spellcheck: false, maxLength: 2000 })
 .addToTab('settings', { type: 'button', text: 'Save Bio', action: async () => {
     const newBio = document.getElementById('bio-edit').value.trim();
     

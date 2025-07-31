@@ -92,7 +92,6 @@
                         maxlength="2000"
                     ></textarea>
                     <div class="message-controls">
-                        <span id="char-count" class="char-count">0/2000</span>
                         <button id="send-message-btn" class="btn btn-sm" disabled>→</button>
                     </div>
                 </div>
@@ -145,6 +144,7 @@
     <div class="form-group">
         <label for="server-description">DESCRIPTION (Optional)</label>
         <textarea id="server-description" name="description" placeholder="What's your guild about?" rows="3"></textarea>
+        
     </div>
                 </div>
                 <div class="button-group">
@@ -175,6 +175,7 @@
                 <div class="form-group">
                     <label for="channel-description">DESCRIPTION (Optional)</label>
                     <textarea id="channel-description" name="description" placeholder="What's this channel about?" rows="3"></textarea>
+                    
                 </div>
                 <div class="button-group">
                     <button type="button" class="btn btn-secondary" id="cancel-channel-button">Cancel</button>
@@ -236,7 +237,7 @@
                     <img id="profile-preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cccccc'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E" alt="Profile Preview">
                     <div class="user-info">
                         <h4 id="modal-username">Username</h4>
-                        <p id="modal-bio" style="margin: 8px 0; color: #888; font-style: italic;"></p>
+                        <p id="modal-bio" style="margin: 8px 0; color: #888;"></p>
                         <p>Account created: <span id="user-created">Unknown</span></p>
                     </div>
                 </div>

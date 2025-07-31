@@ -213,6 +213,7 @@ function showConfirmationDialog(message, callback) {
 
 window.showConfirmationDialog = showConfirmationDialog;
 
+
 window.setActiveGuild = setActiveGuild;
 window.setActiveChannel = setActiveChannel;
 window.setActiveElement = setActiveElement;

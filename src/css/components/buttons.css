@@ -72,12 +72,12 @@
 
   /* === SPECIALIZED BUTTONS === */
 .user-profile-btn {
-    @apply relative min-w-[120px] min-h-[50px] max-h-[80px] flex-1 rounded-none flex items-center cursor-pointer z-[1000] hidden md:flex;
+    @apply relative min-w-[120px] min-h-[50px] max-h-[80px] w-64 md:w-80 lg:w-96 rounded-lg flex items-center cursor-pointer z-[1000] border border-slate-600;
     background: #1e293b;
     color: #e2e5eb;
     padding: 8px 12px;
-    border: none;
     transition: background 0.2s ease;
+    mask: radial-gradient(circle at calc(100% - 48px) 50%, transparent 20px, black 21px);
   }
 
 .user-profile-btn .member-name {
@@ -109,15 +109,19 @@
     background: linear-gradient(45deg, #252b39, #252b39);
   }
 
-  .settings-btn {
-    @apply w-8 h-8 rounded-full flex items-center justify-center cursor-pointer text-base ml-auto;
-    @apply bg-slate-700 border border-slate-600 text-slate-300 shadow-sm transition-all duration-200;
-    @apply hidden sm:flex;
-  }
+.settings-btn {
+  @apply w-10 h-10 rounded-full flex items-center justify-center cursor-pointer text-base;
+  @apply bg-slate-700 border border-slate-600 text-slate-300 shadow-sm transition-all duration-200;
+  @apply absolute z-[1001];
+  right: 44px;
+  top: 50%;
+  transform: translateY(-50%);
+}
 
-  .settings-btn:hover {
-    @apply shadow-md -translate-y-0.5 bg-slate-600;
-  }
+.settings-btn:hover {
+  @apply shadow-md bg-slate-600;
+  transform: translateY(calc(-50% - 1px));
+}
 
   .settings-btn:focus {
     @apply outline-none;

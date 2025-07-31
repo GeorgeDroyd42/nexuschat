@@ -54,25 +54,20 @@ const MessageUI = {
     setupMessageInput() {
         const messageInput = $('message-input');
         const sendBtn = $('send-message-btn');
-        const charCount = $('char-count');
 
         if (!messageInput) {
             console.error('message-input element not found!');
             return;
         }
 
+        CharCountAPI.add('message-input', {
+            maxLength: 2000,
+            warningThreshold: 1800,
+            errorThreshold: 1950
+        });
+                
         messageInput.addEventListener('input', (e) => {
             const length = e.target.value.length;
-            charCount.textContent = `${length}/2000`;
-            
-            if (length >= 1950) {
-                charCount.style.color = 'var(--error-color)';
-            } else if (length >= 1800) {
-                charCount.style.color = 'var(--warning-color)';
-            } else {
-                charCount.style.color = 'var(--text-muted)';
-            }
-            
             sendBtn.disabled = length === 0 || length > 2000;
             
             e.target.style.height = 'auto';

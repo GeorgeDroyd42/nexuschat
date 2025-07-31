@@ -24,8 +24,9 @@ const MessageHandlers = {
             
             messageInput.value = '';
             messageInput.style.height = 'auto';
-            $('char-count').textContent = '0/2000';
-            $('char-count').style.color = 'var(--text-muted)';
+            
+            CharCountAPI.update('message-input');
+            
             $('send-message-btn').disabled = true;
         } catch (error) {
             console.error('Failed to send message:', error);

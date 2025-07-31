@@ -23,13 +23,10 @@
 }
 
 #modal-bio {
-  @apply px-4 py-3 mx-2 text-sm text-gray-300 italic;
-  background-color: rgba(139, 163, 232, 0.15);
-  border: 1px solid rgba(139, 163, 232, 0.3);
-  border-radius: 16px;
-  min-height: 2rem;
-  display: flex;
-  align-items: center;
+  @apply px-4 py-3 mx-2 text-sm text-white bg-[#1a1f2c] border border-[#475569] rounded-md w-64 h-24 overflow-hidden break-words leading-5;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
 }
 
 #modal-bio:empty::before {
