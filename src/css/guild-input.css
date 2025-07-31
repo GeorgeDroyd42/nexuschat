@@ -13,7 +13,7 @@
 @import './guild/headers.css';
 @import './guild/navigation.css';
 @import './guild/channels.css';
-@import './components/guild.css';
+@import './guild/tooltips.css';
 @import './components/messages.css';
 @import './components/context-menu.css';
 @import './components/typing-indicator.css';
