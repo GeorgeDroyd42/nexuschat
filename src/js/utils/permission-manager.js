@@ -46,14 +46,14 @@ async updateGuildUI(guildId) {
     
     if (permissions.canCreateChannels) {
         const createBtn = document.getElementById('create-channel-btn');
-        if (createBtn) createBtn.style.display = 'block';
+        if (createBtn) createBtn.classList.remove('permission-hidden');
         const createMobileBtn = document.querySelector('.add-channel-mobile');
-        if (createMobileBtn) createMobileBtn.style.display = 'block';
+        if (createMobileBtn) createMobileBtn.classList.remove('permission-hidden');
     } else {
         const createBtn = document.getElementById('create-channel-btn');
-        if (createBtn) createBtn.style.display = 'none';
+        if (createBtn) createBtn.classList.add('permission-hidden');
         const createMobileBtn = document.querySelector('.add-channel-mobile');
-        if (createMobileBtn) createMobileBtn.style.display = 'none';
+        if (createMobileBtn) createMobileBtn.classList.add('permission-hidden');
     }
 }
 

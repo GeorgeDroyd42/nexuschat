@@ -1,0 +1,16 @@
+@layer components {
+  .channel-title {
+    @apply sticky top-0 z-10 flex flex-col justify-center items-start border-b border-slate-600 m-0 flex-shrink-0 shadow-lg;
+    background: var(--bg-white);
+    padding: 1rem;
+    min-height: var(--header-height);
+  }
+
+  .channel-description {
+    @apply text-xs font-normal opacity-80 m-0 w-full text-slate-500 leading-tight break-words block;
+  }
+    
+  .channel-content {
+    @apply flex flex-col h-full w-full;
+  } 
+}

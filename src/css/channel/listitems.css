@@ -25,16 +25,4 @@
   .guild-channel-item:hover:before {
     @apply text-white opacity-100;
   }
-
-  @media (max-width: 768px) {
-    .add-channel-mobile {
-      @apply inline-block ml-2 px-2 py-1 rounded-md text-sm min-w-6 h-6 font-semibold bg-[#6b8adb] text-white border border-[#8aa3e8] hover:bg-[#8aa3e8] hover:shadow-[0_2px_12px_rgba(107,138,219,0.4)];
-    }
-  }
-
-  @media (min-width: 769px) {
-    .add-channel-mobile {
-      display: none !important;
-    }
-  }
 }

@@ -1,0 +1,30 @@
+@layer components {
+.channels-sidebar {
+  @apply fixed left-[160px] top-0 w-[180px] h-screen bg-slate-800 border-r border-slate-600 z-30 overflow-y-auto shadow-sm hidden md:block;
+}
+
+.channel-item {
+  @apply p-2 rounded cursor-pointer transition-all duration-200 mb-1 w-full min-w-0 box-border flex items-center;
+}
+
+.channel-name {
+  @apply flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap;
+}
+
+.no-channels {
+  @apply p-4 text-slate-400 text-center text-sm;
+}
+
+.channels-list {
+  @apply p-2;
+}
+
+.channel-item.active {
+  @apply bg-blue-400 text-white;
+}
+
+.channel-item:hover {
+  @apply bg-blue-400 text-white;
+}
+
+}

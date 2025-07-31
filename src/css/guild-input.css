@@ -12,8 +12,12 @@
 @import './guild/icons.css';
 @import './guild/headers.css';
 @import './guild/navigation.css';
-@import './guild/channels.css';
 @import './guild/tooltips.css';
+@import './channel/sidebar.css';
+@import './channel/buttons.css';
+@import './channel/headers.css';
+@import './channel/listitems.css';
+@import './channel/layouts.css';
 @import './components/messages.css';
 @import './components/context-menu.css';
 @import './components/typing-indicator.css';

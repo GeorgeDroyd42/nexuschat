@@ -40,11 +40,6 @@
 }
 
 .guild-chevron {
-    @apply hidden md:hidden;
-  }
-@media (max-width: 768px) {
-    .guild-chevron {
-      @apply block;
-    }
+    @apply block md:hidden;
   }
 }

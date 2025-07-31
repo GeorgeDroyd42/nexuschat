@@ -1,0 +1,9 @@
+@layer components {
+  .channels-header {
+    @apply header-base;
+  }
+
+  .members-header {
+    @apply header-base;
+  }
+}

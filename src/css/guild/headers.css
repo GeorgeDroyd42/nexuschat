@@ -6,13 +6,5 @@
 
   .guild-header {
     @apply flex items-center justify-center h-[60px];
-  }
-
-  .channels-header {
-    @apply header-base;
-  }
-
-  .members-header {
-    @apply header-base;
-  }
+  } 
 }

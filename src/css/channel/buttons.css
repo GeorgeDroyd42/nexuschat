@@ -1,0 +1,17 @@
+@layer components {
+  .channel-settings-btn {
+    @apply opacity-0 invisible transition-all duration-200 bg-transparent border-none text-slate-400 cursor-pointer rounded text-sm flex-shrink-0 flex items-center justify-center w-6 h-6 ml-2;
+  }
+
+  .channel-btn-small {
+    @apply bg-blue-600 text-white border-none rounded px-2 py-1 text-sm cursor-pointer transition-all duration-200;
+  }
+
+  .channel-item:hover .channel-settings-btn {
+    @apply opacity-100 visible;
+  }
+
+  .add-channel-mobile {
+    @apply inline-block md:hidden ml-2 px-2 py-1 rounded-md text-sm min-w-6 h-6 font-semibold bg-[#6b8adb] text-white border border-[#8aa3e8] hover:bg-[#8aa3e8] hover:shadow-[0_2px_12px_rgba(107,138,219,0.4)];
+  }
+}

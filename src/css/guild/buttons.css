@@ -40,18 +40,4 @@
   .btn-small:hover {
     @apply shadow-md -translate-y-0.5 bg-slate-600;
   }
-
-  .channel-settings-btn {
-    @apply opacity-0 invisible transition-all duration-200 bg-transparent border-none text-slate-400 cursor-pointer rounded text-sm flex-shrink-0 flex items-center justify-center w-6 h-6 ml-2;
-  }
-
-  .channel-btn-small {
-    @apply bg-blue-600 text-white border-none rounded px-2 py-1 text-sm cursor-pointer transition-all duration-200;
-  }
-
-  .channel-item:hover .channel-settings-btn {
-    @apply opacity-100 visible;
-  }
-
-
 }
