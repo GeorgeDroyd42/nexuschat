@@ -5,7 +5,12 @@ class ProfileManager {
     }
 
     async loadUserData() {
-        if (this.isLoading) return this.currentUser;
+        if (this.isLoading) {
+            while (this.isLoading) {
+                await new Promise(resolve => setTimeout(resolve, 10));
+            }
+            return this.currentUser;
+        }
         
         this.isLoading = true;
         try {
