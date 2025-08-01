@@ -19,7 +19,7 @@
   @apply py-2 px-3 text-sm m-1 min-w-[70px] md:min-w-[80px] touch-manipulation;
 }
 
-.admin-header .btn {
+.admin-btn-compact {
   @apply px-3 py-2 text-sm md:px-4 md:py-2 md:text-base;
 }
 }

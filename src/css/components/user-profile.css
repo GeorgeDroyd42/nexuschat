@@ -33,4 +33,26 @@
   content: "No bio set";
   @apply text-gray-500;
 }
+
+.user-profile-btn {
+  @apply relative min-w-[120px] min-h-[50px] max-h-[80px] w-64 md:w-80 lg:w-96 rounded-lg flex items-center cursor-pointer z-[1000] border border-slate-600;
+  background: #1e293b;
+  color: #e2e5eb;
+  padding: 8px 12px;
+  transition: background 0.2s ease;
+  mask: radial-gradient(circle at calc(100% - 48px) 50%, transparent 20px, black 21px);
+}
+
+.user-profile-btn .member-name {
+  @apply text-sm font-medium text-gray-200 leading-tight flex-1 min-w-0 break-words;
+  line-height: 1.3;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.user-profile-btn:hover {
+  background: #363c4a;
+}
 }

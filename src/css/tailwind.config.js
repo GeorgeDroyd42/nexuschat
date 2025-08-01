@@ -6,7 +6,9 @@ content: [
   "./guild/**/*.css",
   "./channel/**/*.css",
   "./message/**/*.css",
-  "./admin/**/*.css"
+  "./core/**/*.css",
+  "./admin/**/*.css",
+  "./auth/**/*.css"
 ],
 
   theme: {},

@@ -46,21 +46,4 @@
 .webhook-create-section input {
   @apply w-full flex-1 px-2 md:px-3 py-1.5 md:py-2 border border-gray-600 rounded bg-gray-700 text-gray-200 text-xs md:text-base;
 }
-
-/* Custom scrollbar */
-.webhook-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.webhook-list::-webkit-scrollbar-track {
-  @apply bg-gray-800 rounded;
-}
-
-.webhook-list::-webkit-scrollbar-thumb {
-  @apply bg-gray-600 rounded;
-}
-
-.webhook-list::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-500;
-}
 }

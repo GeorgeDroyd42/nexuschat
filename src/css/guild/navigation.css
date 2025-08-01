@@ -22,23 +22,6 @@
     background: var(--border-light);
 }
 
-.guild-list::-webkit-scrollbar {
-    @apply w-1.5;
-}
-
-.guild-list::-webkit-scrollbar-track {
-    @apply bg-transparent;
-}
-
-.guild-list::-webkit-scrollbar-thumb {
-    @apply rounded opacity-50;
-    background: var(--border-light);
-}
-
-.guild-list::-webkit-scrollbar-thumb:hover {
-    @apply opacity-80;
-}
-
 .guild-chevron {
     @apply block md:hidden;
   }

@@ -9,8 +9,10 @@
     "build-guild-prod": "tailwindcss -i ./guild-input.css -o ../../public/css/guild-tailwind.css --minify",
     "build-admin": "tailwindcss -i ./admin-input.css -o ../../public/css/admin-bundle.css --watch",
     "build-admin-prod": "tailwindcss -i ./admin-input.css -o ../../public/css/admin-bundle.css --minify",
-    "build-all": "npm run build-css-prod && npm run build-guild-prod && npm run build-admin-prod",
-    "build-all-watch": "npm run build-css & npm run build-guild & npm run build-admin"
+    "build-auth": "tailwindcss -i ./auth-input.css -o ../../public/css/auth-bundle.css --watch",
+    "build-auth-prod": "tailwindcss -i ./auth-input.css -o ../../public/css/auth-bundle.css --minify",
+    "build-all": "npm run build-css-prod && npm run build-guild-prod && npm run build-admin-prod && npm run build-auth-prod",
+    "build-all-watch": "npm run build-css & npm run build-guild & npm run build-admin & npm run build-auth"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",

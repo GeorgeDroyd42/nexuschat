@@ -1,14 +1,14 @@
 @import './core/variables.css';
 @import './core/reset.css';
 @import './core/buttons.css';
-@import './components/profile.css';
-@import './components/forms.css';
-@import './components/hero.css';
-@import './components/errorpages.css';
 @import './components/sidebar.css';
-@import './components/modal.css';
-@import './components/response.css';
+@import './components/forms.css';
+@import './components/profile.css';
+@import './auth/forms.css';
+@import './auth/layout.css';
+@import './components/errorpages.css';
+@import './components/hero.css';
 
 @tailwind base;
 @tailwind components;
-@tailwind utilities;    
+@tailwind utilities;

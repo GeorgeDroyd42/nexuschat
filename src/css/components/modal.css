@@ -57,4 +57,12 @@
   #channel-modal .modal-body {
     @apply flex-1 overflow-y-auto pb-0 flex flex-col;
   }
+
+  .modal-close {
+    @apply bg-transparent border-0 cursor-pointer text-2xl text-slate-500 transition-colors duration-200;
+  }
+
+  .modal-close:hover {
+    @apply text-slate-300;
+  }
 }

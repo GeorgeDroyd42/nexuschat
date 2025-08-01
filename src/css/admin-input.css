@@ -1,4 +1,7 @@
+@import './core/reset.css';
+@import './core/scrollbars.css';
 @import './admin/userlist.css';
+@import './core/buttons.css';
 @import './admin/buttons.css';
 @import './admin/search.css';
 @import './admin/header.css';

@@ -34,20 +34,3 @@
   @apply md:hidden font-semibold text-slate-400 inline-block w-16 text-xs uppercase;
 }
 }
-
-.user-table-container::-webkit-scrollbar {
-  @apply w-1.5;
-}
-
-.user-table-container::-webkit-scrollbar-track {
-  @apply bg-transparent;
-}
-
-.user-table-container::-webkit-scrollbar-thumb {
-  @apply rounded opacity-50;
-  background: var(--border-light);
-}
-
-.user-table-container::-webkit-scrollbar-thumb:hover {
-  @apply opacity-80;
-}

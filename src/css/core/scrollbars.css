@@ -1,0 +1,63 @@
+@layer components {
+
+  /* === UNIFIED SCROLLBAR SYSTEM === */
+  .message-input-container::-webkit-scrollbar,
+  .message-input::-webkit-scrollbar,
+  .messages-list::-webkit-scrollbar,
+  .settings-content::-webkit-scrollbar,
+  .profile-menu-content::-webkit-scrollbar,
+  .members-sidebar::-webkit-scrollbar,
+  .user-table-container::-webkit-scrollbar,
+  .guild-list::-webkit-scrollbar,
+  .webhook-list::-webkit-scrollbar {
+    @apply w-1.5;
+  }
+
+  .message-input-container::-webkit-scrollbar-track,
+  .message-input::-webkit-scrollbar-track,
+  .messages-list::-webkit-scrollbar-track,
+  .settings-content::-webkit-scrollbar-track,
+  .profile-menu-content::-webkit-scrollbar-track,
+  .members-sidebar::-webkit-scrollbar-track,
+  .user-table-container::-webkit-scrollbar-track,
+  .guild-list::-webkit-scrollbar-track,
+  .webhook-list::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .message-input-container::-webkit-scrollbar-thumb,
+  .message-input::-webkit-scrollbar-thumb,
+  .messages-list::-webkit-scrollbar-thumb,
+  .settings-content::-webkit-scrollbar-thumb,
+  .profile-menu-content::-webkit-scrollbar-thumb,
+  .members-sidebar::-webkit-scrollbar-thumb,
+  .user-table-container::-webkit-scrollbar-thumb,
+  .guild-list::-webkit-scrollbar-thumb {
+    @apply bg-slate-600 rounded opacity-50;
+  }
+
+  .webhook-list::-webkit-scrollbar-thumb {
+    @apply bg-gray-600 rounded opacity-50;
+  }
+
+  .message-input-container::-webkit-scrollbar-thumb:hover,
+  .message-input::-webkit-scrollbar-thumb:hover,
+  .messages-list::-webkit-scrollbar-thumb:hover,
+  .settings-content::-webkit-scrollbar-thumb:hover,
+  .profile-menu-content::-webkit-scrollbar-thumb:hover,
+  .members-sidebar::-webkit-scrollbar-thumb:hover,
+  .user-table-container::-webkit-scrollbar-thumb:hover,
+  .guild-list::-webkit-scrollbar-thumb:hover,
+  .webhook-list::-webkit-scrollbar-thumb:hover {
+    @apply opacity-80;
+  }
+
+  /* Special case for messages using CSS variable */
+  .message-input-container::-webkit-scrollbar-thumb,
+  .message-input::-webkit-scrollbar-thumb,
+  .messages-list::-webkit-scrollbar-thumb {
+    background: var(--border-light);
+    @apply rounded opacity-50;
+  }
+
+}

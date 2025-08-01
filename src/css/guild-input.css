@@ -1,6 +1,7 @@
-@import './components/variables.css';
-@import './components/reset.css';
-@import './components/buttons.css';
+@import './core/variables.css';
+@import './core/reset.css';
+@import './core/scrollbars.css';
+@import './core/buttons.css';
 @import './components/forms.css';
 @import './components/layouts.css';
 @import './components/sidebar.css';
@@ -22,7 +23,6 @@
 @import './message/content.css';
 @import './message/embeds.css';
 @import './message/input.css';
-@import './message/scrollbars.css';
 @import './components/context-menu.css';
 @import './components/typing-indicator.css';
 @import './components/webhook.css';
