@@ -125,7 +125,7 @@ renderInfoSection(panel, fields, sectionClass = 'info-section') {
     const infoSection = this.createElement('div', sectionClass);
     
     fields.forEach(field => {
-        const group = this.createElement('div', 'form-group');
+        const group = this.createElement('div', 'central-form');
         const label = this.createElement('label', '', field.label);
         const display = this.createElement('div', `info-display ${field.class || ''}`, field.value);
         display.id = field.id;
@@ -156,7 +156,7 @@ renderChannelInfo(panel) {
     }
 
 renderTextarea(panel, item) {
-    const group = this.createElement('div', 'form-group');
+    const group = this.createElement('div', 'central-form');
     const label = this.createElement('label', '', item.label);
     const textarea = this.createElement('textarea', '', '');
     
@@ -192,7 +192,7 @@ renderWebhookList(panel) {
         const list = this.createElement('div', 'webhook-list');
         const createSection = this.createElement('div', 'webhook-create-section');
         
-        const profileGroup = this.createElement('div', 'form-group profile-picture-group');
+        const profileGroup = this.createElement('div', 'central-form profile-picture-group');
         const profileContainer = this.createElement('div', 'profile-preview-container');
         const profilePreview = this.createElement('img');
         profilePreview.id = 'webhook-profile-preview';
@@ -220,7 +220,7 @@ renderWebhookList(panel) {
         input.type = 'text';
         input.id = 'webhook-name';
         input.placeholder = 'Webhook name';
-        input.className = 'form-group';
+        input.className = 'central-form';
         
         const createBtn = this.createElement('button', 'btn btn-primary', 'Create Webhook');
         createBtn.onclick = () => this.createWebhook();

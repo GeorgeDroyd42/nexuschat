@@ -22,7 +22,7 @@ static renderItems(container, items, options = {}) {
                 container.appendChild(element);
             } else if (item.type === 'input' || item.type === 'textarea') {
                 const formGroup = document.createElement('div');
-                formGroup.className = `form-group ${itemClass}`;
+                formGroup.className = `central-form ${itemClass}`;
                 
                 const label = document.createElement('label');
                 label.textContent = item.label;

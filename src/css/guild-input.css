@@ -3,7 +3,7 @@
 @import './core/scrollbars.css';
 @import './core/avatars.css';
 @import './core/buttons.css';
-@import './components/forms.css';
+@import './core/forms.css';
 @import './components/layouts.css';
 @import './components/sidebar.css';
 @import './components/profile.css';

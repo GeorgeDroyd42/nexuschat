@@ -1,9 +1,9 @@
 @import './core/variables.css';
 @import './core/reset.css';
 @import './core/buttons.css';
+@import './core/forms.css';
 @import './core/avatars.css';
 @import './components/sidebar.css';
-@import './components/forms.css';
 @import './components/profile.css';
 @import './auth/forms.css';
 @import './auth/layout.css';
