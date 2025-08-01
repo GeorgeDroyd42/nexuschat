@@ -1,7 +1,4 @@
 @layer components {
-  .guild-icon {
-    @apply flex items-center justify-center;
-  }
 
   .guild-pill.active .avatar-circle,
   .guild-pill.active .avatar-circle-initial {

@@ -21,13 +21,15 @@ const AdminUI = {
             userTableBody.innerHTML = '';
             data.users.forEach(user => {
                 const isCurrentUser = currentUser && user.username === currentUser.username;
+                const showActionButtons = currentUser && !isCurrentUser;
+                
                 const adminButton = user.is_admin ? 
-                    (isCurrentUser ? '' : `<button class="action-btn btn-secondary demote-admin-btn" data-username="${user.username}">Revoke Admin</button>`) : 
-                    `<button class="action-btn btn-warning make-admin-btn" data-username="${user.username}">Make Admin</button>`;
+                    (showActionButtons ? `<button class="action-btn btn-secondary demote-admin-btn" data-username="${user.username}">Revoke Admin</button>` : '') : 
+                    (showActionButtons ? `<button class="action-btn btn-warning make-admin-btn" data-username="${user.username}">Make Admin</button>` : '');
                 
                 const banButton = user.is_banned ?
-                    `<button class="action-btn btn-success unban-btn" data-userid="${user.user_id}" data-username="${user.username}">Unban</button>` :
-                    (isCurrentUser ? '' : `<button class="action-btn btn-danger ban-btn" data-userid="${user.user_id}" data-username="${user.username}">Ban</button>`);
+                    (showActionButtons ? `<button class="action-btn btn-success unban-btn" data-userid="${user.user_id}" data-username="${user.username}">Unban</button>` : '') :
+                    (showActionButtons ? `<button class="action-btn btn-danger ban-btn" data-userid="${user.user_id}" data-username="${user.username}">Ban</button>` : '');
                     
             const userRow = document.createElement('tr');
                 

@@ -1,0 +1,47 @@
+@layer components {
+  /* ========== UNIFIED FORM SYSTEM ========== */
+  
+  /* Form groups and labels */
+  .form-group {
+    @apply mb-4 md:mb-5;
+  }
+
+  .form-group label {
+    @apply block mb-2 font-medium text-slate-400 text-sm md:text-base;
+  }
+
+  /* Base input styling */
+  .input-base {
+    @apply w-full border border-slate-600 rounded-xl bg-slate-800 text-slate-200 
+           shadow-inner transition-all duration-300 text-sm md:text-base outline-none;
+  }
+
+  /* Input focus states */
+  .input-base:focus {
+    @apply border-blue-400 bg-slate-900 ring-4 ring-blue-300/30;
+  }
+
+  /* Input sizes */
+  .input-sm {
+    @apply p-2 text-xs md:text-sm;
+  }
+
+  .input-md {
+    @apply p-3 md:p-4;
+  }
+
+  /* Textarea specific */
+  .textarea-base {
+    @apply input-base resize-none;
+  }
+
+  /* Combined classes for convenience */
+  .form-group input,
+  .form-group textarea {
+    @apply input-base input-md;
+  }
+
+  .form-group textarea {
+    @apply resize-none;
+  }
+}
