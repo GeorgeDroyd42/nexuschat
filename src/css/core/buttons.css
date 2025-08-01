@@ -2,7 +2,7 @@
   /* === BASE BUTTONS === */
   .btn {
     @apply inline-flex items-center justify-center border-0 rounded-lg cursor-pointer font-semibold text-center transition-all duration-300;
-    background: linear-gradient(45deg, #5a78c7, #6b8adb);
+    background: linear-gradient(45deg, var(--primary-dark), var(--primary-color));
     @apply text-white;
     padding: clamp(12px, 3vh, 16px) clamp(24px, 6vw, 32px);
     font-size: clamp(0.95rem, 2.5vw, 1.05rem);
@@ -10,7 +10,7 @@
   }
 
   .btn:hover {
-    background: linear-gradient(45deg, #6b8adb, #8aa3e8);
+    background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
     box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
     @apply -translate-y-0.5;
   }

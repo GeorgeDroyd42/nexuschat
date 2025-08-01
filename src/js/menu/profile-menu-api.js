@@ -41,7 +41,7 @@ renderProfileInfo(panel) {
     const avatarWrapper = AvatarUtils.createSecureAvatar(
         this.currentUser?.username || 'User',
         this.currentUser?.profile_picture,
-        'profile-picture-large'
+        'avatar-circle-lg'
     );
     
     profileContainer.appendChild(avatarWrapper);

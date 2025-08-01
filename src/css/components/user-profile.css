@@ -1,10 +1,4 @@
 @layer components {
-  
-
-.user-avatar {
-  @apply w-20 h-20 rounded-full object-cover;
-  border: 3px solid #8aa3e8;
-}
 
 .user-profile {
   @apply flex flex-col items-center justify-center text-center gap-4;

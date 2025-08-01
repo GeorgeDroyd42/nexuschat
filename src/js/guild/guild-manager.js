@@ -5,7 +5,7 @@ const GuildManager = {
         guildElement.setAttribute('data-guild-id', guild.guild_id);
         
         const guildIcon = guildElement.querySelector('.guild-icon');
-        const guildAvatar = window.AvatarUtils.createSecureAvatar(guild.name, guild.profile_picture_url, 'guild-image');
+        const guildAvatar = window.AvatarUtils.createSecureAvatar(guild.name, guild.profile_picture_url, 'avatar-circle');
         guildIcon.innerHTML = '';
         guildIcon.appendChild(guildAvatar);
         

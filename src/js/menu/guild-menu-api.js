@@ -132,7 +132,7 @@ class GuildMenuAPI extends ChannelMenuAPI {
         const guildAvatarWrapper = window.AvatarUtils.createSecureAvatar(
             this.currentGuild?.name || 'Guild',
             this.currentGuild?.profile_picture_url,
-            'profile-picture-large'
+            'avatar-circle-lg'
         );
         
         guildContainer.appendChild(guildAvatarWrapper);

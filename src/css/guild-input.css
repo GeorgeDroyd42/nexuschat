@@ -2,6 +2,7 @@
 @import './core/reset.css';
 @import './core/scrollbars.css';
 @import './core/buttons.css';
+@import './core/avatars.css';
 @import './components/forms.css';
 @import './components/layouts.css';
 @import './components/sidebar.css';

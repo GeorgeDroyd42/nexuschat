@@ -15,12 +15,12 @@
 
   a {
     @apply no-underline transition-all duration-300;
-    color: #5a78c7;
+    color: var(--primary-dark);
   }
 
   a:hover {
     @apply underline -translate-y-px;
-    color: #8aa3e8;
+    color: var(--primary-light);
   }
 
   a:focus {

@@ -19,10 +19,6 @@
   @apply flex items-center gap-2 md:gap-3 flex-1 min-w-0;
 }
 
-.webhook-avatar {
-  @apply w-7 h-7 md:w-10 md:h-10 rounded-full object-cover border-2 border-gray-600 flex-shrink-0;
-}
-
 .webhook-name {
   @apply text-gray-200 text-xs md:text-sm flex-1 break-words max-w-full;
 }

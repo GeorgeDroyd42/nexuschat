@@ -45,13 +45,15 @@ updateAllElements(userData) {
         });
     }
 
-const imageElements = ['#profile-preview', '#user-avatar'];
-imageElements.forEach(selector => {
+const imageElements = [
+    { selector: '#profile-preview', className: 'avatar-circle-lg' },
+    { selector: '#user-avatar', className: 'avatar-circle-sm' }
+];
+imageElements.forEach(({ selector, className }) => {
     const el = document.querySelector(selector);
     if (el && window.AvatarUtils) {
-        const newAvatar = window.AvatarUtils.createSecureAvatar(userData.username, userData.profile_picture);
-        const avatarContent = newAvatar.firstChild;
-        el.replaceWith(avatarContent);
+        const newAvatar = window.AvatarUtils.createSecureAvatar(userData.username, userData.profile_picture, className);
+        el.replaceWith(newAvatar);
     }
 });
 }

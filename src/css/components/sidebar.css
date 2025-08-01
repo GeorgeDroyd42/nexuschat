@@ -27,13 +27,7 @@
   .member-status.offline {
     @apply bg-slate-500;
   } 
-  .member-avatar {
-    @apply w-8 h-8 rounded-full object-cover mr-3;
-  }
-  .member-initial {
-    @apply w-8 h-8 rounded-full flex items-center justify-center mr-3 text-white text-sm font-bold;
-    background: var(--primary-color);
-  }
+
 .sidebar {
     @apply fixed left-0 top-0 w-[160px] bg-slate-800 border-r border-slate-600 z-[100] overflow-visible transition-all duration-300 flex flex-col;
     height: calc(100vh - var(--bottom-section-height));
